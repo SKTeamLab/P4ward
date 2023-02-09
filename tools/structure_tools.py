@@ -1,0 +1,93 @@
+from .script_tools import logit
+
+def load_biopython_objects(logger=None, protein=None, protein_ligand_chain=None, protein_ligand_resnum=None):
+    """
+    get a protein structure and the protein_ligand as biopython objects
+    returns (protein_obj, protein_ligand_obj)
+    """
+
+    from Bio.PDB.PDBParser import PDBParser as pdbp
+    parser = pdbp(PERMISSIVE=1)
+
+    # protein and its ligand
+
+    protein_obj = parser.get_structure('protein_obj', protein)
+
+    # find ligand, if required:
+    if protein_ligand_chain is not None and protein_ligand_resnum is not None:
+        for i in protein_obj[0][protein_ligand_chain].get_residues():
+            if i.get_id()[1] == protein_ligand_resnum:
+                protein_ligand_obj = i
+                logit.debug('found residue match')
+            else: continue
+        # make sure that the ligand was found:
+        try: 
+            protein_ligand_obj.get_id()[1] == protein_ligand_resnum
+        except:
+            err = f'protein ligand with resnum {protein_ligand_resnum} not found'
+            logit.error(err)
+            raise Exception(err)
+    # if no ligand resnum and chain specified, we get just the protein:
+    else:
+        logit.info('protein ligand not specified though chain and resnum, \
+            retrieving only the protein object')
+        protein_ligand_obj = None
+
+    # only return the structures that were asked for
+    if protein_ligand_obj is not None:
+        return(protein_obj, protein_ligand_obj)
+    else:
+        return(protein_obj)
+
+
+def structure_proximity(obj1, obj2, dist_cutoff=None):
+    """
+    Calculate the distance between the center of mass of two biopython objects
+    and check if it is <= than a distance cutoff, returns Bool.
+    """
+
+    import numpy as np
+
+    distance = np.linalg.norm(
+        obj1.center_of_mass() - obj2.center_of_mass()
+    )
+    print(obj1.center_of_mass())
+    print(obj2.center_of_mass())
+    return(distance, distance <= dist_cutoff)
+
+
+def get_rmsd(obj1, obj2, ca=False, logger=None):
+    """
+    Use biopython to get the atomic coordinates of both objects
+    and the pip tool rmsd.rmsd to calulate the rmsd. Returns rmsd value
+    """
+
+    #from Bio.PDB.PDBParser import PDBParser as pdbp
+    import numpy as np
+    import rmsd
+
+    objects = {
+        'obj1': obj1,
+        'obj2': obj2,
+        'obj1_coords':[],
+        'obj2_coords':[]
+    }
+    
+    for obj in ('obj1', 'obj2'):
+        for res in objects[obj].get_residues():
+            for atom in res.get_atoms():
+                if ca:
+                    if atom.get_name() == 'CA':
+                        objects[f'{obj}_coords'].append(atom.get_coord())
+                    else: continue
+                else:
+                    objects[f'{obj}_coords'].append(atom.get_coord())
+    
+    obj1_coords = np.asarray(objects['obj1_coords'])
+    obj2_coords = np.asarray(objects['obj2_coords'])
+
+    logit.debug(f'obj1 has {len(obj1_coords)} points')
+    logit.debug(f'obj2 has {len(obj2_coords)} points')
+
+    rmsd = rmsd.rmsd(obj1_coords, obj2_coords)
+    return(rmsd)
