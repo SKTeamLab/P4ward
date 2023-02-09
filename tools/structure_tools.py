@@ -1,28 +1,27 @@
 from .script_tools import logit
 
-def load_biopython_objects(logger=None, protein=None, protein_ligand_chain=None, protein_ligand_resnum=None):
+def load_biopython_structures(logger=None, protein=None, protein_ligand_chain=None, protein_ligand_resnum=None):
     """
     get a protein structure and the protein_ligand as biopython objects
-    returns (protein_obj, protein_ligand_obj)
+    returns (protein_struct, protein_ligand_struct)
     """
 
     from Bio.PDB.PDBParser import PDBParser as pdbp
     parser = pdbp(PERMISSIVE=1)
 
     # protein and its ligand
-
-    protein_obj = parser.get_structure('protein_obj', protein)
+    protein_struct = parser.get_structure('protein_struct', protein)
 
     # find ligand, if required:
     if protein_ligand_chain is not None and protein_ligand_resnum is not None:
-        for i in protein_obj[0][protein_ligand_chain].get_residues():
+        for i in protein_struct[0][protein_ligand_chain].get_residues():
             if i.get_id()[1] == protein_ligand_resnum:
-                protein_ligand_obj = i
+                protein_ligand_struct = i
                 logit.debug('found residue match')
             else: continue
         # make sure that the ligand was found:
         try: 
-            protein_ligand_obj.get_id()[1] == protein_ligand_resnum
+            protein_ligand_struct.get_id()[1] == protein_ligand_resnum
         except:
             err = f'protein ligand with resnum {protein_ligand_resnum} not found'
             logit.error(err)
@@ -31,13 +30,13 @@ def load_biopython_objects(logger=None, protein=None, protein_ligand_chain=None,
     else:
         logit.info('protein ligand not specified though chain and resnum, \
             retrieving only the protein object')
-        protein_ligand_obj = None
+        protein_ligand_struct = None
 
     # only return the structures that were asked for
-    if protein_ligand_obj is not None:
-        return(protein_obj, protein_ligand_obj)
+    if protein_ligand_struct is not None:
+        return(protein_struct, protein_ligand_struct)
     else:
-        return(protein_obj)
+        return(protein_struct)
 
 
 def structure_proximity(obj1, obj2, dist_cutoff=None):

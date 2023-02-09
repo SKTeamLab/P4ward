@@ -6,7 +6,7 @@ from ..definitions import CWD
 
 
 @decorators.user_choice
-def run(program_path, receptor, ligase, num_threads,
+def run(program_path, receptor_file, ligase_file, num_threads,
         num_predictions, num_predictions_per_rotation,
         logger=None):
     """
@@ -19,8 +19,8 @@ def run(program_path, receptor, ligase, num_threads,
 
     command = [
         program_path,
-        '-R', receptor,
-        '-L', ligase,
+        '-R', receptor_file,
+        '-L', ligase_file,
         '-N', num_predictions,
         '-t', num_predictions_per_rotation,
         '-o', 'megadock.out'
@@ -39,17 +39,19 @@ def filter_poses(receptor, receptor_ligand_resnum, ligase, ligase_ligand_resnum,
                  #output_file, TODO add output support
                  #output_filtered_file,
                  logger=None):
+    # TODO ver se aqui vai passar a receber o obj pronto do biopython
     """
     Use Biopython to filter the megadock poses which satisfy a
     distance cutoff for both binding sites
     """
+    from ..tools.structure_tools import load_biopython_structures
+    from ..tools.structure_tools import structure_proximity
+    from ..tools.classes import ProteinPose
+
     logit.info(f'Filtering megadock poses with cuttoff {dist_cutoff}')
 
-    from ..tools.structure_tools import load_biopython_objects
-    from ..tools.structure_tools import structure_proximity
-
     # first get receptor, and its ligand, they will not change
-    _, receptor_ligand_obj = load_biopython_objects(
+    _, receptor_ligand_struct = load_biopython_structures(
         protein=receptor,
         protein_ligand_chain=receptor_ligand_chain,
         protein_ligand_resnum=receptor_ligand_resnum,
@@ -60,7 +62,6 @@ def filter_poses(receptor, receptor_ligand_resnum, ligase, ligase_ligand_resnum,
     output_filtered_file = 'megadock-filtered.out'
     output = open(output_file, 'r')
     output_filtered = open(output_filtered_file, 'a+')
-
 
     # make a folder for the docked structures
     output_path = os.path.join(CWD, 'protein_docking')
@@ -85,7 +86,7 @@ def filter_poses(receptor, receptor_ligand_resnum, ligase, ligase_ligand_resnum,
             ]
             subprocess.run(decoygen_command, stdout=subprocess.DEVNULL)
 
-            _, ligase_ligand_obj = load_biopython_objects(
+            _, ligase_ligand_struct = load_biopython_structures(
                 protein=decoy_name,
                 protein_ligand_chain=ligase_ligand_chain,
                 protein_ligand_resnum=ligase_ligand_resnum,
@@ -93,8 +94,8 @@ def filter_poses(receptor, receptor_ligand_resnum, ligase, ligase_ligand_resnum,
             )
 
             distance, proximity = structure_proximity(
-                receptor_ligand_obj,
-                ligase_ligand_obj,
+                receptor_ligand_struct,
+                ligase_ligand_struct,
                 dist_cutoff=dist_cutoff
             )
 
@@ -124,21 +125,21 @@ def cluster(structure_list, clustering_cutoff, logger=None):
     cluster megadock docked poses using a user-specified cutoff
     """
 
-    from ..tools.structure_tools import load_biopython_objects
+    from ..tools.structure_tools import load_biopython_structures
     from sklearn.cluster import AgglomerativeClustering
     from ..tools.structure_tools import get_rmsd
     import numpy as np
     
     # get first ligase as reference:
-    reference_structure_obj = load_biopython_objects(protein=structure_list[0])
+    reference_structure_struct = load_biopython_structures(protein=structure_list[0])
 
     rmsd_values = {'name':[], 'rmsd':[]}
     # load receptor object
     for ligase in structure_list[10:]:
         ligase_name = os.path.basename(ligase)
-        ligase_obj = load_biopython_objects(protein=ligase, logger=logger)
+        ligase_struct = load_biopython_structures(protein=ligase, logger=logger)
 
-        rmsd = get_rmsd(reference_structure_obj, ligase_obj, ca=True)
+        rmsd = get_rmsd(reference_structure_struct, ligase_struct, ca=True)
         rmsd_values['name'].append(ligase_name)
         rmsd_values['rmsd'].append(rmsd)
     
