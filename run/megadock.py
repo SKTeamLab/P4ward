@@ -1,14 +1,12 @@
 import subprocess
 import os
 from ..tools import decorators
-from ..tools.script_tools import logit
+from ..tools.logger import logger
 from ..definitions import CWD
-
 
 @decorators.user_choice
 def run(program_path, receptor_file, ligase_file, num_threads,
-        num_predictions, num_predictions_per_rotation,
-        logger=None):
+        num_predictions, num_predictions_per_rotation):
     """
     Run the megadock main step
     """
@@ -26,37 +24,28 @@ def run(program_path, receptor_file, ligase_file, num_threads,
         '-o', 'megadock.out'
     ]
 
-    logit.info('Running megadock...')
+    logger.info('Running megadock...')
     with open('megadock_run.out', 'w+') as outfile: 
         subprocess.run(command, stdout=outfile)
-    logit.info('Done.')
+    logger.info('Done.')
 
 
 @decorators.user_choice
-def filter_poses(receptor, receptor_ligand_resnum, ligase, ligase_ligand_resnum,
-                 receptor_ligand_chain, ligase_ligand_chain,
+def filter_poses(receptor_obj, ligase_obj,
                  dist_cutoff,
                  #output_file, TODO add output support
                  #output_filtered_file,
-                 logger=None):
-    # TODO ver se aqui vai passar a receber o obj pronto do biopython
+                 ):
     """
     Use Biopython to filter the megadock poses which satisfy a
-    distance cutoff for both binding sites
+    distance cutoff for both binding sites. Takes the a Protein object
+    and handles the rest by accessing its attributes
     """
-    from ..tools.structure_tools import load_biopython_structures
+
     from ..tools.structure_tools import structure_proximity
     from ..tools.classes import ProteinPose
 
-    logit.info(f'Filtering megadock poses with cuttoff {dist_cutoff}')
-
-    # first get receptor, and its ligand, they will not change
-    _, receptor_ligand_struct = load_biopython_structures(
-        protein=receptor,
-        protein_ligand_chain=receptor_ligand_chain,
-        protein_ligand_resnum=receptor_ligand_resnum,
-        logger=logger
-    )
+    logger.info(f'Filtering megadock poses with cuttoff {dist_cutoff}')
 
     output_file = 'megadock.out'
     output_filtered_file = 'megadock-filtered.out'
@@ -67,8 +56,7 @@ def filter_poses(receptor, receptor_ligand_resnum, ligase, ligase_ligand_resnum,
     output_path = os.path.join(CWD, 'protein_docking')
     if os.path.isdir(output_path):
         mssg = f'Docked structure folder {output_path} exists.'
-        try: logit.info(mssg)
-        except: pass
+        logger.info(mssg)
     else:
         os.mkdir(output_path)
 
@@ -81,46 +69,42 @@ def filter_poses(receptor, receptor_ligand_resnum, ligase, ligase_ligand_resnum,
             decoy_name = os.path.join(output_path, f'decoy{count}.pdb')
             decoygen_command = [
                 'decoygen', decoy_name,
-                ligase,
+                ligase_obj.file,
                 output_file, str(count)
             ]
             subprocess.run(decoygen_command, stdout=subprocess.DEVNULL)
 
-            _, ligase_ligand_struct = load_biopython_structures(
-                protein=decoy_name,
-                protein_ligand_chain=ligase_ligand_chain,
-                protein_ligand_resnum=ligase_ligand_resnum,
-                logger=logger
-            )
+            ligase_pose_obj = ProteinPose(parent=ligase_obj, file=decoy_name)
 
             distance, proximity = structure_proximity(
-                receptor_ligand_struct,
-                ligase_ligand_struct,
+                receptor_obj.ligand_struct,
+                ligase_pose_obj.get_ligand_struct(),
                 dist_cutoff=dist_cutoff
             )
 
-            structures = []
             if proximity:
                 output_filtered.write(line)
-                structures.append(decoy_name)
-                logit.info(f'Saving filtered pose {count}, with distance of {distance} between ligands.')
+                ligase_pose_obj.active = True
+                logger.info(f'Saving filtered pose {count}, with distance of {distance} between ligands.')
             else:
-                logit.info(f'Ignoring pose {count}, with distance of {distance} between ligands.')
+                ligase_pose_obj.active = False
+                ligase_pose_obj.file = None
+                logger.info(f'Ignoring pose {count}, with distance of {distance} between ligands.')
                 os.remove(decoy_name)
 
         else: 
             output_filtered.write(line)
     
-    logit.info(f'Saved filtered megadock poses to file {output_filtered_file}')
+    logger.info(f'Saved filtered megadock poses to file {output_filtered_file}')
 
     output.close()
     output_filtered.close()
 
-    return(structures, output_filtered_file)
+    return(output_filtered_file)
 
 
 @decorators.user_choice
-def cluster(structure_list, clustering_cutoff, logger=None):
+def cluster(structure_list, clustering_cutoff):
     """
     cluster megadock docked poses using a user-specified cutoff
     """

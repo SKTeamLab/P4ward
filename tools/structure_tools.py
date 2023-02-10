@@ -1,6 +1,7 @@
-from .script_tools import logit
+from ..tools.logger import logger
 
-def load_biopython_structures(logger=None, protein=None, protein_ligand_chain=None, protein_ligand_resnum=None):
+
+def load_biopython_structures(protein=None, protein_ligand_chain=None, protein_ligand_resnum=None):
     """
     get a protein structure and the protein_ligand as biopython objects
     returns (protein_struct, protein_ligand_struct)
@@ -17,18 +18,18 @@ def load_biopython_structures(logger=None, protein=None, protein_ligand_chain=No
         for i in protein_struct[0][protein_ligand_chain].get_residues():
             if i.get_id()[1] == protein_ligand_resnum:
                 protein_ligand_struct = i
-                logit.debug('found residue match')
+                logger.debug('found residue match')
             else: continue
         # make sure that the ligand was found:
         try: 
             protein_ligand_struct.get_id()[1] == protein_ligand_resnum
         except:
             err = f'protein ligand with resnum {protein_ligand_resnum} not found'
-            logit.error(err)
+            logger.error(err)
             raise Exception(err)
     # if no ligand resnum and chain specified, we get just the protein:
     else:
-        logit.info('protein ligand not specified though chain and resnum, \
+        logger.info('protein ligand not specified though chain and resnum, \
             retrieving only the protein object')
         protein_ligand_struct = None
 
@@ -39,23 +40,23 @@ def load_biopython_structures(logger=None, protein=None, protein_ligand_chain=No
         return(protein_struct)
 
 
-def structure_proximity(obj1, obj2, dist_cutoff=None):
+def structure_proximity(struct1, struct2, dist_cutoff=None):
     """
-    Calculate the distance between the center of mass of two biopython objects
+    Calculate the distance between the center of mass of two biopython struct objects
     and check if it is <= than a distance cutoff, returns Bool.
     """
 
     import numpy as np
 
     distance = np.linalg.norm(
-        obj1.center_of_mass() - obj2.center_of_mass()
+        struct1.center_of_mass() - struct2.center_of_mass()
     )
-    print(obj1.center_of_mass())
-    print(obj2.center_of_mass())
+    print(struct1.center_of_mass())
+    print(struct2.center_of_mass())
     return(distance, distance <= dist_cutoff)
 
 
-def get_rmsd(obj1, obj2, ca=False, logger=None):
+def get_rmsd(obj1, obj2, ca=False):
     """
     Use biopython to get the atomic coordinates of both objects
     and the pip tool rmsd.rmsd to calulate the rmsd. Returns rmsd value
@@ -85,8 +86,8 @@ def get_rmsd(obj1, obj2, ca=False, logger=None):
     obj1_coords = np.asarray(objects['obj1_coords'])
     obj2_coords = np.asarray(objects['obj2_coords'])
 
-    logit.debug(f'obj1 has {len(obj1_coords)} points')
-    logit.debug(f'obj2 has {len(obj2_coords)} points')
+    logger.debug(f'obj1 has {len(obj1_coords)} points')
+    logger.debug(f'obj2 has {len(obj2_coords)} points')
 
     rmsd = rmsd.rmsd(obj1_coords, obj2_coords)
     return(rmsd)

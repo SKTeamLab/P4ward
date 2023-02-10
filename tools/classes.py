@@ -27,7 +27,7 @@ class Protein:
         for the protein. 
         """ 
         from .structure_tools import load_biopython_structures
-        protein_struct = load_biopython_structures(protein=self.protein_file)
+        protein_struct = load_biopython_structures(protein=self.file)
         return(protein_struct)
 
 
@@ -39,7 +39,7 @@ class Protein:
         from .structure_tools import load_biopython_structures
 
         _, ligand_struct = load_biopython_structures(
-            protein=self.protein_file,
+            protein=self.file,
             protein_ligand_chain=self.lig_chain,
             protein_ligand_resnum=self.lig_resnum
         )
@@ -62,7 +62,8 @@ class ProteinPose():
         self.file = file
         self.parent = parent
         self.lig_chain = parent.lig_chain
-        self.lig_resnum = parent.lig_resnum        
+        self.lig_resnum = parent.lig_resnum
+        self.active = None
 
         # add itself to the parent's conformations list
         if self not in parent.conformations:
@@ -75,7 +76,7 @@ class ProteinPose():
         for the protein. 
         """ 
         from .structure_tools import load_biopython_structures
-        protein_struct = load_biopython_structures(protein=self.protein_file)
+        protein_struct = load_biopython_structures(protein=self.file)
         return(protein_struct)
 
 
@@ -87,7 +88,7 @@ class ProteinPose():
         from .structure_tools import load_biopython_structures
 
         _, ligand_struct = load_biopython_structures(
-            protein=self.protein_file,
+            protein=self.file,
             protein_ligand_chain=self.lig_chain,
             protein_ligand_resnum=self.lig_resnum
         )
