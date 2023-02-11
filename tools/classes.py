@@ -5,14 +5,14 @@ class Protein:
     Represent the main receptor target protein or the main ligase protein.
     """
     
-    def __init__(self, type, file, lig_chain, lig_resnum) -> None:
+    def __init__(self, ptn_type, file, lig_chain, lig_resnum) -> None:
         """
         Starts off with the only 3 definitions required:
         pdb file with ligand bound, ligand chain ID, and ligand resnum
         automatically loads the biopython object for the protein
         """
 
-        self.type = type #type is either 'receptor' or 'ligase'
+        self.type = ptn_type #type is either 'receptor' or 'ligase'
         self.file = file
         self.lig_chain = lig_chain
         self.lig_resnum = lig_resnum
@@ -44,6 +44,14 @@ class Protein:
             protein_ligand_resnum=self.lig_resnum
         )
         return(ligand_struct)
+    
+
+    def active_confs(self):
+        """
+        Out of all the poses, return only the active ones
+        """
+        active_confs = [pose for pose in self.conformations if pose.active]
+        return(active_confs)
 
 
 

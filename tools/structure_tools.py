@@ -29,8 +29,6 @@ def load_biopython_structures(protein=None, protein_ligand_chain=None, protein_l
             raise Exception(err)
     # if no ligand resnum and chain specified, we get just the protein:
     else:
-        logger.info('protein ligand not specified though chain and resnum, \
-            retrieving only the protein object')
         protein_ligand_struct = None
 
     # only return the structures that were asked for

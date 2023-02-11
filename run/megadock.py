@@ -5,8 +5,8 @@ from ..tools.logger import logger
 from ..definitions import CWD
 
 @decorators.user_choice
-def run(program_path, receptor_file, ligase_file, num_threads,
-        num_predictions, num_predictions_per_rotation):
+def run(program_path, receptor_file, ligase_file, num_threads, output_file,
+        num_predictions, num_predictions_per_rotation, log_file):
     """
     Run the megadock main step
     """
@@ -21,21 +21,18 @@ def run(program_path, receptor_file, ligase_file, num_threads,
         '-L', ligase_file,
         '-N', num_predictions,
         '-t', num_predictions_per_rotation,
-        '-o', 'megadock.out'
+        '-o', output_file
     ]
 
     logger.info('Running megadock...')
-    with open('megadock_run.out', 'w+') as outfile: 
-        subprocess.run(command, stdout=outfile)
+    with open(log_file, 'w+') as log_file_: 
+        subprocess.run(command, stdout=log_file_)
     logger.info('Done.')
 
 
 @decorators.user_choice
-def filter_poses(receptor_obj, ligase_obj,
-                 dist_cutoff,
-                 #output_file, TODO add output support
-                 #output_filtered_file,
-                 ):
+def filter_poses(receptor_obj, ligase_obj, dist_cutoff,
+                 output_file, output_filtered_file):
     """
     Use Biopython to filter the megadock poses which satisfy a
     distance cutoff for both binding sites. Takes the a Protein object
@@ -47,8 +44,6 @@ def filter_poses(receptor_obj, ligase_obj,
 
     logger.info(f'Filtering megadock poses with cuttoff {dist_cutoff}')
 
-    output_file = 'megadock.out'
-    output_filtered_file = 'megadock-filtered.out'
     output = open(output_file, 'r')
     output_filtered = open(output_filtered_file, 'a+')
 
@@ -100,34 +95,34 @@ def filter_poses(receptor_obj, ligase_obj,
     output.close()
     output_filtered.close()
 
-    return(output_filtered_file)
-
 
 @decorators.user_choice
-def cluster(structure_list, clustering_cutoff):
+def cluster(pose_objects, clustering_cutoff):
     """
-    cluster megadock docked poses using a user-specified cutoff
+    cluster megadock docked poses using a user-specified RMSD cutoff
+    RMSD is calculated using the alpha carbons.
     """
+    # NOTE list is the active ligase.conformations
 
-    from ..tools.structure_tools import load_biopython_structures
     from sklearn.cluster import AgglomerativeClustering
     from ..tools.structure_tools import get_rmsd
     import numpy as np
     
-    # get first ligase as reference:
-    reference_structure_struct = load_biopython_structures(protein=structure_list[0])
+    # get first pose as reference:
+    reference_obj = pose_objects[0]
+    reference_obj_struct = reference_obj.get_protein_struct()
 
-    rmsd_values = {'name':[], 'rmsd':[]}
     # load receptor object
-    for ligase in structure_list[10:]:
-        ligase_name = os.path.basename(ligase)
-        ligase_struct = load_biopython_structures(protein=ligase, logger=logger)
+    for pose_obj in pose_objects:
+        pose_obj_name = os.path.basename(pose_obj.file)
+        pose_obj_struct = pose_obj.get_protein_struct()
 
-        rmsd = get_rmsd(reference_structure_struct, ligase_struct, ca=True)
-        rmsd_values['name'].append(ligase_name)
-        rmsd_values['rmsd'].append(rmsd)
+        rmsd = get_rmsd(reference_obj_struct, pose_obj_struct, ca=True)
+        pose_obj.rmsd = rmsd
+        pose_obj.rmsd_reference = reference_obj
     
-    rmsd_points = np.asarray(rmsd_values['rmsd']).reshape(-1, 1)
+    rmsd_list = [i.rmsd for i in pose_objects]
+    rmsd_points = np.asarray(rmsd_list).reshape(-1, 1)
 
     clustering = AgglomerativeClustering(
         n_clusters=None,
@@ -135,7 +130,8 @@ def cluster(structure_list, clustering_cutoff):
         distance_threshold=clustering_cutoff
     ).fit(rmsd_points)
 
-    return(list(clustering.labels_))
+    for i in range(len(pose_objects)):
+        pose_objects[i].cluster = clustering.labels_[i]
 
-
+    return(clustering)
 

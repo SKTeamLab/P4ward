@@ -1,7 +1,7 @@
 import logging
 import os
 import datetime as dt
-from ..definitions import PIPELINE_NAME
+from ..definitions import PIPELINE_NAME, CWD
 
 def set_logging(PIPELINE_NAME):
     """
@@ -10,7 +10,7 @@ def set_logging(PIPELINE_NAME):
 
     now = dt.datetime.now()
 
-    logfile_name = os.path.join(os.getcwd(), PIPELINE_NAME + '.log')
+    logfile_name = os.path.join(CWD, PIPELINE_NAME + '.log')
     with open(logfile_name, 'w+') as logfile:
         logfile.write(
             f"""

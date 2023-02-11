@@ -9,7 +9,7 @@ def user_choice(func):
     """
 
     @functools.wraps(func)
-    def wrapper(*args, choice=False, **kwargs):
+    def wrapper(*args, choice=True, **kwargs):
         if choice:
             return func(*args, **kwargs)
         else:
