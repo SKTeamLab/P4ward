@@ -5,7 +5,7 @@ from ..tools.logger import logger
 from ..definitions import CWD
 
 @decorators.user_choice
-def run(program_path, receptor_file, ligase_file, num_threads, output_file,
+def run(program_path, receptor_file, ligase_file, num_threads, run_docking_output_file,
         num_predictions, num_predictions_per_rotation, log_file):
     """
     Run the megadock main step
@@ -21,7 +21,7 @@ def run(program_path, receptor_file, ligase_file, num_threads, output_file,
         '-L', ligase_file,
         '-N', num_predictions,
         '-t', num_predictions_per_rotation,
-        '-o', output_file
+        '-o', run_docking_output_file
     ]
 
     logger.info('Running megadock...')
@@ -30,9 +30,74 @@ def run(program_path, receptor_file, ligase_file, num_threads, output_file,
     logger.info('Done.')
 
 
+@decorators.user_choice # choice is True if run megadock is true
+def capture_scores(run_docking_output_file, ligase_obj):
+    """
+    Grab all original megadock scores from run_docking_output_file and
+    generate the ProteinPose objs from the docking run
+    """
+    from ..tools.classes import ProteinPose
+    logger.info(f'Capturing megadock scores from {run_docking_output_file}')
+
+    # start parsing the output
+    output = open(run_docking_output_file, 'r')
+    count = 0
+    for line in output:
+        if len(line.split('\t')) == 7:
+
+            count += 1
+            score = float(line.split('\t')[-1])
+            pose_obj = ProteinPose(parent=ligase_obj, pose_number=int(count))
+            pose_obj.megadock_score = score
+            pose_obj.active = True
+    output.close()
+
+
+@decorators.user_choice
+def generate_poses(run_docking_output_file, ligase_obj, docked_poses_folder):
+    """
+    If user chooses to generate all poses from megadock, independent of 
+    filtering, this function does it and adds the file attribute.
+    """
+    logger.info(
+        f'Generating all poses from output file {run_docking_output_file} '+
+        f'and saving them in the folder {docked_poses_folder}.'
+    )
+
+    if os.path.isdir(docked_poses_folder):
+        logger.info(f'Docked structure folder {docked_poses_folder} exists.')
+    else:
+        os.mkdir(docked_poses_folder)
+        logger.info(f'Created {docked_poses_folder}.')
+
+    output = open(run_docking_output_file, 'r')
+    count = 0
+    for line in output:
+        if len(line.split('\t')) == 7:
+
+            count += 1
+            pose_obj = ligase_obj.conformations[count - 1]
+
+            decoy_name = os.path.join(docked_poses_folder, f'decoy{count}.pdb')
+            decoygen_command = [
+                'decoygen', decoy_name,
+                ligase_obj.file,
+                run_docking_output_file, str(count)
+            ]
+            subprocess.run(decoygen_command, stdout=subprocess.DEVNULL)
+            pose_obj.file = decoy_name
+
+            # check if file was created successfully
+            if not os.path.isfile(pose_obj.file):
+                raise Exception("Could not generate pose successfully")
+
+    output.close()
+
+
 @decorators.user_choice
 def filter_poses(receptor_obj, ligase_obj, dist_cutoff,
-                 output_file, output_filtered_file):
+                 output_file, output_filtered_file, docked_poses_folder,
+                 generate_all_poses=False):
     """
     Use Biopython to filter the megadock poses which satisfy a
     distance cutoff for both binding sites. Takes the a Protein object
@@ -48,28 +113,28 @@ def filter_poses(receptor_obj, ligase_obj, dist_cutoff,
     output_filtered = open(output_filtered_file, 'a+')
 
     # make a folder for the docked structures
-    output_path = os.path.join(CWD, 'protein_docking')
-    if os.path.isdir(output_path):
-        mssg = f'Docked structure folder {output_path} exists.'
-        logger.info(mssg)
+    if os.path.isdir(docked_poses_folder):
+        logger.info(f'Docked structure folder {docked_poses_folder} exists.')
     else:
-        os.mkdir(output_path)
+        os.mkdir(docked_poses_folder)
 
     count = 0
     for line in output:
 
         if len(line.split('\t')) == 7:
             count += 1
+            ligase_pose_obj = ligase_obj.conformations[count - 1]
 
-            decoy_name = os.path.join(output_path, f'decoy{count}.pdb')
-            decoygen_command = [
-                'decoygen', decoy_name,
-                ligase_obj.file,
-                output_file, str(count)
-            ]
-            subprocess.run(decoygen_command, stdout=subprocess.DEVNULL)
-
-            ligase_pose_obj = ProteinPose(parent=ligase_obj, file=decoy_name)
+            # we will only generate the poses that were not already generated before
+            if ligase_pose_obj.file is None or not os.path.isfile(ligase_pose_obj.file):
+                decoy_name = os.path.join(docked_poses_folder, f'decoy{count}.pdb')
+                decoygen_command = [
+                    'decoygen', decoy_name,
+                    ligase_obj.file,
+                    output_file, str(count)
+                ]
+                subprocess.run(decoygen_command, stdout=subprocess.DEVNULL)
+                ligase_pose_obj.file = decoy_name
 
             distance, proximity = structure_proximity(
                 receptor_obj.ligand_struct,
@@ -80,12 +145,13 @@ def filter_poses(receptor_obj, ligase_obj, dist_cutoff,
             if proximity:
                 output_filtered.write(line)
                 ligase_pose_obj.active = True
-                logger.info(f'Saving filtered pose {count}, with distance of {distance} between ligands.')
+                logger.info(f'Activating filtered pose {count}, with distance of {distance} between ligands.')
             else:
                 ligase_pose_obj.active = False
-                ligase_pose_obj.file = None
-                logger.info(f'Ignoring pose {count}, with distance of {distance} between ligands.')
-                os.remove(decoy_name)
+                logger.info(f'Deactivating pose {count}, with distance of {distance} between ligands.')
+                if not generate_all_poses:
+                    ligase_pose_obj.file = None
+                    os.remove(decoy_name)
 
         else: 
             output_filtered.write(line)

@@ -61,17 +61,34 @@ class ProteinPose():
     Represent a (docked) pose of the ligase protein.
     """
 
-    def __init__(self, parent, file) -> None:
+    """
+    attributes added/modified by the functions:
+      megadock.capture_scores()
+          - self.megadock_score
+          - self.active = True
+      megadock.generate_poses()
+          - self.file
+      megadock.filter_poses()
+          - self.active = [True | False]
+          - self.file
+      megadock.cluster()
+          - self.rmsd
+          - self.rmsd_reference
+          - self.cluster
+    """
+
+    def __init__(self, parent, pose_number) -> None:
         """
         requires its file and parent object. automatically generates
         the rest from the main ligase that is its "parent"
         """
 
-        self.file = file
         self.parent = parent
+        self.pose_number = pose_number
         self.lig_chain = parent.lig_chain
         self.lig_resnum = parent.lig_resnum
         self.active = None
+        self.file = None
 
         # add itself to the parent's conformations list
         if self not in parent.conformations:
