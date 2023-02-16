@@ -2,6 +2,27 @@ import pickle
 import os
 from .logger import logger
 from . import classes
+from ..definitions import TRACKER_FILE, CPT_FILE
+
+
+def load_tracker(overwrite):
+    """
+    create/retrieve the dictionary that tracks which function was run
+    and dump it to the pickle object. Should be run only once in the
+    beginning of the run.
+    """
+    if not overwrite and os.path.isfile(TRACKER_FILE):
+
+        logger.info('Retrieving previous run steps.')
+        with open(TRACKER_FILE, 'rb') as pic:
+            run_tracker = pickle.load(pic)
+    else:
+        logger.info('Not retrieving previous run steps.')
+        run_tracker = []
+    
+    with open(TRACKER_FILE, 'wb+') as pic:
+        pickle.dump(run_tracker, pic)
+
 
 def load_protein_objects(pickle_file, conf, overwrite=False):
     """
@@ -31,12 +52,12 @@ def load_protein_objects(pickle_file, conf, overwrite=False):
     return(receptor_obj, ligase_obj)
 
 
-def save_protein_objects(receptor_obj, ligase_obj, pickle_file):
+def save_protein_objects(receptor_obj, ligase_obj):
     """
     Save receptor and ligase objects into pickle file
     """
 
-    with open(pickle_file, 'wb+') as pic:
+    with open(CPT_FILE, 'wb+') as pic:
         pickle.dump((receptor_obj, ligase_obj), pic)
     
     logger.info('Saved information from this run.')

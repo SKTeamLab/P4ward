@@ -4,9 +4,11 @@ from ..tools import decorators
 from ..tools.logger import logger
 from ..definitions import CWD
 
+
 @decorators.user_choice
-def run(program_path, receptor_file, ligase_file, num_threads, run_docking_output_file,
-        num_predictions, num_predictions_per_rotation, log_file):
+@decorators.track_run
+def run_docking(program_path, receptor_file, ligase_file, num_threads, run_docking_output_file,
+                num_predictions, num_predictions_per_rotation, log_file):
     """
     Run the megadock main step
     """
@@ -54,6 +56,7 @@ def capture_scores(run_docking_output_file, ligase_obj):
 
 
 @decorators.user_choice
+@decorators.track_run
 def generate_poses(run_docking_output_file, ligase_obj, docked_poses_folder):
     """
     If user chooses to generate all poses from megadock, independent of 
@@ -95,6 +98,7 @@ def generate_poses(run_docking_output_file, ligase_obj, docked_poses_folder):
 
 
 @decorators.user_choice
+@decorators.track_run
 def filter_poses(receptor_obj, ligase_obj, dist_cutoff,
                  output_file, output_filtered_file, docked_poses_folder,
                  generate_all_poses=False):
@@ -105,7 +109,6 @@ def filter_poses(receptor_obj, ligase_obj, dist_cutoff,
     """
 
     from ..tools.structure_tools import structure_proximity
-    from ..tools.classes import ProteinPose
 
     logger.info(f'Filtering megadock poses with cuttoff {dist_cutoff}')
 
@@ -163,6 +166,7 @@ def filter_poses(receptor_obj, ligase_obj, dist_cutoff,
 
 
 @decorators.user_choice
+@decorators.track_run
 def cluster(pose_objects, clustering_cutoff):
     """
     cluster megadock docked poses using a user-specified RMSD cutoff

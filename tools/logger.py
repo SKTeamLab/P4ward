@@ -3,7 +3,8 @@ import os
 import datetime as dt
 from ..definitions import PIPELINE_NAME, CWD
 
-def set_logging(PIPELINE_NAME):
+
+def set_logging():
     """
     Configure the logger for the whole pipeline
     """
@@ -40,8 +41,9 @@ Log created at {now.strftime("%Y-%m-%d, %H:%M:%S")}
     logger.addHandler(file_handler)
 
     return(logger)
+  
 
+logger = set_logging()
 
-logger = set_logging(PIPELINE_NAME)
   
 

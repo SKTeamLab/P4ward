@@ -3,16 +3,17 @@ if __name__ == '__main__':
 
     # prepare internals:
     from .config import config
-    from .tools.logger import logger
-    from .tools.script_tools import load_protein_objects, save_protein_objects
-    from .definitions import ROOT_DIR, PICKLE_FILE
+    from .tools import run_tracker
+    from .definitions import ROOT_DIR, CPT_FILE
 
     args = config.arg_parser(None)
     conf = config.make_config(args.config_file, ROOT_DIR)
+    # load run tracker from previous run
+    tracker = run_tracker.load_tracker(overwrite=conf.getboolean('general', 'overwrite'))
 
     # load pickle from previous run
-    receptor, ligase = load_protein_objects(
-        pickle_file=PICKLE_FILE,
+    receptor, ligase = run_tracker.load_protein_objects(
+        pickle_file=CPT_FILE,
         conf=conf,
         overwrite=conf.getboolean('general', 'overwrite')
     )
@@ -30,7 +31,7 @@ if __name__ == '__main__':
     # run megadock
     from .run import megadock
 
-    megadock.run(
+    megadock.run_docking(
         program_path=conf.get('megadock', 'program_path'),
         receptor_file=receptor.file,
         ligase_file=ligase.file,
@@ -47,6 +48,9 @@ if __name__ == '__main__':
         run_docking_output_file=conf.get('megadock', 'run_docking_output_file'),
         choice=conf.getboolean('megadock', 'run_docking') # runs if docking is run
     )
+
+    # CHECKPOINT!
+    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase)
 
     megadock.generate_poses(
         ligase_obj=ligase,
@@ -66,6 +70,9 @@ if __name__ == '__main__':
         choice=conf.getboolean('megadock', 'filter_poses')
     )
 
+    # CHECKPOINT!
+    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase)
+
     megadock.cluster(
         pose_objects=ligase.active_confs(), # structures are now the saved confs attr
         clustering_cutoff=conf.getfloat('megadock','clustering_cutoff'),
@@ -76,8 +83,4 @@ if __name__ == '__main__':
     #~~~~~~~~~~~~~ end session ~~~~~~~~~~~~~#
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
-    save_protein_objects(
-        receptor_obj=receptor,
-        ligase_obj=ligase,
-        pickle_file=PICKLE_FILE
-    )
+    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase)
