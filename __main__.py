@@ -59,6 +59,14 @@ if __name__ == '__main__':
         choice=conf.getboolean('megadock', 'generate_all_poses'),
     )
 
+    megadock.zrank_rescore(
+        ligase_obj=ligase,
+        receptor_obj=receptor,
+        zrank_path=conf.get('megadock', 'zrank_path'),
+        run_docking_output_file=conf.get('megadock', 'run_docking_output_file'),
+        choice=conf.getboolean('megadock', 'zrank_rescore'),
+    )
+
     megadock.filter_poses(
         receptor_obj=receptor,
         ligase_obj=ligase,
@@ -82,5 +90,7 @@ if __name__ == '__main__':
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     #~~~~~~~~~~~~~ end session ~~~~~~~~~~~~~#
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    from .analyse.make_summary import summary_csv
 
     run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase)
+    summary_csv(ligase.active_confs())

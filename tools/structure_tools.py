@@ -1,5 +1,6 @@
 from ..tools.logger import logger
-
+import subprocess
+import os
 
 def load_biopython_structures(protein=None, protein_ligand_chain=None, protein_ligand_resnum=None):
     """
@@ -18,7 +19,6 @@ def load_biopython_structures(protein=None, protein_ligand_chain=None, protein_l
         for i in protein_struct[0][protein_ligand_chain].get_residues():
             if i.get_id()[1] == protein_ligand_resnum:
                 protein_ligand_struct = i
-                logger.debug('found residue match')
             else: continue
         # make sure that the ligand was found:
         try: 
@@ -84,8 +84,33 @@ def get_rmsd(obj1, obj2, ca=False):
     obj1_coords = np.asarray(objects['obj1_coords'])
     obj2_coords = np.asarray(objects['obj2_coords'])
 
-    logger.debug(f'obj1 has {len(obj1_coords)} points')
-    logger.debug(f'obj2 has {len(obj2_coords)} points')
-
     rmsd = rmsd.rmsd(obj1_coords, obj2_coords)
     return(rmsd)
+
+
+def reduce(protein_obj_list, protein_only=False):
+    """
+    use chimerax to add hydrogens to proteins
+    """
+
+    for protein_obj in protein_obj_list:
+        protein_file = protein_obj.file
+        reduced_protein_file = os.path.splitext(protein_file)[0] + '_h.pdb'
+
+        if protein_only:
+            del_nonstd = 'del ~protein & H;'
+        else: 
+            del_nonstd = ''
+
+        command = (
+             f"open {protein_file};"
+            + "addh;"
+            +  del_nonstd
+            +f"save {os.path.join(reduced_protein_file)}"
+        )
+        subprocess.run(['chimerax', '--nogui'], input=command, encoding='ascii')
+
+        protein_obj.reduced_file = reduced_protein_file
+        logger.info(f"Added hydrogens to {protein_file}")
+
+

@@ -4,6 +4,13 @@ class Protein:
     """
     Represent the main receptor target protein or the main ligase protein.
     """
+
+    """
+    attributes added/modified by the functions:
+    structure_tools.reduce()
+        - self.reduced_file
+    """
+
     
     def __init__(self, ptn_type, file, lig_chain, lig_resnum) -> None:
         """
@@ -69,12 +76,13 @@ class ProteinPose():
       megadock.generate_poses()
           - self.file
       megadock.filter_poses()
-          - self.active = [True | False]
+          - self.active = Bool
           - self.file
       megadock.cluster()
           - self.rmsd
           - self.rmsd_reference
           - self.cluster
+          - self.centroid = Bool
     """
 
     def __init__(self, parent, pose_number) -> None:
