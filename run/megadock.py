@@ -62,16 +62,14 @@ def generate_poses(run_docking_output_file, ligase_obj, docked_poses_folder):
     If user chooses to generate all poses from megadock, independent of 
     filtering, this function does it and adds the file attribute.
     """
+    from ..tools.script_tools import create_folder
+
     logger.info(
         f'Generating all poses from output file {run_docking_output_file} '+
         f'and saving them in the folder {docked_poses_folder}.'
     )
 
-    if os.path.isdir(docked_poses_folder):
-        logger.info(f'Docked structure folder {docked_poses_folder} exists.')
-    else:
-        os.mkdir(docked_poses_folder)
-        logger.info(f'Created {docked_poses_folder}.')
+    create_folder(docked_poses_folder)
 
     output = open(run_docking_output_file, 'r')
     count = 0
@@ -109,6 +107,7 @@ def filter_poses(receptor_obj, ligase_obj, dist_cutoff,
     """
 
     from ..tools.structure_tools import structure_proximity
+    from ..tools.script_tools import create_folder
 
     logger.info(f'Filtering megadock poses with cuttoff {dist_cutoff}')
 
@@ -116,10 +115,7 @@ def filter_poses(receptor_obj, ligase_obj, dist_cutoff,
     output_filtered = open(output_filtered_file, 'a+')
 
     # make a folder for the docked structures
-    if os.path.isdir(docked_poses_folder):
-        logger.info(f'Docked structure folder {docked_poses_folder} exists.')
-    else:
-        os.mkdir(docked_poses_folder)
+    create_folder(docked_poses_folder)
 
     count = 0
     for line in output:
@@ -245,8 +241,8 @@ def zrank_rescore(ligase_obj, receptor_obj, zrank_path, run_docking_output_file)
     # the end of the file has an empty line, zrank tries to score that. So strip it out:
     megadock_output_read = megadock_output_read.rstrip()
     # now swap protein file names to reduced file names
-    megadock_output_read.replace(receptor_obj.file, receptor_obj.reduced_file)
-    megadock_output_read.replace(ligase_obj.file, ligase_obj.reduced_file)
+    megadock_output_read = megadock_output_read.replace(receptor_obj.file, receptor_obj.reduced_file)
+    megadock_output_read = megadock_output_read.replace(ligase_obj.file, ligase_obj.reduced_file)
     
     # run zrank using `megadock_output_read` as temporary file
     with tempfile.NamedTemporaryFile(mode='w', dir=CWD, delete=True) as tmp:

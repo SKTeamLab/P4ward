@@ -87,6 +87,32 @@ if __name__ == '__main__':
         choice=conf.getboolean('megadock', 'filter_poses')
     )
 
+    # rank final protein poses
+    from .analyse import rank
+
+    rank.protein_poses(
+        pose_objs=ligase.active_confs(),
+        top_poses=conf.getint('protein_ranking', 'top_poses'),
+        final_ranking_megadock_score=conf.getboolean('protein_ranking', 'final_ranking_megadock_score'),
+        final_ranking_z_score=conf.getboolean('protein_ranking', 'final_ranking_z_score'),
+        use_only_cluster_centroids=conf.getboolean('protein_ranking', 'use_only_cluster_centroids'),
+        top_poses_from_centroids_only=conf.getboolean('protein_ranking', 'top_poses_from_centroids_only'),
+    )
+
+    # run ligand sampling
+    # from .run import linker_sampling
+
+    # linker_sampling.rdkit_sampling(
+    #     receptor_obj=receptor,
+    #     pose_objs=ligase.active_confs(),
+    #     receptor_ligand=conf.get('general', 'receptor_ligand'),
+    #     ligase_ligand=conf.get('general', 'ligase_ligand'),
+    #     protac=conf.get('general', 'protac'),
+    #     rdkit_number_of_confs=conf.getint('linker_sampling', 'rdkit_number_of_confs'),
+    #     protac_poses_folder=conf.get('linker_sampling', 'protac_poses_folder'),
+    #     choice=conf.getboolean('linker_sampling', 'rdkit_sampling'),
+    # )
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     #~~~~~~~~~~~~~ end session ~~~~~~~~~~~~~#
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#

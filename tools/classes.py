@@ -70,19 +70,24 @@ class ProteinPose():
 
     """
     attributes added/modified by the functions:
-      megadock.capture_scores()
-          - self.megadock_score
-          - self.active = True
-      megadock.generate_poses()
-          - self.file
-      megadock.filter_poses()
-          - self.active = Bool
-          - self.file
-      megadock.cluster()
-          - self.rmsd
-          - self.rmsd_reference
-          - self.cluster
-          - self.centroid = Bool
+        megadock.capture_scores()
+            - self.megadock_score
+            - self.active = True
+        megadock.generate_poses()
+            - self.file
+        megadock.filter_poses()
+            - self.active = Bool
+            - self.file
+        megadock.cluster()
+            - self.rmsd
+            - self.rmsd_reference
+            - self.cluster
+            - self.centroid = Bool
+        megadock.zrank_rescore()
+            - self.z_score
+        linker_sampling.rdkit_sampling()
+            - self.protac_file
+        
     """
 
     def __init__(self, parent, pose_number) -> None:

@@ -114,3 +114,25 @@ def reduce(protein_obj_list, protein_only=False):
         logger.info(f"Added hydrogens to {protein_file}")
 
 
+def smiles2smarts(smiles_code):
+    """
+    turn a smiles code into a smarts code that is a wildcard,
+    all atoms that are not carbon are changed into a *
+    """
+    smiles_code = smiles_code.split('\t')[0]
+
+    atomlist = ['s','h','o','n','p','f','i','Cl','Br']
+    bondlist = ['=','-']
+    carbonlist = ['c']
+
+    for atom in atomlist:
+        smiles_code = smiles_code.replace(atom, '*')
+        smiles_code = smiles_code.replace(atom.upper(), '*')
+        smiles_code = smiles_code.replace('.', '')
+    # for bond in bondlist:
+    #     if bond == '=':
+    #         smiles_code = smiles_code.replace(bond, '')
+    #     else:
+    #         smiles_code = smiles_code.replace(bond, '~')
+    
+    return(smiles_code)
