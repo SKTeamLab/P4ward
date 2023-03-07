@@ -100,18 +100,19 @@ if __name__ == '__main__':
     )
 
     # run ligand sampling
-    # from .run import linker_sampling
+    from .run import linker_sampling
 
-    # linker_sampling.rdkit_sampling(
-    #     receptor_obj=receptor,
-    #     pose_objs=ligase.active_confs(),
-    #     receptor_ligand=conf.get('general', 'receptor_ligand'),
-    #     ligase_ligand=conf.get('general', 'ligase_ligand'),
-    #     protac=conf.get('general', 'protac'),
-    #     rdkit_number_of_confs=conf.getint('linker_sampling', 'rdkit_number_of_confs'),
-    #     protac_poses_folder=conf.get('linker_sampling', 'protac_poses_folder'),
-    #     choice=conf.getboolean('linker_sampling', 'rdkit_sampling'),
-    # )
+    linker_sampling.rdkit_sampling(
+        receptor_obj=receptor,
+        pose_objs=ligase.active_confs(),
+        receptor_ligand=conf.get('general', 'receptor_ligand'),
+        ligase_ligand=conf.get('general', 'ligase_ligand'),
+        protac=conf.get('general', 'protac'),
+        rdkit_number_of_confs=conf.getint('linker_sampling', 'rdkit_number_of_confs'),
+        protac_poses_folder=conf.get('linker_sampling', 'protac_poses_folder'),
+        rmsd_tolerance=conf.getfloat('rdkit_pose_rmsd_tolerance'),
+        choice=conf.getboolean('linker_sampling', 'rdkit_sampling'),
+    )
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     #~~~~~~~~~~~~~ end session ~~~~~~~~~~~~~#

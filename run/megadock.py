@@ -264,4 +264,3 @@ def zrank_rescore(ligase_obj, receptor_obj, zrank_path, run_docking_output_file)
 
             pose_obj = ligase_obj.conformations[pose - 1]
             pose_obj.z_score = score
-
