@@ -5,6 +5,39 @@ from ..tools.logger import logger
 from ..definitions import CWD
 
 
+@decorators.user_choice # NOTE choice is True if run megadock is true
+@decorators.track_run
+def prep_structures(receptor_obj, ligase_obj):
+    """
+    Combine and prepare the protein files with their ligands for docking
+    using chimerax
+    """
+    receptor_file = receptor_obj.file
+    ligase_file = ligase_obj.file
+    receptor_ligand_file = receptor_obj.lig_file
+    ligase_ligand_file = ligase_obj.lig_file
+
+    prep_receptor_file = f'mg-{receptor_file}.pdb'
+    prep_ligase_file = f'mg-{ligase_file}.pdb'
+    
+    command = [
+         f"open {receptor_file}; open {receptor_ligand_file}"
+        +f"combine modelId 9"
+        +f"save {prep_receptor_file} models #9"
+        +f"del #*"
+        
+         f"open {ligase_file}; open {ligase_ligand_file}"
+        +f"combine modelId 9"
+        +f"save {prep_ligase_file} models #9"
+    ]
+    subprocess.run(['chimerax', '--nogui'], input=command, encoding='ascii')
+
+    logger.info(f'Saved protein files for megadock: {receptor_ligand_file}, {ligase_ligand_file}')
+
+    receptor_obj.mg_file = prep_receptor_file
+    ligase_obj.mg_file = prep_ligase_file
+
+
 @decorators.user_choice
 @decorators.track_run
 def run_docking(program_path, receptor_file, ligase_file, num_threads, run_docking_output_file,
@@ -32,7 +65,7 @@ def run_docking(program_path, receptor_file, ligase_file, num_threads, run_docki
     logger.info('Done.')
 
 
-@decorators.user_choice # choice is True if run megadock is true
+@decorators.user_choice # NOTE choice is True if run megadock is true
 def capture_scores(run_docking_output_file, ligase_obj):
     """
     Grab all original megadock scores from run_docking_output_file and
