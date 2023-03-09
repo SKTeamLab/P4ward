@@ -2,40 +2,30 @@ from ..tools.logger import logger
 import subprocess
 import os
 
-def load_biopython_structures(protein=None, protein_ligand_chain=None, protein_ligand_resnum=None):
+
+def load_biopython_structures(structure_file, mol2=False):
     """
-    get a protein structure and the protein_ligand as biopython objects
-    returns (protein_struct, protein_ligand_struct)
+    load a structure as biopython object. If file in mol2 format,
+    convert first using rdkit. Intended for use with the ligands.
     """
 
     from Bio.PDB.PDBParser import PDBParser as pdbp
     parser = pdbp(PERMISSIVE=1)
 
-    # protein and its ligand
-    protein_struct = parser.get_structure('protein_struct', protein)
+    if mol2:
+        from rdkit import Chem
+        from io import StringIO
 
-    # find ligand, if required:
-    if protein_ligand_chain is not None and protein_ligand_resnum is not None:
-        for i in protein_struct[0][protein_ligand_chain].get_residues():
-            if i.get_id()[1] == protein_ligand_resnum:
-                protein_ligand_struct = i
-            else: continue
-        # make sure that the ligand was found:
-        try: 
-            protein_ligand_struct.get_id()[1] == protein_ligand_resnum
-        except:
-            err = f'protein ligand with resnum {protein_ligand_resnum} not found'
-            logger.error(err)
-            raise Exception(err)
-    # if no ligand resnum and chain specified, we get just the protein:
-    else:
-        protein_ligand_struct = None
+        rdkit_obj = Chem.MolFromMol2File(structure_file)
+        pdb_block = Chem.MolToPDBBlock(rdkit_obj)
+        pdbfile = StringIO(pdb_block)
 
-    # only return the structures that were asked for
-    if protein_ligand_struct is not None:
-        return(protein_struct, protein_ligand_struct)
+        structure_obj = parser.get_structure('structure', pdbfile)
+
     else:
-        return(protein_struct)
+        structure_obj = parser.get_structure('structure', structure_file)
+
+    return(structure_obj)
 
 
 def structure_proximity(struct1, struct2, dist_cutoff=None):
@@ -122,17 +112,10 @@ def smiles2smarts(smiles_code):
     smiles_code = smiles_code.split('\t')[0]
 
     atomlist = ['s','h','o','n','p','f','i','Cl','Br']
-    bondlist = ['=','-']
-    carbonlist = ['c']
 
     for atom in atomlist:
         smiles_code = smiles_code.replace(atom, '*')
         smiles_code = smiles_code.replace(atom.upper(), '*')
         smiles_code = smiles_code.replace('.', '')
-    # for bond in bondlist:
-    #     if bond == '=':
-    #         smiles_code = smiles_code.replace(bond, '')
-    #     else:
-    #         smiles_code = smiles_code.replace(bond, '~')
     
     return(smiles_code)

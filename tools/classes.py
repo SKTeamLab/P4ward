@@ -7,12 +7,15 @@ class Protein:
 
     """
     attributes added/modified by the functions:
-    structure_tools.reduce()
-        - self.reduced_file
+        structure_tools.reduce()
+            - self.reduced_file
+        megadock.prep_structures()
+            - self.prep_receptor_file
+            - self.prep_ligase_file
     """
 
     
-    def __init__(self, ptn_type, file, lig_chain, lig_resnum) -> None:
+    def __init__(self, ptn_type, file, lig_file) -> None:
         """
         Starts off with the only 3 definitions required:
         pdb file with ligand bound, ligand chain ID, and ligand resnum
@@ -21,8 +24,7 @@ class Protein:
 
         self.type = ptn_type #type is either 'receptor' or 'ligase'
         self.file = file
-        self.lig_chain = lig_chain
-        self.lig_resnum = lig_resnum
+        self.lig_file = lig_file
 
         if self.type == 'ligase':
             self.conformations = []
@@ -34,7 +36,7 @@ class Protein:
         for the protein. 
         """ 
         from .structure_tools import load_biopython_structures
-        protein_struct = load_biopython_structures(protein=self.file)
+        protein_struct = load_biopython_structures(structure_file=self.file)
         return(protein_struct)
 
 
@@ -45,10 +47,9 @@ class Protein:
         """
         from .structure_tools import load_biopython_structures
 
-        _, ligand_struct = load_biopython_structures(
-            protein=self.file,
-            protein_ligand_chain=self.lig_chain,
-            protein_ligand_resnum=self.lig_resnum
+        ligand_struct = load_biopython_structures(
+            structure_file=self.lig_file,
+            mol2=True
         )
         return(ligand_struct)
     
@@ -98,8 +99,7 @@ class ProteinPose():
 
         self.parent = parent
         self.pose_number = pose_number
-        self.lig_chain = parent.lig_chain
-        self.lig_resnum = parent.lig_resnum
+        self.lig_file = parent.lig_file
         self.active = None
         self.file = None
 
@@ -114,7 +114,7 @@ class ProteinPose():
         for the protein. 
         """ 
         from .structure_tools import load_biopython_structures
-        protein_struct = load_biopython_structures(protein=self.file)
+        protein_struct = load_biopython_structures(structure_file=self.file)
         return(protein_struct)
 
 
@@ -125,9 +125,8 @@ class ProteinPose():
         """
         from .structure_tools import load_biopython_structures
 
-        _, ligand_struct = load_biopython_structures(
-            protein=self.file,
-            protein_ligand_chain=self.lig_chain,
-            protein_ligand_resnum=self.lig_resnum
+        ligand_struct = load_biopython_structures(
+            structure_file=self.lig_file,
+            mol2=True
         )
         return(ligand_struct)
