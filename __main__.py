@@ -78,10 +78,6 @@ if __name__ == '__main__':
         receptor_obj=receptor,
         ligase_obj=ligase,
         dist_cutoff=conf.getfloat('megadock','filter_dist_cutoff'),
-        output_file=conf.get('megadock', 'run_docking_output_file'),
-        output_filtered_file=conf.get('megadock', 'filter_poses_output_file'),
-        generate_all_poses=conf.getboolean('megadock', 'generate_all_poses'),
-        docked_poses_folder=conf.get('megadock', 'docked_poses_folder'),
         choice=conf.getboolean('megadock', 'filter_poses')
     )
 

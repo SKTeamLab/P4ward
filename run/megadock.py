@@ -165,7 +165,6 @@ def rotate_atoms(atom_coords, ref_rotation, pose_rotation):
     return(final_x, final_y, final_z)
 
 
-
 @decorators.user_choice
 @decorators.track_run
 def generate_poses(run_docking_output_file, ligase_obj, docked_poses_folder):
@@ -208,9 +207,7 @@ def generate_poses(run_docking_output_file, ligase_obj, docked_poses_folder):
 
 @decorators.user_choice
 @decorators.track_run
-def filter_poses(receptor_obj, ligase_obj, dist_cutoff,
-                 output_file, output_filtered_file, docked_poses_folder,
-                 generate_all_poses=False):
+def filter_poses(receptor_obj, ligase_obj, dist_cutoff):
     """
     Use Biopython to filter the megadock poses which satisfy a
     distance cutoff for both binding sites. Takes the a Protein object
@@ -218,57 +215,39 @@ def filter_poses(receptor_obj, ligase_obj, dist_cutoff,
     """
 
     from ..tools.structure_tools import structure_proximity
-    from ..tools.script_tools import create_folder
 
     logger.info(f'Filtering megadock poses with cuttoff {dist_cutoff}')
 
-    output = open(output_file, 'r')
-    output_filtered = open(output_filtered_file, 'a+')
+    pose_objs = ligase_obj.active_confs()
+    ref_rotate = ligase_obj.rotate
 
-    # make a folder for the docked structures
-    create_folder(docked_poses_folder)
+    for pose_obj in pose_objs:
+        pose_rotate = pose_obj.rotate
+        ligand_obj = pose_obj.parent.get_ligand_struct()
 
-    count = 0
-    for line in output:
+        for model in ligand_obj:
+            for chain in model:
+                for res in chain:
+                    for atom in res:
+                        x,y,z, = atom.get_vector()
+                        newX, newY, newZ = rotate_atoms(
+                            (x, y, z),
+                            ref_rotation=ref_rotate,
+                            pose_rotation=pose_rotate
+                        )
+                        atom.set_coord((newX, newY, newZ))
 
-        if len(line.split('\t')) == 7:
-            count += 1
-            ligase_pose_obj = ligase_obj.conformations[count - 1]
+        distance, proximity = structure_proximity(
+            receptor_obj.ligand_struct,
+            ligand_obj,
+            dist_cutoff=dist_cutoff
+        )
 
-            # we will only generate the poses that were not already generated before
-            if ligase_pose_obj.file is None or not os.path.isfile(ligase_pose_obj.file):
-                decoy_name = os.path.join(docked_poses_folder, f'decoy{count}.pdb')
-                decoygen_command = [
-                    'decoygen', decoy_name,
-                    ligase_obj.file,
-                    output_file, str(count)
-                ]
-                subprocess.run(decoygen_command, stdout=subprocess.DEVNULL)
-                ligase_pose_obj.file = decoy_name
-
-            distance, proximity = structure_proximity(
-                receptor_obj.ligand_struct,
-                ligase_pose_obj.get_ligand_struct(),
-                dist_cutoff=dist_cutoff
-            )
-
-            if proximity:
-                output_filtered.write(line)
-                ligase_pose_obj.active = True
-                logger.info(f'Activating filtered pose {count}, with distance of {distance} between ligands.')
-            else:
-                ligase_pose_obj.active = False
-                if not generate_all_poses:
-                    ligase_pose_obj.file = None
-                    os.remove(decoy_name)
-
-        else: 
-            output_filtered.write(line)
-    
-    logger.info(f'Saved filtered megadock poses to file {output_filtered_file}')
-
-    output.close()
-    output_filtered.close()
+        if proximity:
+            pose_obj.active = True
+            logger.info(f'Activating filtered pose {pose_obj.pose_number}, with distance of {distance} between ligands.')
+        else:
+            pose_obj.active = False
 
 
 @decorators.user_choice
