@@ -18,6 +18,7 @@ if __name__ == '__main__':
         overwrite=conf.getboolean('general', 'overwrite')
     )
     # load the biopython objects as attributes for receptor and ligand:
+    # TODO check if this is still necessary
     receptor.protein_struct = receptor.get_protein_struct()
     receptor.ligand_struct = receptor.get_ligand_struct()
     ligase.protein_struct = ligase.get_protein_struct()
@@ -25,16 +26,22 @@ if __name__ == '__main__':
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-    #~~~~~~~~~~~~ start running ~~~~~~~~~~~~#
+    #~~~~~~~~~~~~ start docking ~~~~~~~~~~~~#
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     
     # run megadock
     from .run import megadock
 
+    megadock.prep_structures(
+        receptor_obj=receptor,
+        ligase_obj=ligase,
+        choice=conf.getboolean('megadock', 'run_docking')
+    )
+
     megadock.run_docking(
         program_path=conf.get('megadock', 'program_path'),
-        receptor_file=receptor.file,
-        ligase_file=ligase.file,
+        receptor_file=receptor.mg_file,
+        ligase_file=ligase.mg_file,
         num_threads=conf.get('megadock', 'num_threads'),
         run_docking_output_file=conf.get('megadock', 'run_docking_output_file'),
         num_predictions=conf.get('megadock', 'num_predictions'),
@@ -87,19 +94,27 @@ if __name__ == '__main__':
         choice=conf.getboolean('megadock', 'filter_poses')
     )
 
+
     # rank final protein poses
-    from .analyse import rank
+    # from .analyse import rank
 
-    rank.protein_poses(
-        pose_objs=ligase.active_confs(),
-        top_poses=conf.getint('protein_ranking', 'top_poses'),
-        final_ranking_megadock_score=conf.getboolean('protein_ranking', 'final_ranking_megadock_score'),
-        final_ranking_z_score=conf.getboolean('protein_ranking', 'final_ranking_z_score'),
-        use_only_cluster_centroids=conf.getboolean('protein_ranking', 'use_only_cluster_centroids'),
-        top_poses_from_centroids_only=conf.getboolean('protein_ranking', 'top_poses_from_centroids_only'),
-    )
+    # rank.protein_poses(
+    #     pose_objs=ligase.active_confs(),
+    #     top_poses=conf.getint('protein_ranking', 'top_poses'),
+    #     final_ranking_megadock_score=conf.getboolean('protein_ranking', 'final_ranking_megadock_score'),
+    #     final_ranking_z_score=conf.getboolean('protein_ranking', 'final_ranking_z_score'),
+    #     use_only_cluster_centroids=conf.getboolean('protein_ranking', 'use_only_cluster_centroids'),
+    #     top_poses_from_centroids_only=conf.getboolean('protein_ranking', 'top_poses_from_centroids_only'),
+    # )
 
-    # run ligand sampling
+    # CHECKPOINT!
+    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase)
+
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    #~~~~~~~~~~~ ligand sampling ~~~~~~~~~~~#
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
     from .run import linker_sampling
 
     linker_sampling.rdkit_sampling(

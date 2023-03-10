@@ -17,22 +17,22 @@ def prep_structures(receptor_obj, ligase_obj):
     receptor_ligand_file = receptor_obj.lig_file
     ligase_ligand_file = ligase_obj.lig_file
 
-    prep_receptor_file = f'mg-{receptor_file}.pdb'
-    prep_ligase_file = f'mg-{ligase_file}.pdb'
+    prep_receptor_file = f'mg-{receptor_file}'
+    prep_ligase_file = f'mg-{ligase_file}'
     
-    command = [
-         f"open {receptor_file}; open {receptor_ligand_file}"
-        +f"combine modelId 9"
-        +f"save {prep_receptor_file} models #9"
-        +f"del #*"
+    command = (
+         f"open {receptor_file}; open {receptor_ligand_file};"
+        +f"combine modelId 9;"
+        +f"save {prep_receptor_file} models #9;"
+        +f"del #*;"
         
-         f"open {ligase_file}; open {ligase_ligand_file}"
-        +f"combine modelId 9"
+         f"open {ligase_file}; open {ligase_ligand_file};"
+        +f"combine modelId 9;"
         +f"save {prep_ligase_file} models #9"
-    ]
+    )
     subprocess.run(['chimerax', '--nogui'], input=command, encoding='ascii')
 
-    logger.info(f'Saved protein files for megadock: {receptor_ligand_file}, {ligase_ligand_file}')
+    logger.info(f'Saved protein files for megadock: {prep_receptor_file}, {prep_ligase_file}')
 
     receptor_obj.mg_file = prep_receptor_file
     ligase_obj.mg_file = prep_ligase_file
@@ -75,17 +75,95 @@ def capture_scores(run_docking_output_file, ligase_obj):
     logger.info(f'Capturing megadock scores from {run_docking_output_file}')
 
     # start parsing the output
+    ## grab header rotation information and add to lig_obj
     output = open(run_docking_output_file, 'r')
+    header = [next(output) for _ in range(4)]
+    rotate = {
+        'grid_size':   int(header[0].split('\t')[0]),
+        'spacing':     float(header[0].split('\t')[1]),
+        'initial_rot': [float(i) for i in header[1].split('\t') if i!=''],
+        'rec_transl':  [float(i) for i in header[2].split('\t')[-3:]],
+        'lig_transl':  [float(i) for i in header[3].split('\t')[-3:]]
+    }
+    ligase_obj.rotate = rotate
+    
+    ## grab the information for each pose
     count = 0
     for line in output:
         if len(line.split('\t')) == 7:
-
             count += 1
+
+            rotate = {
+                'angles':[float(i) for i in line.split('\t')[:3]],
+                'transl':[float(i) for i in line.split('\t')[3:6]]
+            }
             score = float(line.split('\t')[-1])
+
             pose_obj = ProteinPose(parent=ligase_obj, pose_number=int(count))
             pose_obj.megadock_score = score
+            pose_obj.rotate = rotate
             pose_obj.active = True
     output.close()
+
+
+def rotate_atoms(atom_coords, ref_rotation, pose_rotation):
+    """
+    move atoms as performed by megadock decoygen, using information
+    captured from the megadock output file
+    """
+
+    ref_psi, ref_theta, ref_phi = ref_rotation['initial_rot']
+    l1, l2, l3 = ref_rotation['lig_transl']
+    r1, r2, r3 = ref_rotation['rec_transl']
+    N = ref_rotation['grid_size']
+    spacing = ref_rotation['spacing']
+
+    t1, t2, t3 = pose_rotation['transl']
+    a1, a2, a3 = pose_rotation['angles']
+
+    def rotate(psi, theta, phi, oldX, oldY, oldZ):
+        import numpy as np
+
+        r11 = np.cos(psi)*np.cos(phi)  -  np.sin(psi)*np.cos(theta)*np.sin(phi)
+        r21 = np.sin(psi)*np.cos(phi)  +  np.cos(psi)*np.cos(theta)*np.sin(phi)
+        r31 = np.sin(theta)*np.sin(phi)
+
+        r12 = -np.cos(psi)*np.sin(phi)  -  np.sin(psi)*np.cos(theta)*np.cos(phi)
+        r22 = -np.sin(psi)*np.sin(phi)  +  np.cos(psi)*np.cos(theta)*np.cos(phi)
+        r32 = np.sin(theta)*np.cos(phi)
+
+        r13 = np.sin(psi)*np.sin(theta)
+        r23 = -np.cos(psi)*np.sin(theta)
+        r33 = np.cos(theta)
+
+        newX = r11 * oldX + r12 * oldY + r13 * oldZ
+        newY = r21 * oldX + r22 * oldY + r23 * oldZ
+        newZ = r31 * oldX + r32 * oldY + r33 * oldZ
+
+        return(newX, newY, newZ)
+    
+    # first subtract ligand initial translation
+    coord1, coord2, coord3 = atom_coords
+    oldx = coord1 - l1
+    oldy = coord2 - l2
+    oldz = coord3 - l3
+
+    # rotate based on reference rotation
+    tx1, ty1, tz1 = rotate(ref_psi, ref_theta, ref_phi, oldx, oldy, oldz)
+    # rotate based on pose angles
+    tx2, ty2, tz2 = rotate(a1, a2, a3, tx1, ty1, tz1)
+
+    if t1 >= N/2: t1 -= N
+    if t2 >= N/2: t2 -= N
+    if t3 >= N/2: t3 -= N
+
+    # calculate to find final box
+    final_x = tx2-t1*spacing+r1
+    final_y = ty2-t2*spacing+r2
+    final_z = tz2-t3*spacing+r3
+
+    return(final_x, final_y, final_z)
+
 
 
 @decorators.user_choice

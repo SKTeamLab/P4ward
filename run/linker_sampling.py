@@ -1,5 +1,4 @@
 import os
-import subprocess
 from ..tools import decorators
 from ..tools.logger import logger
 from ..tools.script_tools import create_folder
@@ -94,7 +93,7 @@ def rdkit_sampling(
                 for i in range(rdkit_number_of_confs):
                     rmsd = Chem.rdMolAlign.AlignMol(protac, reference_ligs, atomMap=pairs, prbCid=i)
                     if rmsd <= rmsd_tolerance:
-                        molblock = Chem.MolToMolBlock(protac, confId=i)
+                        molblock = Chem.MolToMolBlock(protac, confId=i, kekulize=False)
                         confs_file.write(f'conf {i}')
                         confs_file.write(molblock)
                         confs_file.write('$$$$\n')

@@ -39,14 +39,12 @@ def load_protein_objects(pickle_file, conf, overwrite=False):
         receptor_obj = classes.Protein(
             ptn_type='receptor',
             file=conf.get('general', 'receptor'),
-            lig_chain=conf.get('general','receptor_ligand_chain'),
-            lig_resnum=conf.getint('general','receptor_ligand_resnum')
+            lig_file=conf.get('general','receptor_ligand')
         )
         ligase_obj = classes.Protein(
             ptn_type='ligase',
             file=conf.get('general', 'ligase'),
-            lig_chain=conf.get('general','ligase_ligand_chain'),
-            lig_resnum=conf.getint('general','ligase_ligand_resnum')
+            lig_file=conf.get('general','ligase_ligand')
         )
 
     return(receptor_obj, ligase_obj)
