@@ -39,8 +39,6 @@ def structure_proximity(struct1, struct2, dist_cutoff=None):
     distance = np.linalg.norm(
         struct1.center_of_mass() - struct2.center_of_mass()
     )
-    print(struct1.center_of_mass())
-    print(struct2.center_of_mass())
     return(distance, distance <= dist_cutoff)
 
 
@@ -78,13 +76,15 @@ def get_rmsd(obj1, obj2, ca=False):
     return(rmsd)
 
 
-def reduce(protein_obj_list, protein_only=False):
+def reduce(protein_obj_list, file_attribute_name, protein_only=False):
     """
-    use chimerax to add hydrogens to proteins
+    use chimerax to add hydrogens to proteins.
+    takes the objects as arguments so that they can be updated on the fly
+    `file_attribute_name` specifies which file attribute to capture from the obj
     """
 
     for protein_obj in protein_obj_list:
-        protein_file = protein_obj.file
+        protein_file = getattr(protein_obj, file_attribute_name)
         reduced_protein_file = os.path.splitext(protein_file)[0] + '_h.pdb'
 
         if protein_only:
@@ -100,7 +100,7 @@ def reduce(protein_obj_list, protein_only=False):
         )
         subprocess.run(['chimerax', '--nogui'], input=command, encoding='ascii')
 
-        protein_obj.reduced_file = reduced_protein_file
+        setattr(protein_obj, file_attribute_name+'_reduced', reduced_protein_file)
         logger.info(f"Added hydrogens to {protein_file}")
 
 

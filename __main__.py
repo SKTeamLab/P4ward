@@ -87,21 +87,21 @@ if __name__ == '__main__':
     megadock.cluster(
         pose_objects=ligase.active_confs(), # structures are now the saved confs attr
         clustering_cutoff=conf.getfloat('megadock','clustering_cutoff'),
-        choice=conf.getboolean('megadock', 'filter_poses')
+        choice=conf.getboolean('megadock', 'cluster_poses')
     )
 
 
-    # rank final protein poses
-    # from .analyse import rank
+    #rank final protein poses
+    from .analyse import rank
 
-    # rank.protein_poses(
-    #     pose_objs=ligase.active_confs(),
-    #     top_poses=conf.getint('protein_ranking', 'top_poses'),
-    #     final_ranking_megadock_score=conf.getboolean('protein_ranking', 'final_ranking_megadock_score'),
-    #     final_ranking_z_score=conf.getboolean('protein_ranking', 'final_ranking_z_score'),
-    #     use_only_cluster_centroids=conf.getboolean('protein_ranking', 'use_only_cluster_centroids'),
-    #     top_poses_from_centroids_only=conf.getboolean('protein_ranking', 'top_poses_from_centroids_only'),
-    # )
+    rank.protein_poses(
+        pose_objs=ligase.active_confs(),
+        top_poses=conf.getint('protein_ranking', 'top_poses'),
+        final_ranking_megadock_score=conf.getboolean('protein_ranking', 'final_ranking_megadock_score'),
+        final_ranking_z_score=conf.getboolean('protein_ranking', 'final_ranking_z_score'),
+        use_only_cluster_centroids=conf.getboolean('protein_ranking', 'use_only_cluster_centroids'),
+        top_poses_from_centroids_only=conf.getboolean('protein_ranking', 'top_poses_from_centroids_only'),
+    )
 
     # CHECKPOINT!
     run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase)
@@ -115,13 +115,11 @@ if __name__ == '__main__':
 
     linker_sampling.rdkit_sampling(
         receptor_obj=receptor,
-        pose_objs=ligase.active_confs(),
-        receptor_ligand=conf.get('general', 'receptor_ligand'),
-        ligase_ligand=conf.get('general', 'ligase_ligand'),
+        ligase_obj=ligase,
         protac=conf.get('general', 'protac'),
         rdkit_number_of_confs=conf.getint('linker_sampling', 'rdkit_number_of_confs'),
         protac_poses_folder=conf.get('linker_sampling', 'protac_poses_folder'),
-        rmsd_tolerance=conf.getfloat('rdkit_pose_rmsd_tolerance'),
+        rmsd_tolerance=conf.getfloat('linker_sampling', 'rdkit_pose_rmsd_tolerance'),
         choice=conf.getboolean('linker_sampling', 'rdkit_sampling'),
     )
 

@@ -7,9 +7,8 @@ from ..tools.script_tools import create_folder
 @decorators.user_choice
 @decorators.track_run
 def rdkit_sampling(
-                        pose_objs,
-                        receptor_ligand,
-                        ligase_ligand,
+                        receptor_obj,
+                        ligase_obj,
                         protac,
                         rdkit_number_of_confs,
                         protac_poses_folder,
@@ -23,20 +22,36 @@ def rdkit_sampling(
     from rdkit.Chem import AllChem
     from rdkit.Geometry.rdGeometry import Point3D
     from ..tools.structure_tools import smiles2smarts
+    from ..run.megadock import rotate_atoms
 
 
     # make folder where the linkers for all pose objs will be stored
     create_folder(protac_poses_folder)
 
+    # open receptor ligand - will not change
+    reclig = Chem.MolFromMol2File(receptor_obj.lig_file)
+    # get initial rotation information from ligase obj
+    ref_rotation  = ligase_obj.rotate
+
+    pose_objs = ligase_obj.active_confs()
     for pose_obj in pose_objs:
 
         # make folder for each pose obj linker file to be saved
         linker_folder = os.path.join(protac_poses_folder, f'protein_pose_{pose_obj.pose_number}')
         create_folder(linker_folder)
 
-        # open ligands
-        liglig = Chem.MolFromMol2File(ligase_ligand)
-        reclig = Chem.MolFromMol2File(receptor_ligand)
+        # open ligase ligand - changes every loop
+        liglig = Chem.MolFromMol2File(ligase_obj.lig_file)
+        conf = liglig.GetConformer()
+
+        # get final rotation information for the pose
+        pose_rotation = pose_obj.rotate
+        
+        # rotate ligase ligand to new position
+        for i in range(liglig.GetNumAtoms()):
+            x, y, z = conf.GetAtomPosition(i)
+            newX, newY, newZ = rotate_atoms((x, y, z), ref_rotation=ref_rotation, pose_rotation=pose_rotation)
+            conf.SetAtomPosition(i,Point3D(newX, newY, newZ))
 
         # combine both ligs
         reference_ligs = Chem.CombineMols(liglig, reclig)        

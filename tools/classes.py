@@ -7,11 +7,11 @@ class Protein:
 
     """
     attributes added/modified by the functions:
+        megadock.prep_structures()
+            - self.mg_file
+            - self.mg_file
         structure_tools.reduce()
             - self.reduced_file
-        megadock.prep_structures()
-            - self.prep_receptor_file
-            - self.prep_ligase_file
     """
 
     
@@ -108,25 +108,33 @@ class ProteinPose():
             parent.conformations.append(self)
 
 
-    def get_protein_struct(self):
+    def get_rotated_struct(self, struct):
         """
-        Use the function load_biopython_structures to get the biopython object
-        for the protein. 
-        """ 
-        from .structure_tools import load_biopython_structures
-        protein_struct = load_biopython_structures(structure_file=self.file)
-        return(protein_struct)
-
-
-    def get_ligand_struct(self):
+        Use the rotate_atoms function to return a completely rotated
+        coordinate set for the protein pose.
         """
-        Use the function load_biopython_structures to get the biopython object
-        for the protein ligand. 
-        """
-        from .structure_tools import load_biopython_structures
 
-        ligand_struct = load_biopython_structures(
-            structure_file=self.lig_file,
-            mol2=True
-        )
-        return(ligand_struct)
+        from ..run.megadock import rotate_atoms
+
+        if struct == 'protein':
+            ligase_obj = self.parent.get_protein_struct()
+        elif struct == 'ligand':
+            ligase_obj = self.parent.get_ligand_struct()
+        else:
+            raise Exception('Structure to capture must "protein" or "ligand".')
+        ref_rotate = self.parent.rotate
+        pose_rotate = self.rotate
+
+        for model in ligase_obj:
+            for chain in model:
+                for res in chain:
+                    for atom in res:
+                        x,y,z, = atom.get_vector()
+                        newX, newY, newZ = rotate_atoms(
+                            (x, y, z),
+                            ref_rotation=ref_rotate,
+                            pose_rotation=pose_rotate
+                        )
+                        atom.set_coord((newX, newY, newZ))
+
+        return(ligase_obj)

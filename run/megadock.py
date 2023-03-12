@@ -66,6 +66,7 @@ def run_docking(program_path, receptor_file, ligase_file, num_threads, run_docki
 
 
 @decorators.user_choice # NOTE choice is True if run megadock is true
+@decorators.track_run
 def capture_scores(run_docking_output_file, ligase_obj):
     """
     Grab all original megadock scores from run_docking_output_file and
@@ -213,29 +214,14 @@ def filter_poses(receptor_obj, ligase_obj, dist_cutoff):
     distance cutoff for both binding sites. Takes the a Protein object
     and handles the rest by accessing its attributes.
     """
+    logger.info(f'Filtering megadock poses with cuttoff {dist_cutoff}')
 
     from ..tools.structure_tools import structure_proximity
 
-    logger.info(f'Filtering megadock poses with cuttoff {dist_cutoff}')
-
     pose_objs = ligase_obj.active_confs()
-    ref_rotate = ligase_obj.rotate
 
     for pose_obj in pose_objs:
-        pose_rotate = pose_obj.rotate
-        ligand_obj = pose_obj.parent.get_ligand_struct()
-
-        for model in ligand_obj:
-            for chain in model:
-                for res in chain:
-                    for atom in res:
-                        x,y,z, = atom.get_vector()
-                        newX, newY, newZ = rotate_atoms(
-                            (x, y, z),
-                            ref_rotation=ref_rotate,
-                            pose_rotation=pose_rotate
-                        )
-                        atom.set_coord((newX, newY, newZ))
+        ligand_obj = pose_obj.get_rotated_struct(struct='ligand')
 
         distance, proximity = structure_proximity(
             receptor_obj.ligand_struct,
@@ -264,14 +250,16 @@ def cluster(pose_objects, clustering_cutoff):
     from sklearn.neighbors import NearestNeighbors
     from ..tools.structure_tools import get_rmsd
     import numpy as np
+
+    logger.info(f'Clustering protein poses using cutoff of {clustering_cutoff}')
     
     # get first pose as reference:
     reference_obj = pose_objects[0]
-    reference_obj_struct = reference_obj.get_protein_struct()
+    reference_obj_struct = reference_obj.get_rotated_struct(struct='protein')
 
     # load receptor object
     for pose_obj in pose_objects:
-        pose_obj_struct = pose_obj.get_protein_struct()
+        pose_obj_struct = pose_obj.get_rotated_struct(struct='protein')
 
         rmsd = get_rmsd(reference_obj_struct, pose_obj_struct, ca=True)
         pose_obj.rmsd = rmsd
@@ -321,18 +309,18 @@ def zrank_rescore(ligase_obj, receptor_obj, zrank_path, run_docking_output_file)
 
     # check if receptor and ligase were already reduced
     for protein_obj in (ligase_obj, receptor_obj):
-        if not hasattr(protein_obj, 'reduced_file'):
-            reduce([protein_obj])
+        if not hasattr(protein_obj, 'mg_file_reduced'):
+            reduce([protein_obj], file_attribute_name='mg_file')
 
     # zrank considers all conformations + 1
     conf_count = len(ligase_obj.conformations)
-    # read megadock outpu
+    # read megadock output
     megadock_output_read = open(run_docking_output_file, 'r').read()
     # the end of the file has an empty line, zrank tries to score that. So strip it out:
     megadock_output_read = megadock_output_read.rstrip()
     # now swap protein file names to reduced file names
-    megadock_output_read = megadock_output_read.replace(receptor_obj.file, receptor_obj.reduced_file)
-    megadock_output_read = megadock_output_read.replace(ligase_obj.file, ligase_obj.reduced_file)
+    megadock_output_read = megadock_output_read.replace(receptor_obj.mg_file, receptor_obj.mg_file_reduced)
+    megadock_output_read = megadock_output_read.replace(ligase_obj.mg_file, ligase_obj.mg_file_reduced)
     
     # run zrank using `megadock_output_read` as temporary file
     with tempfile.NamedTemporaryFile(mode='w', dir=CWD, delete=True) as tmp:
