@@ -168,46 +168,6 @@ def rotate_atoms(atom_coords, ref_rotation, pose_rotation):
 
 @decorators.user_choice
 @decorators.track_run
-def generate_poses(run_docking_output_file, ligase_obj, docked_poses_folder):
-    """
-    If user chooses to generate all poses from megadock, independent of 
-    filtering, this function does it and adds the file attribute.
-    """
-    from ..tools.script_tools import create_folder
-
-    logger.info(
-        f'Generating all poses from output file {run_docking_output_file} '+
-        f'and saving them in the folder {docked_poses_folder}.'
-    )
-
-    create_folder(docked_poses_folder)
-
-    output = open(run_docking_output_file, 'r')
-    count = 0
-    for line in output:
-        if len(line.split('\t')) == 7:
-
-            count += 1
-            pose_obj = ligase_obj.conformations[count - 1]
-
-            decoy_name = os.path.join(docked_poses_folder, f'decoy{count}.pdb')
-            decoygen_command = [
-                'decoygen', decoy_name,
-                ligase_obj.file,
-                run_docking_output_file, str(count)
-            ]
-            subprocess.run(decoygen_command, stdout=subprocess.DEVNULL)
-            pose_obj.file = decoy_name
-
-            # check if file was created successfully
-            if not os.path.isfile(pose_obj.file):
-                raise Exception("Could not generate pose successfully")
-
-    output.close()
-
-
-@decorators.user_choice
-@decorators.track_run
 def filter_poses(receptor_obj, ligase_obj, dist_cutoff):
     """
     Use Biopython to filter the megadock poses which satisfy a
@@ -221,18 +181,21 @@ def filter_poses(receptor_obj, ligase_obj, dist_cutoff):
     pose_objs = ligase_obj.active_confs()
 
     for pose_obj in pose_objs:
-        ligand_obj = pose_obj.get_rotated_struct(struct='ligand')
+        receptor_lig_obj = receptor_obj.get_ligand_struct()
+        ligand_lig_obj = pose_obj.get_rotated_struct(struct_type='ligand')
 
         distance, proximity = structure_proximity(
-            receptor_obj.ligand_struct,
-            ligand_obj,
+            receptor_lig_obj,
+            ligand_lig_obj,
             dist_cutoff=dist_cutoff
         )
 
         if proximity:
             pose_obj.active = True
+            pose_obj.filtered = True
             logger.info(f'Activating filtered pose {pose_obj.pose_number}, with distance of {distance} between ligands.')
         else:
+            pose_obj.filtered = False
             pose_obj.active = False
 
 
@@ -255,11 +218,11 @@ def cluster(pose_objects, clustering_cutoff):
     
     # get first pose as reference:
     reference_obj = pose_objects[0]
-    reference_obj_struct = reference_obj.get_rotated_struct(struct='protein')
+    reference_obj_struct = reference_obj.get_rotated_struct(struct_type='protein')
 
     # load receptor object
     for pose_obj in pose_objects:
-        pose_obj_struct = pose_obj.get_rotated_struct(struct='protein')
+        pose_obj_struct = pose_obj.get_rotated_struct(struct_type='protein')
 
         rmsd = get_rmsd(reference_obj_struct, pose_obj_struct, ca=True)
         pose_obj.rmsd = rmsd

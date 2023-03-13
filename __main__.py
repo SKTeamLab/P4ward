@@ -17,12 +17,6 @@ if __name__ == '__main__':
         conf=conf,
         overwrite=conf.getboolean('general', 'overwrite')
     )
-    # load the biopython objects as attributes for receptor and ligand:
-    # TODO check if this is still necessary
-    receptor.protein_struct = receptor.get_protein_struct()
-    receptor.ligand_struct = receptor.get_ligand_struct()
-    ligase.protein_struct = ligase.get_protein_struct()
-    ligase.ligand_struct = ligase.get_ligand_struct()
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
@@ -59,13 +53,6 @@ if __name__ == '__main__':
     # CHECKPOINT!
     run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase)
 
-    megadock.generate_poses(
-        ligase_obj=ligase,
-        run_docking_output_file=conf.get('megadock', 'run_docking_output_file'),
-        docked_poses_folder=conf.get('megadock', 'docked_poses_folder'),
-        choice=conf.getboolean('megadock', 'generate_all_poses'),
-    )
-
     megadock.zrank_rescore(
         ligase_obj=ligase,
         receptor_obj=receptor,
@@ -95,12 +82,18 @@ if __name__ == '__main__':
     from .analyse import rank
 
     rank.protein_poses(
-        pose_objs=ligase.active_confs(),
+        pose_objs=ligase.conformations,
         top_poses=conf.getint('protein_ranking', 'top_poses'),
         final_ranking_megadock_score=conf.getboolean('protein_ranking', 'final_ranking_megadock_score'),
         final_ranking_z_score=conf.getboolean('protein_ranking', 'final_ranking_z_score'),
         use_only_cluster_centroids=conf.getboolean('protein_ranking', 'use_only_cluster_centroids'),
         top_poses_from_centroids_only=conf.getboolean('protein_ranking', 'top_poses_from_centroids_only'),
+    )
+
+    rank.generate_protein_poses(
+        pose_objs=ligase.conformations,
+        poses=conf.get('protein_ranking', 'generate_poses'),
+        generated_poses_folder=conf.get('protein_ranking', 'generated_poses_folder')
     )
 
     # CHECKPOINT!

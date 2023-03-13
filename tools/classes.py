@@ -28,15 +28,20 @@ class Protein:
 
         if self.type == 'ligase':
             self.conformations = []
+    
+
+    # def __getattr__(self, item):
+    #     return(None)
 
 
-    def get_protein_struct(self):
+    def get_protein_struct(self, struct_attr='file'):
         """
         Use the function load_biopython_structures to get the biopython object
         for the protein. 
         """ 
         from .structure_tools import load_biopython_structures
-        protein_struct = load_biopython_structures(structure_file=self.file)
+        structure_file = getattr(self, struct_attr)
+        protein_struct = load_biopython_structures(structure_file=structure_file)
         return(protein_struct)
 
 
@@ -72,13 +77,13 @@ class ProteinPose():
     """
     attributes added/modified by the functions:
         megadock.capture_scores()
-            - self.megadock_score
             - self.active = True
+            - self.megadock_score
         megadock.generate_poses()
             - self.file
         megadock.filter_poses()
             - self.active = Bool
-            - self.file
+            - self.filtered = Bool
         megadock.cluster()
             - self.rmsd
             - self.rmsd_reference
@@ -86,6 +91,9 @@ class ProteinPose():
             - self.centroid = Bool
         megadock.zrank_rescore()
             - self.z_score
+        rank.protein_poses()
+            - self.active = Bool
+            - self.top = Bool
         linker_sampling.rdkit_sampling()
             - self.protac_file
         
@@ -108,7 +116,11 @@ class ProteinPose():
             parent.conformations.append(self)
 
 
-    def get_rotated_struct(self, struct):
+    # def __getattr__(self, item):
+    #     return(None)
+    
+
+    def get_rotated_struct(self, struct_type, struct_attr='file'):
         """
         Use the rotate_atoms function to return a completely rotated
         coordinate set for the protein pose.
@@ -116,9 +128,9 @@ class ProteinPose():
 
         from ..run.megadock import rotate_atoms
 
-        if struct == 'protein':
-            ligase_obj = self.parent.get_protein_struct()
-        elif struct == 'ligand':
+        if struct_type == 'protein':
+            ligase_obj = self.parent.get_protein_struct(struct_attr=struct_attr)
+        elif struct_type == 'ligand':
             ligase_obj = self.parent.get_ligand_struct()
         else:
             raise Exception('Structure to capture must "protein" or "ligand".')
