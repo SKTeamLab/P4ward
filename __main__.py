@@ -12,7 +12,7 @@ if __name__ == '__main__':
     tracker = run_tracker.load_tracker(overwrite=conf.getboolean('general', 'overwrite'))
 
     # load pickle from previous run
-    receptor, ligase = run_tracker.load_protein_objects(
+    receptor, ligase, protac = run_tracker.load_run_objects(
         pickle_file=CPT_FILE,
         conf=conf,
         overwrite=conf.getboolean('general', 'overwrite')

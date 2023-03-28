@@ -1,5 +1,6 @@
 import os
 from ..tools import decorators
+from ..tools import classes
 from ..tools.logger import logger
 from ..tools.script_tools import create_folder
 
@@ -9,7 +10,7 @@ from ..tools.script_tools import create_folder
 def rdkit_sampling(
                         receptor_obj,
                         ligase_obj,
-                        protac,
+                        protac_obj,
                         rdkit_number_of_confs,
                         protac_poses_folder,
                         rmsd_tolerance,
@@ -33,6 +34,7 @@ def rdkit_sampling(
     reclig = Chem.MolFromMol2File(receptor_obj.lig_file)
     # get initial rotation information from ligase obj
     ref_rotation  = ligase_obj.rotate
+
 
     pose_objs = ligase_obj.active_confs()
     for pose_obj in pose_objs:
@@ -68,8 +70,7 @@ def rdkit_sampling(
         pose_lig_smarts = Chem.MolFromSmarts(pose_lig_smarts_)
         
         # open protac smiles and addhs
-        protac_ = open('protac.smiles', 'r').read()
-        protac = Chem.MolFromSmiles(protac_)
+        protac = Chem.MolFromSmiles(protac_obj.smiles)
         protac = Chem.AddHs(protac)
 
         # find atoms in the protac that match the wildcards:
@@ -79,6 +80,12 @@ def rdkit_sampling(
         # they are going to give the coordinates we have to match:
         receptor_lig_coords = reference_ligs.GetSubstructMatches(receptor_lig_smarts)[0]
         pose_lig_coords = reference_ligs.GetSubstructMatches(pose_lig_smarts)[0]
+
+        # make a new protac object and save its ligand atom indices if not done before
+        if protac_obj.index_ligs == None:
+            indices = list(receptor_lig_indices)
+            indices.extend(list(pose_lig_indices))
+            protac_obj.index_ligs = indices
 
         # build the dict that will contain the mapping btwn indices and coords:
         coordmap = {}
@@ -94,7 +101,9 @@ def rdkit_sampling(
             x, y, z = mol.GetAtomPosition(atom_coord)
             coordmap[atom_ix] = Point3D(x, y, z)
 
-        # sample the conformations!
+        # make ProtacPose obj:
+        protac_pose_obj = classes.ProtacPose(parent=protac_obj, protein_parent=pose_obj)
+        # sample its conformations!
         kwargs = {
             'mol':protac, 'coordMap':coordmap,
             'numConfs':rdkit_number_of_confs,
@@ -106,7 +115,6 @@ def rdkit_sampling(
             logger.warning(f"rdkit timeout for pose {pose_obj.pose_number}")
             pass
 
-
         # make pairlist to align the protac confs to the ref struct
         pairs = [(receptor_lig_indices[i], receptor_lig_coords[i]) for i in range(len(receptor_lig_indices))]
         pairs.extend([(pose_lig_indices[i], pose_lig_coords[i]) for i in range(len(pose_lig_indices))])
@@ -117,16 +125,22 @@ def rdkit_sampling(
         try:
             with open(protac_file, 'a+') as confs_file:
                 for i in range(rdkit_number_of_confs):
+                    # make linker conf object
+                    linker_conf = classes.LinkerConf(parent=protac_pose_obj, conf_number=i)
                     rmsd = Chem.rdMolAlign.AlignMol(protac, reference_ligs, atomMap=pairs, prbCid=i)
                     if rmsd <= rmsd_tolerance:
                         molblock = Chem.MolToMolBlock(protac, confId=i, kekulize=False)
                         confs_file.write(f'conf {i}')
                         confs_file.write(molblock)
                         confs_file.write('$$$$\n')
-            pose_obj.linker_gen = True
+                        linker_conf.active = True
+                    else:
+                        linker_conf.active = False
+            protac_pose_obj.active = True
+            protac_pose_obj.file = protac_file
         except:
             logger.info(f'No conformation possible for pose {pose_obj.pose_number}')
-            pose_obj.linker_gen = False
+            protac_pose_obj.active = False
 
         # update pose_obj with new linker file
         pose_obj.protac_file = protac_file

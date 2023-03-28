@@ -110,6 +110,7 @@ class ProteinPose():
         self.lig_file = parent.lig_file
         self.active = None
         self.file = None
+        self.protac_pose = None
 
         # add itself to the parent's conformations list
         if self not in parent.conformations:
@@ -149,3 +150,64 @@ class ProteinPose():
             atom.set_coord((newX, newY, newZ))
 
         return(ligase_obj)
+
+
+
+
+class Protac():
+
+    """
+    attributes added/modified by the functions:
+        linker_sampling.rdkit_sampling()
+            - self.index_ligs       
+    """
+
+    def __init__(self, smiles) -> None:
+        self.smiles = smiles
+        self.poses = [],
+        self.index_ligs = None
+
+
+
+
+class ProtacPose():
+
+    """
+    attributes added/modified by the functions:
+        linker_sampling.rdkit_sampling()
+            - self.active
+            - self.file
+    """
+
+    def __init__(self, parent, protein_parent) -> None:
+        self.parent = parent
+        self.protein_parent = protein_parent
+        self.linker_confs = []
+        self.active = None
+
+        self.protein_parent.protac_pose = self
+        if self not in parent.poses:
+            parent.poses.append(self)
+    
+    def active_confs(self):
+        active_confs = [pose for pose in self.linker_confs if pose.active]
+        return(active_confs)
+
+
+
+
+class LinkerConf():
+
+    """
+    attributes added/modified by the functions:
+        linker_sampling.rdkit_sampling()
+        linker_sampling.capture_dock6_scores()
+        linker_sampling.detect_clashes()
+    """
+
+    def __init__(self, parent, conf_number) -> None:
+        self.parent = parent
+        self.conf_number = conf_number
+
+        if self not in parent.linker_confs:
+            parent.linker_confs.append(self)

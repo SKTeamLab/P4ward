@@ -24,7 +24,7 @@ def load_tracker(overwrite):
         pickle.dump(run_tracker, pic)
 
 
-def load_protein_objects(pickle_file, conf, overwrite=False):
+def load_run_objects(pickle_file, conf, overwrite=False):
     """
     load receptor and ligase objects either from previously saved pickle or
     from scratch when first time running or overwrite chosen by user
@@ -33,7 +33,7 @@ def load_protein_objects(pickle_file, conf, overwrite=False):
     if not overwrite and os.path.isfile(pickle_file):
         logger.info('Retrieving information from previous run.')
         with open(pickle_file, 'rb') as pic:
-            receptor_obj, ligase_obj = pickle.load(pic)
+            receptor_obj, ligase_obj, protac_obj = pickle.load(pic)
     else:
         logger.info('No previous data retrieved.')
         receptor_obj = classes.Protein(
@@ -46,16 +46,19 @@ def load_protein_objects(pickle_file, conf, overwrite=False):
             file=conf.get('general', 'ligase'),
             lig_file=conf.get('general','ligase_ligand')
         )
+        protac_obj = classes.Protac(
+            smiles=open(conf.get('general', 'protac').read())
+        )
 
-    return(receptor_obj, ligase_obj)
+    return(receptor_obj, ligase_obj, protac_obj)
 
 
-def save_protein_objects(receptor_obj, ligase_obj):
+def save_protein_objects(receptor_obj, ligase_obj, protac_obj):
     """
     Save receptor and ligase objects into pickle file
     """
 
     with open(CPT_FILE, 'wb+') as pic:
-        pickle.dump((receptor_obj, ligase_obj), pic)
+        pickle.dump((receptor_obj, ligase_obj, protac_obj), pic)
     
     logger.info('Saved information from this run.')
