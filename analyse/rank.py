@@ -1,6 +1,7 @@
 import os
 from ..tools.logger import logger
 from ..tools import decorators
+from ..tools.script_tools import create_folder
 
 @decorators.track_run
 def protein_poses(
@@ -62,7 +63,7 @@ def protein_poses(
     """"""
     
 
-
+@decorators.track_run
 def generate_protein_poses(poses, pose_objs, generated_poses_folder):
     """
     Subset of protein-protein poses to generate based on conf option `generate_poses`.
@@ -87,10 +88,11 @@ def generate_protein_poses(poses, pose_objs, generated_poses_folder):
     else:
         raise Exception("Invalid choice for generate_poses")
     
-    
+    create_folder(generated_poses_folder)
     for pose in final_poses:
-        struct = pose.get_rotated_struct(struct_type='protein', struct_attr='mg_file')
+        struct = pose.get_rotated_struct(struct_type='protein', struct_attr='file')
         
         pdbio.set_structure(struct)
         final_file = os.path.join(generated_poses_folder, f"pose{pose.pose_number}.pdb")
+        pose.file = final_file
         pdbio.save(final_file)

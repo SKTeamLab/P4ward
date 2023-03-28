@@ -33,7 +33,7 @@ if __name__ == '__main__':
     )
 
     megadock.run_docking(
-        program_path=conf.get('megadock', 'program_path'),
+        program_path=conf.get('program_paths', 'megadock'),
         receptor_file=receptor.mg_file,
         ligase_file=ligase.mg_file,
         num_threads=conf.get('megadock', 'num_threads'),
@@ -106,6 +106,7 @@ if __name__ == '__main__':
 
     from .run import linker_sampling
 
+    # sample conformations
     linker_sampling.rdkit_sampling(
         receptor_obj=receptor,
         ligase_obj=ligase,
@@ -113,7 +114,21 @@ if __name__ == '__main__':
         rdkit_number_of_confs=conf.getint('linker_sampling', 'rdkit_number_of_confs'),
         protac_poses_folder=conf.get('linker_sampling', 'protac_poses_folder'),
         rmsd_tolerance=conf.getfloat('linker_sampling', 'rdkit_pose_rmsd_tolerance'),
+        time_tolerance=conf.getint('linker_sampling', 'rdkit_time_tolerance'),
         choice=conf.getboolean('linker_sampling', 'rdkit_sampling'),
+    )
+
+    # score conformations
+    linker_sampling.dock6_score(
+        pose_objs=ligase.active_confs(),
+        dock6_root=conf.get('program_paths', 'dock6_root'),
+        choice=conf.getboolean('linker_ranking', 'dock6_score')
+    )
+
+    linker_sampling.capture_dock6_scores(
+        pose_objs=ligase.active_confs(),
+        filter_linkers=conf.getboolean('linker_ranking', 'filter_successful_linkers'),
+        choice=conf.getboolean('linker_ranking', 'dock6_score')
     )
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
@@ -122,4 +137,4 @@ if __name__ == '__main__':
     from .analyse.make_summary import summary_csv
 
     run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase)
-    summary_csv(ligase.active_confs())
+    summary_csv([i for i in ligase.conformations if i.top])

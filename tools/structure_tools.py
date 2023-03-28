@@ -48,7 +48,6 @@ def get_rmsd(obj1, obj2, ca=False):
     and the pip tool rmsd.rmsd to calulate the rmsd. Returns rmsd value
     """
 
-    #from Bio.PDB.PDBParser import PDBParser as pdbp
     import numpy as np
     import rmsd
 
@@ -114,7 +113,17 @@ def smiles2smarts(smiles_code):
     atomlist = ['s','h','o','n','p','f','i','Cl','Br']
 
     for atom in atomlist:
+
+        # replace atoms with number
+        for i in range(9):
+            smiles_code = smiles_code.replace(f'[{atom}-{i}]', '[*]')
+            smiles_code = smiles_code.replace(f'[{atom.upper()}-{i}]', '[*]')
+
+        smiles_code = smiles_code.replace(f'[{atom}-]', '[*]')
+        smiles_code = smiles_code.replace(f'[{atom}-]', '[*]')
         smiles_code = smiles_code.replace(atom, '*')
+        smiles_code = smiles_code.replace(f'[{atom.upper()}-]', '[*]')
+        smiles_code = smiles_code.replace(f'[{atom.upper()}-]', '[*]')
         smiles_code = smiles_code.replace(atom.upper(), '*')
         smiles_code = smiles_code.replace('.', '')
     

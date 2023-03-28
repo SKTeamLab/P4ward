@@ -30,10 +30,6 @@ class Protein:
             self.conformations = []
     
 
-    # def __getattr__(self, item):
-    #     return(None)
-
-
     def get_protein_struct(self, struct_attr='file'):
         """
         Use the function load_biopython_structures to get the biopython object
@@ -96,6 +92,10 @@ class ProteinPose():
             - self.top = Bool
         linker_sampling.rdkit_sampling()
             - self.protac_file
+        linker_sampling.capture_dock6_scores()
+            - self.linker_scores
+            - self.active_linkers
+            - self.active
         
     """
 
@@ -125,6 +125,7 @@ class ProteinPose():
         Use the rotate_atoms function to return a completely rotated
         coordinate set for the protein pose.
         """
+        from Bio.PDB import Selection
 
         from ..run.megadock import rotate_atoms
 
@@ -137,16 +138,14 @@ class ProteinPose():
         ref_rotate = self.parent.rotate
         pose_rotate = self.rotate
 
-        for model in ligase_obj:
-            for chain in model:
-                for res in chain:
-                    for atom in res:
-                        x,y,z, = atom.get_vector()
-                        newX, newY, newZ = rotate_atoms(
-                            (x, y, z),
-                            ref_rotation=ref_rotate,
-                            pose_rotation=pose_rotate
-                        )
-                        atom.set_coord((newX, newY, newZ))
+        atoms = Selection.unfold_entities(ligase_obj, 'A')
+        for atom in atoms:
+            x,y,z, = atom.get_vector()
+            newX, newY, newZ = rotate_atoms(
+                (x, y, z),
+                ref_rotation=ref_rotate,
+                pose_rotation=pose_rotate
+            )
+            atom.set_coord((newX, newY, newZ))
 
         return(ligase_obj)

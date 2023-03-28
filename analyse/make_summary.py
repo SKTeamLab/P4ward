@@ -7,12 +7,18 @@ def summary_csv(pose_objects):
         'megadock_score':[],
         'z_score':[],
         'cluster':[],
-        'centroid':[]
+        'centroid':[],
+        'linker_gen':[],
+        'active_linkers':[],
     }
     
     for pose_obj in pose_objects:
         for attr in data_dict.keys():
-            data_dict[attr].append(getattr(pose_obj, attr))
+            try:
+                attr_value = getattr(pose_obj, attr)
+            except:
+                attr_value = None
+            data_dict[attr].append(attr_value)
     
     data = pd.DataFrame.from_dict(data_dict)
     data.to_csv('summary.csv')
