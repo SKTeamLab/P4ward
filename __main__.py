@@ -51,7 +51,7 @@ if __name__ == '__main__':
     )
 
     # CHECKPOINT!
-    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase)
+    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_obj=protac)
 
     megadock.zrank_rescore(
         ligase_obj=ligase,
@@ -69,7 +69,7 @@ if __name__ == '__main__':
     )
 
     # CHECKPOINT!
-    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase)
+    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_obj=protac)
 
     megadock.cluster(
         pose_objects=ligase.active_confs(), # structures are now the saved confs attr
@@ -97,7 +97,7 @@ if __name__ == '__main__':
     )
 
     # CHECKPOINT!
-    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase)
+    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_obj=protac)
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
@@ -110,15 +110,30 @@ if __name__ == '__main__':
     linker_sampling.rdkit_sampling(
         receptor_obj=receptor,
         ligase_obj=ligase,
-        protac=conf.get('general', 'protac'),
+        protac_obj=protac,
         rdkit_number_of_confs=conf.getint('linker_sampling', 'rdkit_number_of_confs'),
         protac_poses_folder=conf.get('linker_sampling', 'protac_poses_folder'),
         rmsd_tolerance=conf.getfloat('linker_sampling', 'rdkit_pose_rmsd_tolerance'),
         time_tolerance=conf.getint('linker_sampling', 'rdkit_time_tolerance'),
         choice=conf.getboolean('linker_sampling', 'rdkit_sampling'),
     )
+    # CHECKPOINT!
+    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_obj=protac)
 
-    # score conformations
+    # detect linker clashes
+    linker_sampling.detect_clashes(
+        receptor_obj=receptor,
+        protac_obj=protac,
+        pose_objs=ligase.active_confs(),
+        protac_poses_folder=conf.get('linker_sampling', 'protac_poses_folder'),
+        clash_threshold=conf.getfloat('linker_ranking', 'clash_threshold'),
+        restrict_clash_to_linker=conf.getboolean('linker_ranking', 'restrict_clash_to_linker'),
+        filter_clashed=conf.getboolean('linker_ranking', 'filter_clashed'),
+        max_clashes_allowed=conf.getint('linker_ranking', 'max_clashes_allowed'),
+        choice=conf.getboolean('linker_ranking', 'clash_detection')
+    )
+
+    # score conformations with dock6
     linker_sampling.dock6_score(
         pose_objs=ligase.active_confs(),
         dock6_root=conf.get('program_paths', 'dock6_root'),
@@ -127,14 +142,14 @@ if __name__ == '__main__':
 
     linker_sampling.capture_dock6_scores(
         pose_objs=ligase.active_confs(),
-        filter_linkers=conf.getboolean('linker_ranking', 'filter_successful_linkers'),
+        filter_linkers=conf.getboolean('linker_ranking', 'filter_scored_linkers'),
         choice=conf.getboolean('linker_ranking', 'dock6_score')
     )
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     #~~~~~~~~~~~~~ end session ~~~~~~~~~~~~~#
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-    from .analyse.make_summary import summary_csv
+    from .analyse.summaries import summary_csv
 
-    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase)
+    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_obj=protac)
     summary_csv([i for i in ligase.conformations if i.top])

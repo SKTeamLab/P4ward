@@ -81,7 +81,7 @@ def rdkit_sampling(
         receptor_lig_coords = reference_ligs.GetSubstructMatches(receptor_lig_smarts)[0]
         pose_lig_coords = reference_ligs.GetSubstructMatches(pose_lig_smarts)[0]
 
-        # make a new protac object and save its ligand atom indices if not done before
+        # save protac_obj ligand atom indices if not done before
         if protac_obj.index_ligs == None:
             indices = list(receptor_lig_indices)
             indices.extend(list(pose_lig_indices))
@@ -130,7 +130,7 @@ def rdkit_sampling(
                     rmsd = Chem.rdMolAlign.AlignMol(protac, reference_ligs, atomMap=pairs, prbCid=i)
                     if rmsd <= rmsd_tolerance:
                         molblock = Chem.MolToMolBlock(protac, confId=i, kekulize=False)
-                        confs_file.write(f'conf {i}')
+                        confs_file.write(f'conf_{i}')
                         confs_file.write(molblock)
                         confs_file.write('$$$$\n')
                         linker_conf.active = True
@@ -155,18 +155,14 @@ def dock6_score(pose_objs, dock6_root):
     """
     import subprocess
     from ..definitions import ROOT_DIR
+    from ..tools.structure_tools import obabel_convert
 
     logger.info('Scoring protacs coformations using dock6 continuous score')
 
     for pose_obj in pose_objs:
 
         # use obabel to convert sdf to mol2:
-        mol2_file = pose_obj.protac_file.replace('sdf','mol2')
-        command = [
-            'obabel', '-isdf', pose_obj.protac_file,
-            '-omol2', '-O', mol2_file
-        ]
-        subprocess.run(command)
+        mol2_file = obabel_convert(pose_obj.protac_file, 'sdf', 'mol2')
         logger.info('Converted conformations sdf file into mol2')
     
         folder_path = os.path.dirname(mol2_file)
@@ -222,7 +218,7 @@ def capture_dock6_scores(pose_objs, filter_linkers):
         for key in patterns:
             found = re.findall(patterns[key], file_text)
             if key == 'conf_number':
-                found = [int(i.split(' ')[-1]) for i in found]
+                found = [int(i.split('_')[-1]) for i in found]
             else:
                 found = [float(i) for i in found]
             data[key] = found
@@ -250,13 +246,63 @@ def capture_dock6_scores(pose_objs, filter_linkers):
                 pose_obj.active_linkers = None
                 pose_obj.active = False
 
+@decorators.track_run
+@decorators.user_choice
+def detect_clashes(
+        receptor_obj,
+        protac_obj,
+        pose_objs,
+        protac_poses_folder,
+        clash_threshold,
+        restrict_clash_to_linker,
+        filter_clashed,
+        max_clashes_allowed
+):
+    """
+    Use biopython to detect clashes between proteins and linker poses
+    """
 
-# def detect_clashes(receptor_obj, pose_objs, clash_tolerance):
-#     """
-#     Use biopython to detect clashes between proteins and linker poses
-#     """
-#     # pose_objs where linker_gen is True
+    from Bio.PDB import Selection, NeighborSearch
+    from ..tools.structure_tools import obabel_convert, load_biopython_structures
+    from ..tools.script_tools import create_folder
+    
+    receptor_struct = receptor_obj.get_protein_struct()
 
-#     receptor_struct = receptor_obj.get_protein_struct()
+    # only looop the pose_objs if their protac_pose is active
+    pose_objs = [i for i in pose_objs if i.protac_pose.active]
+    for pose_obj in pose_objs:
+        pose_struct = pose_obj.get_rotated_struct(struct_type='protein')
 
-#     for pose_obj in pose_objs:
+        # convert their poses and split
+        split_confs_folder = os.path.join(protac_poses_folder, f'protein_pose_{pose_obj.pose_number}', 'split_confs')
+        create_folder(split_confs_folder)
+        obabel_convert(pose_obj.protac_pose.file, 'sdf', 'pdb', split=True, split_folder=split_confs_folder)
+
+        # initialize neighbour search
+        proteins = Selection.unfold_entities(receptor_struct, 'A')
+        proteins.extend(Selection.unfold_entities(pose_struct, 'A'))
+        ns = NeighborSearch(proteins)
+
+        # only loop the linker_confs that are active
+        linker_confs = [i for i in pose_obj.protac_pose.linker_confs if i.active]
+        for linker_conf in linker_confs:
+
+            conf_file = f'conf_{linker_conf.conf_number}.pdb'
+            conf_struct = load_biopython_structures(os.path.join(split_confs_folder, conf_file))
+
+            atom_selection = Selection.unfold_entities(conf_struct, 'A')
+            if restrict_clash_to_linker:
+                atom_selection = [i for i in atom_selection if i not in protac_obj.index_ligs]
+
+            clash_count = 0
+            for atom in atom_selection:
+                close_atoms = ns.search(atom.coord, clash_threshold)
+                if len(close_atoms) > 0:
+                    clash_count+=1
+            
+            linker_conf.clash_count = clash_count
+            if filter_clashed and clash_count > max_clashes_allowed:
+                linker_conf.active = False
+
+
+

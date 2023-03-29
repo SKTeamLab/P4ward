@@ -47,7 +47,7 @@ def load_run_objects(pickle_file, conf, overwrite=False):
             lig_file=conf.get('general','ligase_ligand')
         )
         protac_obj = classes.Protac(
-            smiles=open(conf.get('general', 'protac').read())
+            smiles=open(conf.get('general', 'protac')).read()
         )
 
     return(receptor_obj, ligase_obj, protac_obj)

@@ -91,7 +91,7 @@ class ProteinPose():
             - self.active = Bool
             - self.top = Bool
         linker_sampling.rdkit_sampling()
-            - self.protac_file
+            - self.protac_pose
         linker_sampling.capture_dock6_scores()
             - self.linker_scores
             - self.active_linkers
@@ -110,15 +110,10 @@ class ProteinPose():
         self.lig_file = parent.lig_file
         self.active = None
         self.file = None
-        self.protac_pose = None
 
         # add itself to the parent's conformations list
         if self not in parent.conformations:
             parent.conformations.append(self)
-
-
-    # def __getattr__(self, item):
-    #     return(None)
     
 
     def get_rotated_struct(self, struct_type, struct_attr='file'):
@@ -164,7 +159,7 @@ class Protac():
 
     def __init__(self, smiles) -> None:
         self.smiles = smiles
-        self.poses = [],
+        self.poses = []
         self.index_ligs = None
 
 
@@ -203,6 +198,8 @@ class LinkerConf():
         linker_sampling.rdkit_sampling()
         linker_sampling.capture_dock6_scores()
         linker_sampling.detect_clashes()
+            - self.clash_count
+            - self.active
     """
 
     def __init__(self, parent, conf_number) -> None:

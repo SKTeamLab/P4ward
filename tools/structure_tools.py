@@ -128,3 +128,20 @@ def smiles2smarts(smiles_code):
         smiles_code = smiles_code.replace('.', '')
     
     return(smiles_code)
+
+
+def obabel_convert(file_path, input_format, output_format, split=False, split_folder=''):
+
+    if split:
+        split_str = '--split'
+        new_file = os.path.join(split_folder, f'template.{output_format}')
+    else:
+        split_str = ''
+        new_file = file_path.replace(input_format, output_format)
+
+    command = [
+        'obabel', f'-i{input_format}', file_path, split_str, '-d'
+        f'-o{output_format}', '-O', new_file
+    ]
+    subprocess.run(command)
+    return(new_file)
