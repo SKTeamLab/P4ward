@@ -38,8 +38,11 @@ def summary_csv(pose_objects):
 
 
 def chimerax_view(receptor_obj, pose_objs):
+    """
+    Make a chimerax visualization script to see the final successful poses
+    """
+    
     import seaborn as sns
-
 
     script = f"open {receptor_obj.file};\n color #1 #afafaf target asr;\n"
     model_num = 1
@@ -52,19 +55,20 @@ def chimerax_view(receptor_obj, pose_objs):
         pose_obj = models[i]
         model_num += 2
         script += (
-            f"open protein_docking/pose{pose_obj.pose_number}.pdb;\n" +
-            f"open ligand_sampling/protein_pose_{pose_obj.pose_number}/protac_embedded_confs.sdf;\n" +
-            f"color #{model_num-1},{model_num} {palette[i]} target asr;\n" +
-            f"color #{model_num} byhet;\n"
+             f"open protein_docking/pose{pose_obj.pose_number}.pdb;\n"
+            +f"open ligand_sampling/protein_pose_{pose_obj.pose_number}/protac_embedded_confs.sdf;\n"
+            +f"color #{model_num-1},{model_num} {palette[i]} target asr;\n"
+            +f"color #{model_num} byhet;\n"
         )
         for i in pose_obj.protac_pose.linker_confs:
             if not i.active:
                 script += (f'close #{model_num} &  ##name="conf_{i.conf_number}";\n')
     
     script += (
-        f"hide H;\n" +
-        f"lighting full;\n" +
-        f"set bgcolor white;\n"
+         f"hide H;\n"
+        +f"lighting full;\n"
+        +f"set bgcolor white;\n"
+        +f"view;\n"
     )
 
     with open('summary.cxc', 'w+') as cmx:

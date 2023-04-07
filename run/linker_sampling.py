@@ -22,6 +22,7 @@ def rdkit_sampling(
     """
     from rdkit import Chem
     from rdkit.Chem import AllChem
+    from rdkit.Chem import rdFMCS
     from rdkit.Geometry.rdGeometry import Point3D
     from func_timeout import func_timeout
     from ..tools.structure_tools import smiles2smarts
@@ -31,7 +32,7 @@ def rdkit_sampling(
     create_folder(protac_poses_folder)
 
     # open receptor ligand - will not change
-    reclig = Chem.MolFromMol2File(receptor_obj.lig_file)
+    reclig = Chem.MolFromMol2File(receptor_obj.lig_file, sanitize=False, cleanupSubstructures=False)
     # get initial rotation information from ligase obj
     ref_rotation  = ligase_obj.rotate
 
@@ -44,7 +45,7 @@ def rdkit_sampling(
         create_folder(linker_folder)
 
         # open ligase ligand - changes every loop
-        liglig = Chem.MolFromMol2File(ligase_obj.lig_file)
+        liglig = Chem.MolFromMol2File(ligase_obj.lig_file, sanitize=False, cleanupSubstructures=False)
         conf = liglig.GetConformer()
 
         # get final rotation information for the pose
@@ -59,20 +60,16 @@ def rdkit_sampling(
         # combine both ligs
         reference_ligs = Chem.CombineMols(liglig, reclig)
 
-        #  convert and get smiles
-        pose_lig_smiles = Chem.MolToSmiles(liglig)
-        receptor_lig_smiles = Chem.MolToSmiles(reclig)
-        
-        # for each of their smiles, transform into wildcard smarts
-        receptor_lig_smarts_ = smiles2smarts(receptor_lig_smiles)
-        pose_lig_smarts_ = smiles2smarts(pose_lig_smiles)
-        receptor_lig_smarts = Chem.MolFromSmarts(receptor_lig_smarts_)
-        pose_lig_smarts = Chem.MolFromSmarts(pose_lig_smarts_)
-        
-        # open protac smiles and addhs
+        # open protac smiles
         protac = Chem.MolFromSmiles(protac_obj.smiles)
         protac = Chem.AddHs(protac)
 
+        # between the protac and each extremity, get maximum common substructure
+        receptor_lig_smarts_ = rdFMCS.FindMCS([protac, reclig]).smartsString
+        pose_lig_smarts_ = rdFMCS.FindMCS([protac, liglig]).smartsString
+        receptor_lig_smarts = Chem.MolFromSmarts(receptor_lig_smarts_)
+        pose_lig_smarts = Chem.MolFromSmarts(pose_lig_smarts_)
+        
         # find atoms in the protac that match the wildcards:
         receptor_lig_indices = protac.GetSubstructMatches(receptor_lig_smarts)[0]
         pose_lig_indices = protac.GetSubstructMatches(pose_lig_smarts)[0]
@@ -81,11 +78,20 @@ def rdkit_sampling(
         receptor_lig_coords = reference_ligs.GetSubstructMatches(receptor_lig_smarts)[0]
         pose_lig_coords = reference_ligs.GetSubstructMatches(pose_lig_smarts)[0]
 
-        # save protac_obj ligand atom indices if not done before
+        # save protac_obj ligand and linker atom indices if not done before
         if protac_obj.index_ligs == None:
+
+            # save ligands
             indices = list(receptor_lig_indices)
             indices.extend(list(pose_lig_indices))
             protac_obj.index_ligs = indices
+
+            # save linker
+            protac_obj.index_link = []
+            for atom in Chem.RemoveHs(protac).GetAtoms():
+                ix = atom.GetIdx()
+                if ix not in indices:
+                    protac_obj.index_link.append(ix)
 
         # build the dict that will contain the mapping btwn indices and coords:
         coordmap = {}
@@ -138,17 +144,16 @@ def rdkit_sampling(
                         linker_conf.active = False
             protac_pose_obj.active = True
             protac_pose_obj.file = protac_file
-        except:
+        except Exception as e:
+            print(e)
             logger.info(f'No conformation possible for pose {pose_obj.pose_number}')
             protac_pose_obj.active = False
 
-        # update pose_obj with new linker file
-        pose_obj.protac_file = protac_file
 
 
 @decorators.track_run
 @decorators.user_choice
-def dock6_score(pose_objs, dock6_root):
+def dock6_score(pose_objs, dock6_root, linkers_only):
     """
     Use dock6 continuous score to rank the linker conformations.
     If no linker conf has negative energy, then the protein pose is not viable
@@ -162,7 +167,7 @@ def dock6_score(pose_objs, dock6_root):
     for pose_obj in pose_objs:
 
         # use obabel to convert sdf to mol2:
-        mol2_file = obabel_convert(pose_obj.protac_file, 'sdf', 'mol2')
+        mol2_file = obabel_convert(pose_obj.protac_pose.file, 'sdf', 'mol2')
         logger.info('Converted conformations sdf file into mol2')
     
         folder_path = os.path.dirname(mol2_file)
@@ -228,7 +233,7 @@ def capture_dock6_scores(pose_objs, filter_linkers):
  
     for pose_obj in pose_objs:
 
-        folder_path = os.path.dirname(pose_obj.protac_file)
+        folder_path = os.path.dirname(pose_obj.protac_pose.file)
         scored_file = 'protac_scored.mol2'
 
         data = parse_file(os.path.join(folder_path, scored_file))

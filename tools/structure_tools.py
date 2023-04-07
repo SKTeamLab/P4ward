@@ -16,8 +16,12 @@ def load_biopython_structures(structure_file, mol2=False):
         from rdkit import Chem
         from io import StringIO
 
-        rdkit_obj = Chem.MolFromMol2File(structure_file)
-        pdb_block = Chem.MolToPDBBlock(rdkit_obj)
+        run = subprocess.run(
+            ['obabel','-imol2',structure_file,'-opdb'],
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+            text=True
+        )
+        pdb_block = run.stdout
         pdbfile = StringIO(pdb_block)
 
         structure_obj = parser.get_structure('structure', pdbfile)

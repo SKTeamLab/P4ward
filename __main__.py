@@ -137,6 +137,7 @@ if __name__ == '__main__':
     linker_sampling.dock6_score(
         pose_objs=ligase.active_confs(),
         dock6_root=conf.get('program_paths', 'dock6_root'),
+        linkers_only=conf.get('linker_ranking', 'dock6_linkers_only'),
         choice=conf.getboolean('linker_ranking', 'dock6_score')
     )
 
@@ -149,7 +150,8 @@ if __name__ == '__main__':
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     #~~~~~~~~~~~~~ end session ~~~~~~~~~~~~~#
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-    from .analyse.summaries import summary_csv
+    from .analyse import summaries
 
     run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_obj=protac)
-    summary_csv([i for i in ligase.conformations if i.top])
+    summaries.summary_csv([i for i in ligase.conformations if i.top])
+    summaries.chimerax_view(receptor, [i for i in ligase.conformations if i.top])

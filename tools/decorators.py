@@ -43,5 +43,5 @@ def track_run(func):
                 pickle.dump(tracker, pic)
             
         else:
-            logger.debug('Skipping run for function {func_path}')
+            logger.debug(f'Skipping run for function {func_path}')
     return(wrapper)

@@ -90,7 +90,7 @@ def generate_protein_poses(poses, pose_objs, generated_poses_folder):
     
     create_folder(generated_poses_folder)
     for pose in final_poses:
-        struct = pose.get_rotated_struct(struct_type='protein', struct_attr='file')
+        struct = pose.get_rotated_struct(struct_type='protein', struct_attr='mg_file')
         
         pdbio.set_structure(struct)
         final_file = os.path.join(generated_poses_folder, f"pose{pose.pose_number}.pdb")
