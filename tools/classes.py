@@ -154,13 +154,14 @@ class Protac():
     """
     attributes added/modified by the functions:
         linker_sampling.rdkit_sampling()
-            - self.index_ligs       
+            - self.indices_ligs       
+            - self.indices_link
     """
 
     def __init__(self, smiles) -> None:
         self.smiles = smiles
         self.poses = []
-        self.index_ligs = None
+        self.indices_ligs = None
 
 
 

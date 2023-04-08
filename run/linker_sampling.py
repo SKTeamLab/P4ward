@@ -1,4 +1,6 @@
 import os
+import copy
+import numpy as np
 from ..tools import decorators
 from ..tools import classes
 from ..tools.logger import logger
@@ -6,11 +8,13 @@ from ..tools.script_tools import create_folder
 
 
 @decorators.user_choice
-@decorators.track_run
+#@decorators.track_run
 def rdkit_sampling(
                         receptor_obj,
                         ligase_obj,
                         protac_obj,
+                        extend_flexible_small_linker,
+                        min_linker_length,
                         rdkit_number_of_confs,
                         protac_poses_folder,
                         rmsd_tolerance,
@@ -25,46 +29,25 @@ def rdkit_sampling(
     from rdkit.Chem import rdFMCS
     from rdkit.Geometry.rdGeometry import Point3D
     from func_timeout import func_timeout
-    from ..tools.structure_tools import smiles2smarts
     from ..run.megadock import rotate_atoms
 
-    # make folder where the linkers for all pose objs will be stored
-    create_folder(protac_poses_folder)
 
-    # open receptor ligand - will not change
-    reclig = Chem.MolFromMol2File(receptor_obj.lig_file, sanitize=False, cleanupSubstructures=False)
-    # get initial rotation information from ligase obj
-    ref_rotation  = ligase_obj.rotate
+    def make_indices(receptor_lig_indices, pose_lig_indices):
 
+        indices_ligs = list(receptor_lig_indices)
+        indices_ligs.extend(list(pose_lig_indices))
 
-    pose_objs = ligase_obj.active_confs()
-    for pose_obj in pose_objs:
-
-        # make folder for each pose obj linker file to be saved
-        linker_folder = os.path.join(protac_poses_folder, f'protein_pose_{pose_obj.pose_number}')
-        create_folder(linker_folder)
-
-        # open ligase ligand - changes every loop
-        liglig = Chem.MolFromMol2File(ligase_obj.lig_file, sanitize=False, cleanupSubstructures=False)
-        conf = liglig.GetConformer()
-
-        # get final rotation information for the pose
-        pose_rotation = pose_obj.rotate
+        indices_link = []
+        for atom in Chem.RemoveHs(protac).GetAtoms():
+            ix = atom.GetIdx()
+            if ix not in indices_ligs:
+                indices_link.append(ix)
         
-        # rotate ligase ligand to new position
-        for i in range(liglig.GetNumAtoms()):
-            x, y, z = conf.GetAtomPosition(i)
-            newX, newY, newZ = rotate_atoms((x, y, z), ref_rotation=ref_rotation, pose_rotation=pose_rotation)
-            conf.SetAtomPosition(i,Point3D(newX, newY, newZ))
+        return(indices_ligs, indices_link)
+    
 
-        # combine both ligs
-        reference_ligs = Chem.CombineMols(liglig, reclig)
+    def get_matches(protac, reclig, liglig, reference_ligs):
 
-        # open protac smiles
-        protac = Chem.MolFromSmiles(protac_obj.smiles)
-        protac = Chem.AddHs(protac)
-
-        # between the protac and each extremity, get maximum common substructure
         receptor_lig_smarts_ = rdFMCS.FindMCS([protac, reclig]).smartsString
         pose_lig_smarts_ = rdFMCS.FindMCS([protac, liglig]).smartsString
         receptor_lig_smarts = Chem.MolFromSmarts(receptor_lig_smarts_)
@@ -78,32 +61,123 @@ def rdkit_sampling(
         receptor_lig_coords = reference_ligs.GetSubstructMatches(receptor_lig_smarts)[0]
         pose_lig_coords = reference_ligs.GetSubstructMatches(pose_lig_smarts)[0]
 
-        # save protac_obj ligand and linker atom indices if not done before
-        if protac_obj.index_ligs == None:
+        matches = {
+            'receptor_lig_indices' : list(receptor_lig_indices),
+            'pose_lig_indices'     : list(pose_lig_indices),
+            'receptor_lig_coords'  : list(receptor_lig_coords),
+            'pose_lig_coords'      : list(pose_lig_coords)
+        }
+        return(matches)
 
-            # save ligands
-            indices = list(receptor_lig_indices)
-            indices.extend(list(pose_lig_indices))
-            protac_obj.index_ligs = indices
 
-            # save linker
-            protac_obj.index_link = []
-            for atom in Chem.RemoveHs(protac).GetAtoms():
-                ix = atom.GetIdx()
-                if ix not in indices:
-                    protac_obj.index_link.append(ix)
+    def check_linker_size(protac, indices_link, min_linker_length, matches):
+
+        if len(indices_link) <= min_linker_length:
+            logger.warning(f"Linker length is {len(indices_link)}, extending flexibility to neighbouring atoms.")
+
+            neighbours = []
+            protac_noh = Chem.RemoveHs(protac)
+            for linker_atom in indices_link:                    # for each linker atom:
+                atom = protac_noh.GetAtomWithIdx(linker_atom)   # get the atom obj
+                nbs = [i.GetIdx() for i in atom.GetNeighbors()] # get idx of the atom's neighbours (nbs)
+                nbs = [i for i in nbs if i not in indices_link] # only keep nbs that are not in the linker already
+                neighbours.extend(nbs)                          # add them to neighbour list
+            neighbours = list(np.unique(neighbours))            # remove duplicates
+
+            receptor_lig_indices = dict(zip(range(len(matches['receptor_lig_indices'])), matches['receptor_lig_indices']))
+            receptor_lig_coords = dict(zip(range(len(matches['receptor_lig_coords'])), matches['receptor_lig_coords']))            
+            for i in range(len(receptor_lig_indices)):    # remove nbs from receptor_lig_indices and coords
+                if receptor_lig_indices[i] in neighbours:
+                    receptor_lig_indices.pop(i)
+                    receptor_lig_coords.pop(i)
+            matches['receptor_lig_indices'] = list(receptor_lig_indices.values())
+            matches['receptor_lig_coords'] = list(receptor_lig_coords.values())
+
+            pose_lig_indices = dict(zip(range(len(matches['pose_lig_indices'])), matches['pose_lig_indices']))
+            pose_lig_coords = dict(zip(range(len(matches['pose_lig_coords'])), matches['pose_lig_coords']))
+            for i in range(len(pose_lig_indices)):        # remove nbs from pose_lig_indices and coords
+                if pose_lig_indices[i] in neighbours:
+                    pose_lig_indices.pop(i)
+                    pose_lig_coords.pop(i)
+            matches['pose_lig_indices'] = list(pose_lig_indices.values())
+            matches['pose_lig_coords'] = list(pose_lig_coords.values())
+        
+        else:
+            logger.info(f"Linker length is {len(indices_link)}, not extending flexibility.")
+        
+        return(matches)
+           
+
+    # make folder where the linkers for all pose objs will be stored
+    create_folder(protac_poses_folder)
+    # open receptor ligand - will not change, get its rotation info
+    reclig = Chem.MolFromMol2File(receptor_obj.lig_file, sanitize=False, cleanupSubstructures=False)
+    ref_rotation  = ligase_obj.rotate
+    # open ligase ligand - raw initial position
+    liglig = Chem.MolFromMol2File(ligase_obj.lig_file, sanitize=False, cleanupSubstructures=False)
+    # combine reclig and liglig into a single molecule
+    reference_ligs = Chem.CombineMols(liglig, reclig)
+    # open protac and addHs
+    protac = Chem.MolFromSmiles(protac_obj.smiles)
+    protac = Chem.AddHs(protac)
+
+    matches = get_matches(protac, reclig, liglig, reference_ligs)
+    indices_ligs, indices_link = make_indices(matches['receptor_lig_indices'], matches['pose_lig_indices'])
+    alignment_pairs = [(matches['receptor_lig_indices'][i], matches['receptor_lig_coords'][i]) for i in range(len(matches['receptor_lig_indices']))]
+    alignment_pairs.extend([(matches['pose_lig_indices'][i], matches['pose_lig_coords'][i]) for i in range(len(matches['pose_lig_indices']))])
+
+
+    if extend_flexible_small_linker:
+        matches = check_linker_size(protac, indices_link, min_linker_length, matches)
+        indices_ligs, indices_link = make_indices(matches['receptor_lig_indices'], matches['pose_lig_indices'])
+        alignment_pairs = [(matches['receptor_lig_indices'][i], matches['receptor_lig_coords'][i]) for i in range(len(matches['receptor_lig_indices']))]
+        alignment_pairs.extend([(matches['pose_lig_indices'][i], matches['pose_lig_coords'][i]) for i in range(len(matches['pose_lig_indices']))])
+        
+        print(indices_link)
+
+    # save protac_obj ligand and linker atom indices if not done before
+    if protac_obj.indices_ligs == None:
+        protac_obj.indices_ligs = indices_ligs
+        protac_obj.indices_link = indices_link
+
+
+    pose_objs = ligase_obj.active_confs()
+    for pose_obj in pose_objs:
+
+        # make folder for each pose obj linker file to be saved
+        linker_folder = os.path.join(protac_poses_folder, f'protein_pose_{pose_obj.pose_number}')
+        create_folder(linker_folder)
+
+        # open ligase ligand - changes every loop
+        liglig_rotate = copy.deepcopy(liglig)
+        conf = liglig_rotate.GetConformer()
+
+        # get final rotation information for the pose
+        pose_rotation = pose_obj.rotate
+        
+        # rotate ligase ligand to new position
+        for i in range(liglig_rotate.GetNumAtoms()):
+            x, y, z = conf.GetAtomPosition(i)
+            newX, newY, newZ = rotate_atoms((x, y, z), ref_rotation=ref_rotation, pose_rotation=pose_rotation)
+            conf.SetAtomPosition(i,Point3D(newX, newY, newZ))
+
+        # combine both ligs
+        reference_ligs_rotate = Chem.CombineMols(liglig_rotate, reclig)
+
+        # copy protac to be embedded
+        protac_embed = copy.deepcopy(protac)
 
         # build the dict that will contain the mapping btwn indices and coords:
         coordmap = {}
-        mol = reference_ligs.GetConformer()
-        for i in range(len(receptor_lig_indices)):
-            atom_ix = receptor_lig_indices[i]
-            atom_coord = receptor_lig_coords[i]
+        mol = reference_ligs_rotate.GetConformer()
+        for i in range(len(matches['receptor_lig_indices'])):
+            atom_ix = matches['receptor_lig_indices'][i]
+            atom_coord = matches['receptor_lig_coords'][i]
             x, y, z = mol.GetAtomPosition(atom_coord)
             coordmap[atom_ix] = Point3D(x, y, z)
-        for i in range(len(pose_lig_indices)):
-            atom_ix = pose_lig_indices[i]
-            atom_coord = pose_lig_coords[i]
+        for i in range(len(matches['pose_lig_indices'])):
+            atom_ix = matches['pose_lig_indices'][i]
+            atom_coord = matches['pose_lig_coords'][i]
             x, y, z = mol.GetAtomPosition(atom_coord)
             coordmap[atom_ix] = Point3D(x, y, z)
 
@@ -111,7 +185,7 @@ def rdkit_sampling(
         protac_pose_obj = classes.ProtacPose(parent=protac_obj, protein_parent=pose_obj)
         # sample its conformations!
         kwargs = {
-            'mol':protac, 'coordMap':coordmap,
+            'mol':protac_embed, 'coordMap':coordmap,
             'numConfs':rdkit_number_of_confs,
             'enforceChirality':False
         }
@@ -121,10 +195,6 @@ def rdkit_sampling(
             logger.warning(f"rdkit timeout for pose {pose_obj.pose_number}")
             pass
 
-        # make pairlist to align the protac confs to the ref struct
-        pairs = [(receptor_lig_indices[i], receptor_lig_coords[i]) for i in range(len(receptor_lig_indices))]
-        pairs.extend([(pose_lig_indices[i], pose_lig_coords[i]) for i in range(len(pose_lig_indices))])
-        
         # for each conformation, align and write to single sdf file,
         # capturing only the poses that obey the rmsd tolerance
         protac_file = os.path.join(linker_folder, 'protac_embedded_confs.sdf')
@@ -133,9 +203,10 @@ def rdkit_sampling(
                 for i in range(rdkit_number_of_confs):
                     # make linker conf object
                     linker_conf = classes.LinkerConf(parent=protac_pose_obj, conf_number=i)
-                    rmsd = Chem.rdMolAlign.AlignMol(protac, reference_ligs, atomMap=pairs, prbCid=i)
+                    rmsd = Chem.rdMolAlign.AlignMol(protac_embed, reference_ligs_rotate, atomMap=alignment_pairs, prbCid=i)
+                    logger.debug(f"pose: {pose_obj.pose_number}, conf: {i}, rmsd: {rmsd}")
                     if rmsd <= rmsd_tolerance:
-                        molblock = Chem.MolToMolBlock(protac, confId=i, kekulize=False)
+                        molblock = Chem.MolToMolBlock(protac_embed, confId=i, kekulize=False)
                         confs_file.write(f'conf_{i}')
                         confs_file.write(molblock)
                         confs_file.write('$$$$\n')
@@ -297,7 +368,7 @@ def detect_clashes(
 
             atom_selection = Selection.unfold_entities(conf_struct, 'A')
             if restrict_clash_to_linker:
-                atom_selection = [i for i in atom_selection if i not in protac_obj.index_ligs]
+                atom_selection = [i for i in atom_selection if i not in protac_obj.indices_ligs]
 
             clash_count = 0
             for atom in atom_selection:
