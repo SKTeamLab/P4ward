@@ -112,6 +112,7 @@ if __name__ == '__main__':
         ligase_obj=ligase,
         protac_obj=protac,
         extend_flexible_small_linker=conf.getboolean('linker_sampling', 'extend_flexible_small_linker'),
+        neighbour_number=conf.getint('linker_sampling', 'extend_neighbour_number'),
         min_linker_length=conf.getint('linker_sampling', 'min_linker_length'),
         rdkit_number_of_confs=conf.getint('linker_sampling', 'rdkit_number_of_confs'),
         protac_poses_folder=conf.get('linker_sampling', 'protac_poses_folder'),
