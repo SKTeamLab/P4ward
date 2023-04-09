@@ -93,6 +93,7 @@ if __name__ == '__main__':
     rank.generate_protein_poses(
         pose_objs=ligase.conformations,
         poses=conf.get('protein_ranking', 'generate_poses'),
+        altlocA = conf.getboolean('protein_ranking', 'generate_poses_altlocA'),
         generated_poses_folder=conf.get('protein_ranking', 'generated_poses_folder')
     )
 

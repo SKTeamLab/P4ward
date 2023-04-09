@@ -133,7 +133,6 @@ def rdkit_sampling(
     alignment_pairs = [(matches['receptor_lig_indices'][i], matches['receptor_lig_coords'][i]) for i in range(len(matches['receptor_lig_indices']))]
     alignment_pairs.extend([(matches['pose_lig_indices'][i], matches['pose_lig_coords'][i]) for i in range(len(matches['pose_lig_indices']))])
 
-
     if extend_flexible_small_linker:
         matches = check_linker_size(protac, indices_link, min_linker_length, neighbour_number, matches)
         indices_ligs, indices_link = make_indices(matches['receptor_lig_indices'], matches['pose_lig_indices'])

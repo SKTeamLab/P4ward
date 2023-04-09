@@ -13,7 +13,6 @@ def load_biopython_structures(structure_file, mol2=False):
     parser = pdbp(PERMISSIVE=1)
 
     if mol2:
-        from rdkit import Chem
         from io import StringIO
 
         run = subprocess.run(

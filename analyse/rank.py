@@ -64,14 +64,18 @@ def protein_poses(
     
 
 @decorators.track_run
-def generate_protein_poses(poses, pose_objs, generated_poses_folder):
+def generate_protein_poses(poses, pose_objs, generated_poses_folder, altlocA):
     """
     Subset of protein-protein poses to generate based on conf option `generate_poses`.
     Options are "none", "all", "filtered", "top", "filtered_centroids", "top_centroids".
     Biopython is used to rotate the pose and then save it.
     """
-    from Bio.PDB.PDBIO import PDBIO
+    from Bio.PDB.PDBIO import Select, PDBIO
     pdbio = PDBIO()
+
+    class NotDisordered(Select): # save only altloc A
+        def accept_atom(self, atom):
+            return not atom.is_disordered() or atom.get_altloc() == "A"
 
     if poses == "none":
         pass
@@ -91,8 +95,12 @@ def generate_protein_poses(poses, pose_objs, generated_poses_folder):
     create_folder(generated_poses_folder)
     for pose in final_poses:
         struct = pose.get_rotated_struct(struct_type='protein', struct_attr='mg_file')
-        
+
         pdbio.set_structure(struct)
         final_file = os.path.join(generated_poses_folder, f"pose{pose.pose_number}.pdb")
         pose.file = final_file
-        pdbio.save(final_file)
+
+        if altlocA:
+            pdbio.save(final_file, select=NotDisordered())
+        else:
+            pdbio.save(final_file)
