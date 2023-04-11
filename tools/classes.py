@@ -156,6 +156,8 @@ class Protac():
         linker_sampling.rdkit_sampling()
             - self.indices_ligs       
             - self.indices_link
+        structure_tools.get_protac_dist_cuttoff()
+            - self.dist_cutoff
     """
 
     def __init__(self, smiles) -> None:

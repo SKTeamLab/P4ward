@@ -45,17 +45,28 @@ def get_protac_dist_cuttoff(
         logger.info("Ligands distance cutoff set to automatic.")
         logger.info('Sampling unbound protac conformations to determine distace cutoff.')
 
-        from io import StringIO
         import numpy as np
         from rdkit import Chem
-        from rdkit.Chem import rdDepictor, rdFMCS, AllChem
-        from Bio.PDB.PDBParser import PDBParser as pdbp
+        from rdkit.Chem import rdFMCS, AllChem
         
-        parser = pdbp(PERMISSIVE=1)
+        def center_of_mass(atom_indices, conf):
+
+            total_mass = 0.0
+            xs = []; ys = []; zs = []
+            for j in atom_indices:
+                atom = conf.GetAtomWithIdx(j)
+                mass = atom.GetMass()
+                total_mass += mass
+                x,y,z = conf.GetConformer().GetAtomPosition(j)
+                xs.append(mass*x)
+                ys.append(mass*y)
+                zs.append(mass*z)
+            center = np.array([np.sum(xs)/total_mass, np.sum(ys)/total_mass, np.sum(zs)/total_mass])
+            return(center)
 
         protac = Chem.MolFromSmiles(protac_obj.smiles)
-        reclig = Chem.MolFromMol2File(reclig_file)
-        liglig = Chem.MolFromMol2File(liglig_file)
+        reclig = Chem.MolFromMol2File(reclig_file, sanitize=False, cleanupSubstructures=False)
+        liglig = Chem.MolFromMol2File(liglig_file, sanitize=False, cleanupSubstructures=False)
 
         receptor_lig_smarts_ = rdFMCS.FindMCS([protac, reclig]).smartsString
         pose_lig_smarts_ = rdFMCS.FindMCS([protac, liglig]).smartsString
@@ -74,32 +85,12 @@ def get_protac_dist_cuttoff(
         for i in range(100):
 
             conf = Chem.Mol(protac, confId=i)
-            reclig2d = Chem.EditableMol(conf)
-            atoms = sorted([i.GetIdx() for i in protac.GetAtoms()], reverse=True)
-            for atom in atoms:
-                if atom not in receptor_lig_indices:
-                    reclig2d.RemoveAtom(atom)
-            reclig2d = reclig2d.GetMol()
-            reclig2d.UpdatePropertyCache(strict=False)
-            Chem.SanitizeMol(reclig2d,sanitizeOps=Chem.SANITIZE_ALL^Chem.SANITIZE_PROPERTIES^Chem.SANITIZE_CLEANUP)
-            pdbblock = StringIO(Chem.MolToPDBBlock(reclig2d, sanitize=False))
-            reclig2d = parser.get_structure('structure', pdbblock)
+            center_reclig = center_of_mass(receptor_lig_indices, conf)
+            center_liglig = center_of_mass(pose_lig_indices, conf)
 
-            conf = Chem.Mol(protac, confId=i)
-            liglig2d = Chem.EditableMol(conf)
-            atoms = sorted([i.GetIdx() for i in protac.GetAtoms()], reverse=True)
-            for atom in atoms:
-                if atom not in pose_lig_indices:
-                    liglig2d.RemoveAtom(atom)
-            liglig2d = liglig2d.GetMol()
-            pdbblock = StringIO(Chem.MolToPDBBlock(liglig2d))
-            liglig2d = parser.get_structure('structure', pdbblock)
-
-            distance = np.linalg.norm(
-                reclig2d.center_of_mass() - liglig2d.center_of_mass()
-            )
+            distance = np.linalg.norm(center_liglig - center_reclig)
             distances.append(distance)
-        
+
         cutoff = np.mean(distances)
         protac_obj.dist_cutoff = cutoff
 
