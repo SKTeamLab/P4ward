@@ -8,7 +8,7 @@ from ..tools.script_tools import create_folder
 
 
 @decorators.user_choice
-#@decorators.track_run
+@decorators.track_run
 def rdkit_sampling(
                         receptor_obj,
                         ligase_obj,

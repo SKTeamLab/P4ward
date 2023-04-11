@@ -1,4 +1,5 @@
 from ..tools.logger import logger
+from ..tools import decorators
 import subprocess
 import os
 
@@ -29,6 +30,85 @@ def load_biopython_structures(structure_file, mol2=False):
         structure_obj = parser.get_structure('structure', structure_file)
 
     return(structure_obj)
+
+@decorators.user_choice
+@decorators.track_run
+def get_protac_dist_cuttoff(
+        protac_obj,
+        reclig_file,
+        liglig_file,
+        dist_cutoff
+):
+
+    if dist_cutoff == 'auto':
+
+        logger.info("Ligands distance cutoff set to automatic.")
+        logger.info('Sampling unbound protac conformations to determine distace cutoff.')
+
+        from io import StringIO
+        import numpy as np
+        from rdkit import Chem
+        from rdkit.Chem import rdDepictor, rdFMCS, AllChem
+        from Bio.PDB.PDBParser import PDBParser as pdbp
+        
+        parser = pdbp(PERMISSIVE=1)
+
+        protac = Chem.MolFromSmiles(protac_obj.smiles)
+        reclig = Chem.MolFromMol2File(reclig_file)
+        liglig = Chem.MolFromMol2File(liglig_file)
+
+        receptor_lig_smarts_ = rdFMCS.FindMCS([protac, reclig]).smartsString
+        pose_lig_smarts_ = rdFMCS.FindMCS([protac, liglig]).smartsString
+        receptor_lig_smarts = Chem.MolFromSmarts(receptor_lig_smarts_)
+        pose_lig_smarts = Chem.MolFromSmarts(pose_lig_smarts_)
+        receptor_lig_indices = protac.GetSubstructMatches(receptor_lig_smarts)[0]
+        pose_lig_indices = protac.GetSubstructMatches(pose_lig_smarts)[0]
+
+        protac = Chem.AddHs(protac)
+
+        params = AllChem.ETKDGv3()
+        AllChem.EmbedMultipleConfs(protac, numConfs=100, params=params)
+       
+        distances = []
+
+        for i in range(100):
+
+            conf = Chem.Mol(protac, confId=i)
+            reclig2d = Chem.EditableMol(conf)
+            atoms = sorted([i.GetIdx() for i in protac.GetAtoms()], reverse=True)
+            for atom in atoms:
+                if atom not in receptor_lig_indices:
+                    reclig2d.RemoveAtom(atom)
+            reclig2d = reclig2d.GetMol()
+            reclig2d.UpdatePropertyCache(strict=False)
+            Chem.SanitizeMol(reclig2d,sanitizeOps=Chem.SANITIZE_ALL^Chem.SANITIZE_PROPERTIES^Chem.SANITIZE_CLEANUP)
+            pdbblock = StringIO(Chem.MolToPDBBlock(reclig2d, sanitize=False))
+            reclig2d = parser.get_structure('structure', pdbblock)
+
+            conf = Chem.Mol(protac, confId=i)
+            liglig2d = Chem.EditableMol(conf)
+            atoms = sorted([i.GetIdx() for i in protac.GetAtoms()], reverse=True)
+            for atom in atoms:
+                if atom not in pose_lig_indices:
+                    liglig2d.RemoveAtom(atom)
+            liglig2d = liglig2d.GetMol()
+            pdbblock = StringIO(Chem.MolToPDBBlock(liglig2d))
+            liglig2d = parser.get_structure('structure', pdbblock)
+
+            distance = np.linalg.norm(
+                reclig2d.center_of_mass() - liglig2d.center_of_mass()
+            )
+            distances.append(distance)
+        
+        cutoff = np.mean(distances)
+        protac_obj.dist_cutoff = cutoff
+
+        logger.info(f"Setting distance cutoff to {cutoff}")
+    
+    else:
+        protac_obj.dist_cutoff = float(dist_cutoff)
+        logger.info(f"Ligands distance cutoff set to {dist_cutoff}.")
+
 
 
 def structure_proximity(struct1, struct2, dist_cutoff=None):
@@ -105,7 +185,7 @@ def reduce(protein_obj_list, file_attribute_name, protein_only=False):
         setattr(protein_obj, file_attribute_name+'_reduced', reduced_protein_file)
         logger.info(f"Added hydrogens to {protein_file}")
 
-
+# TODO remove
 def smiles2smarts(smiles_code):
     """
     turn a smiles code into a smarts code that is a wildcard,

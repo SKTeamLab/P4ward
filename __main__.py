@@ -25,6 +25,7 @@ if __name__ == '__main__':
     
     # run megadock
     from .run import megadock
+    from .tools import structure_tools
 
     megadock.prep_structures(
         receptor_obj=receptor,
@@ -61,10 +62,18 @@ if __name__ == '__main__':
         choice=conf.getboolean('megadock', 'zrank_rescore'),
     )
 
+    structure_tools.get_protac_dist_cuttoff(
+        protac_obj=protac,
+        reclig_file=receptor.lig_file,
+        liglig_file=ligase.lig_file,
+        dist_cutoff=conf.get('megadock', 'filter_dist_cutoff'),
+        choice=conf.getboolean('megadock', 'filter_poses')
+    )
+
     megadock.filter_poses(
         receptor_obj=receptor,
         ligase_obj=ligase,
-        dist_cutoff=conf.getfloat('megadock','filter_dist_cutoff'),
+        dist_cutoff=protac.dist_cutoff,
         choice=conf.getboolean('megadock', 'filter_poses')
     )
 

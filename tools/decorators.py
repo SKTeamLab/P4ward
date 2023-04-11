@@ -27,21 +27,24 @@ def track_run(func):
     """
 
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, track=True, **kwargs):
         
-        with open(TRACKER_FILE, 'rb') as pic:
-            tracker = pickle.load(pic)
-        
-        func_path = f"{func.__module__}.{func.__name__}"
+        if track:
 
-        if func_path not in tracker:
-
-            func(*args, **kwargs)
-
-            tracker.append(func_path)
-            with open(TRACKER_FILE, 'wb+') as pic:
-                pickle.dump(tracker, pic)
+            with open(TRACKER_FILE, 'rb') as pic:
+                tracker = pickle.load(pic)
             
-        else:
-            logger.debug(f'Skipping run for function {func_path}')
+            func_path = f"{func.__module__}.{func.__name__}"
+
+            if func_path not in tracker:
+
+                func(*args, **kwargs)
+
+                tracker.append(func_path)
+                with open(TRACKER_FILE, 'wb+') as pic:
+                    pickle.dump(tracker, pic)
+                
+            else:
+                logger.debug(f'Skipping run for function {func_path}')
+        
     return(wrapper)

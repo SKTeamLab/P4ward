@@ -197,6 +197,9 @@ def filter_poses(receptor_obj, ligase_obj, dist_cutoff):
         else:
             pose_obj.filtered = False
             pose_obj.active = False
+    
+    # if there are no filtered poses, quit the program
+        
 
 
 @decorators.user_choice
