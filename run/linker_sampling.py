@@ -46,8 +46,8 @@ def coordinate_linker_sampling(func):
 
 
 @decorators.user_choice
+@decorators.track_run
 @coordinate_linker_sampling
-# @decorators.track_run
 def rdkit_sampling(
                         receptor_obj,
                         ligase_obj,
