@@ -31,6 +31,7 @@ def load_biopython_structures(structure_file, mol2=False):
 
     return(structure_obj)
 
+
 @decorators.user_choice
 @decorators.track_run
 def get_protac_dist_cuttoff(

@@ -3,9 +3,9 @@ from ..tools.logger import logger
 from ..tools import decorators
 from ..tools.script_tools import create_folder
 
-@decorators.track_run
+# @decorators.track_run
 def protein_poses(
-                    pose_objs,
+                    ligase_obj,
                     final_ranking_megadock_score,
                     final_ranking_z_score,
                     top_poses,
@@ -19,8 +19,6 @@ def protein_poses(
     takes all arguments from protein_ranking section in the config file
     """
 
-    active_pose_objs = [i for i in pose_objs if i.active]
-
     rankings = {   
         'final_ranking_megadock_score':{'user_choice':final_ranking_megadock_score, 'ascending':False},
         'final_ranking_z_score':{'user_choice':final_ranking_z_score, 'ascending':True}
@@ -30,8 +28,13 @@ def protein_poses(
     ascending = rankings[ranking_score_config]['ascending']
     # ^ capture the name of the scoring function as it is in the objects' attribute name
 
-    # sort based on the chosen score
-    sorted_confs = sorted(active_pose_objs, key=lambda x: getattr(x, ranking), reverse=~ascending)
+    # sort based on the chosen score and save sorted list
+    sorted_confs = sorted(ligase_obj.conformations, key=lambda x: getattr(x, ranking), reverse=~ascending)
+    ligase_obj.conformations = sorted_confs
+
+    # now sorted list and pose_objs must include only actives
+    pose_objs = [i for i in ligase_obj.conformations if i.active]
+    sorted_confs = [i for i in sorted_confs if i.active]
     
     if top_poses_from_centroids_only:
         sorted_confs = [i for i in sorted_confs if i.centroid]
@@ -41,7 +44,7 @@ def protein_poses(
     if use_only_cluster_centroids:
         sorted_confs = [i for i in sorted_confs if i.centroid]
     
-    for pose_obj in pose_objs:
+    for pose_obj in ligase_obj.conformations:
         if pose_obj not in sorted_confs:
             pose_obj.active = False
             pose_obj.top = False

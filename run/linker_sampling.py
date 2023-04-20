@@ -1,5 +1,6 @@
 import os
 import copy
+import functools
 import numpy as np
 from ..tools import decorators
 from ..tools import classes
@@ -7,8 +8,46 @@ from ..tools.logger import logger
 from ..tools.script_tools import create_folder
 
 
+
+def coordinate_linker_sampling(func):
+
+    @functools.wraps(func)
+    def wrapper(*args, extend_top_poses_sampled=False, **kwargs):
+
+        pose_objs = [i for i in kwargs['ligase_obj'].conformations if i.filtered]
+        candidate_poses = [i for i in pose_objs if i.top]
+        top = len(candidate_poses)
+
+        if extend_top_poses_sampled:
+            successful_poses = [i for i in pose_objs if i.protac_pose.active == True]
+
+            while len(successful_poses) < top:
+                logger.info((
+                     f'Generated {len(successful_poses)}. '
+                    +f'Need {top - len(successful_poses)} more to reach {top}. Extending.'
+                ))
+                candidate_poses = [i for i in pose_objs if i.protac_pose.active == None]
+                if len(candidate_poses) == 0:
+                    logger.info("No more poses to extend.")
+                    break
+                candidate_poses = candidate_poses[:top - len(successful_poses)]
+                func(*args, pose_objs=candidate_poses, **kwargs)
+                successful_poses = [i for i in pose_objs if i.protac_pose.active == True]
+            
+            logger.info(f'Reached {top} successful poses.')
+            for i in successful_poses:
+                i.top = True
+        
+        else:
+            func(*args, pose_objs=candidate_poses, **kwargs)
+
+    return(wrapper)
+
+
+
 @decorators.user_choice
-@decorators.track_run
+@coordinate_linker_sampling
+# @decorators.track_run
 def rdkit_sampling(
                         receptor_obj,
                         ligase_obj,
@@ -19,7 +58,8 @@ def rdkit_sampling(
                         rdkit_number_of_confs,
                         protac_poses_folder,
                         rmsd_tolerance,
-                        time_tolerance
+                        time_tolerance,
+                        pose_objs=None
 ):
 
     """
@@ -144,8 +184,8 @@ def rdkit_sampling(
         protac_obj.indices_ligs = indices_ligs
         protac_obj.indices_link = indices_link
 
-
-    pose_objs = ligase_obj.active_confs()
+    if pose_objs is None:
+        pose_objs = ligase_obj.active_confs()
     for pose_obj in pose_objs:
 
         # make folder for each pose obj linker file to be saved
@@ -186,7 +226,8 @@ def rdkit_sampling(
             coordmap[atom_ix] = Point3D(x, y, z)
 
         # make ProtacPose obj:
-        protac_pose_obj = classes.ProtacPose(parent=protac_obj, protein_parent=pose_obj)
+        # protac_pose_obj = classes.ProtacPose(parent=protac_obj, protein_parent=pose_obj)
+        protac_pose_obj = pose_obj.protac_pose
         # sample its conformations!
         kwargs = {
             'mol':protac_embed, 'coordMap':coordmap,
@@ -324,6 +365,7 @@ def capture_dock6_scores(pose_objs, filter_linkers):
             else:
                 pose_obj.active_linkers = None
                 pose_obj.active = False
+
 
 @decorators.track_run
 @decorators.user_choice

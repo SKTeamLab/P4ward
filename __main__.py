@@ -73,6 +73,7 @@ if __name__ == '__main__':
     megadock.filter_poses(
         receptor_obj=receptor,
         ligase_obj=ligase,
+        protac_obj=protac,
         dist_cutoff=protac.dist_cutoff,
         choice=conf.getboolean('megadock', 'filter_poses')
     )
@@ -91,19 +92,12 @@ if __name__ == '__main__':
     from .analyse import rank
 
     rank.protein_poses(
-        pose_objs=ligase.conformations,
+        ligase_obj=ligase,
         top_poses=conf.getint('protein_ranking', 'top_poses'),
         final_ranking_megadock_score=conf.getboolean('protein_ranking', 'final_ranking_megadock_score'),
         final_ranking_z_score=conf.getboolean('protein_ranking', 'final_ranking_z_score'),
         use_only_cluster_centroids=conf.getboolean('protein_ranking', 'use_only_cluster_centroids'),
         top_poses_from_centroids_only=conf.getboolean('protein_ranking', 'top_poses_from_centroids_only'),
-    )
-
-    rank.generate_protein_poses(
-        pose_objs=ligase.conformations,
-        poses=conf.get('protein_ranking', 'generate_poses'),
-        altlocA = conf.getboolean('protein_ranking', 'generate_poses_altlocA'),
-        generated_poses_folder=conf.get('protein_ranking', 'generated_poses_folder')
     )
 
     # CHECKPOINT!
@@ -128,10 +122,18 @@ if __name__ == '__main__':
         protac_poses_folder=conf.get('linker_sampling', 'protac_poses_folder'),
         rmsd_tolerance=conf.getfloat('linker_sampling', 'rdkit_pose_rmsd_tolerance'),
         time_tolerance=conf.getint('linker_sampling', 'rdkit_time_tolerance'),
+        extend_top_poses_sampled=conf.getboolean('linker_sampling', 'extend_top_poses_sampled'),
         choice=conf.getboolean('linker_sampling', 'rdkit_sampling')
     )
     # CHECKPOINT!
     run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_obj=protac)
+
+    rank.generate_protein_poses(
+        pose_objs=ligase.conformations,
+        poses=conf.get('protein_ranking', 'generate_poses'),
+        altlocA = conf.getboolean('protein_ranking', 'generate_poses_altlocA'),
+        generated_poses_folder=conf.get('protein_ranking', 'generated_poses_folder')
+    )
 
     # detect linker clashes
     linker_sampling.detect_clashes(
