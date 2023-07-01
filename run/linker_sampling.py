@@ -14,7 +14,7 @@ def coordinate_linker_sampling(func):
     @functools.wraps(func)
     def wrapper(*args, extend_top_poses_sampled=False, **kwargs):
 
-        pose_objs = [i for i in kwargs['ligase_obj'].conformations if i.filtered]
+        pose_objs = [i for i in kwargs['ligase_obj'].conformations if i.active]
         candidate_poses = [i for i in pose_objs if i.top]
         top = len(candidate_poses)
 

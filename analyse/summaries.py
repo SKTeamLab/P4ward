@@ -8,7 +8,7 @@ def summary_csv(pose_objects):
         'megadock_score':[],
         'z_score':[],
         'cluster':[],
-        'centroid':[],
+        'clrep':[],
     }
     for pose_obj in pose_objects:
         for attr in data_dict.keys():

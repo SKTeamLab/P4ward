@@ -96,8 +96,8 @@ if __name__ == '__main__':
         top_poses=conf.getint('protein_ranking', 'top_poses'),
         final_ranking_megadock_score=conf.getboolean('protein_ranking', 'final_ranking_megadock_score'),
         final_ranking_z_score=conf.getboolean('protein_ranking', 'final_ranking_z_score'),
-        use_only_cluster_centroids=conf.getboolean('protein_ranking', 'use_only_cluster_centroids'),
-        top_poses_from_centroids_only=conf.getboolean('protein_ranking', 'top_poses_from_centroids_only'),
+        cluster_rep=conf.get('protein_ranking', 'cluster_rep'),
+        rank_cluster_reps_only=conf.getboolean('protein_ranking', 'rank_cluster_reps_only'),
     )
 
     # CHECKPOINT!
