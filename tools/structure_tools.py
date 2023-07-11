@@ -1,5 +1,6 @@
 from ..tools.logger import logger
 from ..tools import decorators
+from pathlib import Path
 import subprocess
 import os
 
@@ -220,3 +221,15 @@ def obabel_convert(file_path, input_format, output_format, split=False, split_fo
     ]
     subprocess.run(command)
     return(new_file)
+
+
+def pymol_combine(*args, out_filename='combined.pdb'):
+
+    import pymol
+
+    basenames = [Path(filename).stem for filename in args]
+    for filename in args:
+        pymol.cmd.load(filename)
+    
+    pymol.cmd.create('combined', ' '.join(basenames))
+    pymol.cmd.save(out_filename, 'combined')

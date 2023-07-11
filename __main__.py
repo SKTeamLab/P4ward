@@ -108,7 +108,7 @@ if __name__ == '__main__':
     #~~~~~~~~~~~ ligand sampling ~~~~~~~~~~~#
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
-    from .run import linker_sampling
+    from .run import linker_sampling, linker_scoring
 
     # sample conformations
     linker_sampling.rdkit_sampling(
@@ -125,8 +125,6 @@ if __name__ == '__main__':
         extend_top_poses_sampled=conf.getboolean('linker_sampling', 'extend_top_poses_sampled'),
         choice=conf.getboolean('linker_sampling', 'rdkit_sampling')
     )
-    # CHECKPOINT!
-    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_obj=protac)
 
     rank.generate_protein_poses(
         pose_objs=ligase.conformations,
@@ -146,6 +144,21 @@ if __name__ == '__main__':
         filter_clashed=conf.getboolean('linker_ranking', 'filter_clashed'),
         max_clashes_allowed=conf.getint('linker_ranking', 'max_clashes_allowed'),
         choice=conf.getboolean('linker_ranking', 'clash_detection')
+    )
+
+    # CHECKPOINT!
+    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_obj=protac)
+    # score conformations with rxdock
+    linker_scoring.rxdock_rescore(
+        receptor_obj=receptor,
+        ligase_obj=ligase,
+        minimize=conf.getboolean('linker_ranking','rxdock_minimize'),
+        choice=conf.getboolean('linker_ranking','rxdock_score')
+    )
+
+    linker_scoring.capture_rxdock_scores(
+        ligase_obj=ligase,
+        choice=conf.getboolean('linker_ranking','rxdock_score')
     )
 
     # score conformations with dock6

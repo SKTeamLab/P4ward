@@ -112,6 +112,7 @@ def generate_protein_poses(poses, pose_objs, generated_poses_folder, altlocA):
     elif poses == 'top':
         final_poses = [i for i in pose_objs if i.top]
     elif poses == 'filtered_centroids':
+        # TODO CHANGE THIS TO REFLECT NEW CLREP
         final_poses = [i for i in pose_objs if i.filtered and i.centroid]
     elif poses == 'top_centroids':
         final_poses = [i for i in pose_objs if i.top and i.centroid]
@@ -120,7 +121,7 @@ def generate_protein_poses(poses, pose_objs, generated_poses_folder, altlocA):
     
     create_folder(generated_poses_folder)
     for pose in final_poses:
-        struct = pose.get_rotated_struct(struct_type='protein', struct_attr='mg_file')
+        struct = pose.get_rotated_struct(struct_type='protein', struct_attr='file')
 
         pdbio.set_structure(struct)
         final_file = os.path.join(generated_poses_folder, f"pose{pose.pose_number}.pdb")

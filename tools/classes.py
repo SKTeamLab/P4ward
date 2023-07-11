@@ -175,6 +175,8 @@ class ProtacPose():
         linker_sampling.rdkit_sampling()
             - self.active
             - self.file
+        linker_scoring.rxdock_rescore()
+            - self.scored_file
     """
 
     def __init__(self, parent, protein_parent) -> None:
@@ -203,6 +205,8 @@ class LinkerConf():
         linker_sampling.detect_clashes()
             - self.clash_count
             - self.active
+        linker_scoring.capture_rxdock_scores()
+            - self.rx_score
     """
 
     def __init__(self, parent, conf_number) -> None:
