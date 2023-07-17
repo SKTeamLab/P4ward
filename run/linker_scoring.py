@@ -79,7 +79,7 @@ def rxdock_rescore(
 
 
 @decorators.user_choice
-# @decorators.track_run
+@decorators.track_run
 def capture_rxdock_scores(ligase_obj):
 
     from openbabel import pybel
@@ -92,7 +92,7 @@ def capture_rxdock_scores(ligase_obj):
         confs = pybel.readfile('sdf', str(protac_pose.scored_file))
         for conf in confs:
             conf_number = conf.data['Name'].split('_')[-1] # name in sdf file is format "conf_X"
-            score = conf.data['SCORE']
+            score = float(conf.data['SCORE'])
 
             linker_conf = [i for i in protac_pose.linker_confs if i.conf_number == int(conf_number)][0]
             linker_conf.rx_score = score

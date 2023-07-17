@@ -3,7 +3,7 @@ from ..tools.logger import logger
 from ..tools import decorators
 from ..tools.script_tools import create_folder
 
-# @decorators.track_run
+@decorators.track_run
 def protein_poses(
                     ligase_obj,
                     final_ranking_megadock_score,
@@ -131,3 +131,25 @@ def generate_protein_poses(poses, pose_objs, generated_poses_folder, altlocA):
             pdbio.save(final_file, select=NotDisordered())
         else:
             pdbio.save(final_file)
+
+
+@decorators.track_run
+def protac_conformations(protac_poses):
+    """
+    rank the linker conformations for each protac pose and mark the ones that have negative scores.
+    """
+
+    for protac_pose in protac_poses:
+
+        # def get_linker_score(linker_conf):
+        #     if hasattr(linker_conf, 'rx_score'):
+        #         return(getattr(linker_conf, 'rx_score'))
+        #     else:
+        #         return(None)
+
+        sorted_linker_confs = sorted(protac_pose.active_confs(), key=lambda x: getattr(x, 'rx_score'))
+        protac_pose.linker_confs = sorted_linker_confs
+
+        for linker_conf in protac_pose.linker_confs:
+            if linker_conf.rx_score < 0:
+                linker_conf.neg_score = True

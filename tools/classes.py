@@ -154,7 +154,7 @@ class Protac():
     """
     attributes added/modified by the functions:
         linker_sampling.rdkit_sampling()
-            - self.indices_ligs       
+            - self.indices_ligs
             - self.indices_link
         structure_tools.get_protac_dist_cuttoff()
             - self.dist_cutoff
@@ -164,6 +164,12 @@ class Protac():
         self.smiles = smiles
         self.poses = []
         self.indices_ligs = None
+
+
+    def active_poses(self):
+
+        active_confs = [pose for pose in self.poses if pose.active]
+        return(active_confs)
 
 
 
@@ -207,6 +213,8 @@ class LinkerConf():
             - self.active
         linker_scoring.capture_rxdock_scores()
             - self.rx_score
+        rank.protac_conformations()
+            - self.neg_score
     """
 
     def __init__(self, parent, conf_number) -> None:

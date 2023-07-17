@@ -161,19 +161,23 @@ if __name__ == '__main__':
         choice=conf.getboolean('linker_ranking','rxdock_score')
     )
 
-    # score conformations with dock6
-    linker_sampling.dock6_score(
-        pose_objs=ligase.active_confs(),
-        dock6_root=conf.get('program_paths', 'dock6_root'),
-        linkers_only=conf.get('linker_ranking', 'dock6_linkers_only'),
-        choice=conf.getboolean('linker_ranking', 'dock6_score')
+    rank.protac_conformations(
+        protac_poses=protac.active_poses()
     )
 
-    linker_sampling.capture_dock6_scores(
-        pose_objs=ligase.active_confs(),
-        filter_linkers=conf.getboolean('linker_ranking', 'filter_scored_linkers'),
-        choice=conf.getboolean('linker_ranking', 'dock6_score')
-    )
+    # # score conformations with dock6
+    # linker_sampling.dock6_score(
+    #     pose_objs=ligase.active_confs(),
+    #     dock6_root=conf.get('program_paths', 'dock6_root'),
+    #     linkers_only=conf.get('linker_ranking', 'dock6_linkers_only'),
+    #     choice=conf.getboolean('linker_ranking', 'dock6_score')
+    # )
+
+    # linker_sampling.capture_dock6_scores(
+    #     pose_objs=ligase.active_confs(),
+    #     filter_linkers=conf.getboolean('linker_ranking', 'filter_scored_linkers'),
+    #     choice=conf.getboolean('linker_ranking', 'dock6_score')
+    # )
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     #~~~~~~~~~~~~~ end session ~~~~~~~~~~~~~#

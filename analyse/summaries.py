@@ -21,17 +21,22 @@ def summary_csv(pose_objects):
     # get protac pose and linkers attributes
     data_dict['protac_pose'] = []
     data_dict['active_linkers'] = []
+    data_dict['top_protac_score'] = []
+
     for pose_obj in pose_objects:
         data_dict['protac_pose'].append(pose_obj.protac_pose.active)
         if pose_obj.protac_pose.active:
-            active_linkers = [i.conf_number for i in pose_obj.protac_pose.linker_confs if i.active]
+            active_linkers = [i for i in pose_obj.protac_pose.linker_confs if i.active]
+            top_protac_score = active_linkers[0].rx_score
             if len(active_linkers) == 0:
                 active_linkers = '0'
             else:
-                active_linkers = ','.join([str(i) for i in active_linkers])
+                active_linkers = ','.join([str(i.conf_number) for i in active_linkers])
         else:
             active_linkers = '0'
+            top_protac_score = None
         data_dict['active_linkers'].append(active_linkers)
+        data_dict['top_protac_score'].append(top_protac_score)
     
     data = pd.DataFrame.from_dict(data_dict)
     data.to_csv('summary.csv')
