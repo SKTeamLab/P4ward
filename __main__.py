@@ -1,12 +1,19 @@
 
 if __name__ == '__main__':
 
-    # prepare internals:
+    from sys import exit
     from .config import config
     from .tools import run_tracker
+    from .tools.script_tools import write_default_conf
     from .definitions import ROOT_DIR, CPT_FILE
 
+    # prepare internals:
     args = config.arg_parser(None)
+
+    if args.write_default:
+        write_default_conf()
+        exit(0)
+
     conf = config.make_config(args.config_file, ROOT_DIR)
     # load run tracker from previous run
     tracker = run_tracker.load_tracker(overwrite=conf.getboolean('general', 'overwrite'))

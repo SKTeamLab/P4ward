@@ -2,16 +2,6 @@ import configparser
 import argparse
 import os
 
-# def get_paths():
-#     """
-#     get root dir and cwd global variables
-#     """
-
-#     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-#     CWD = os.getcwd()
-
-#     return(ROOT_DIR, CWD)
-
 
 def arg_parser(arguments):
     """
@@ -24,6 +14,11 @@ def arg_parser(arguments):
         "--config_file",
         type=str,
         help='Path to the .ini file where the user configuration is stored'
+    )
+    parser.add_argument(
+        "--write_default",
+        action='store_true',
+        help='Copy full configuration file and quit the program.'
     )
 
     if arguments == None:

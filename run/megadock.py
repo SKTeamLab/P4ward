@@ -203,7 +203,7 @@ def filter_poses(receptor_obj, ligase_obj, protac_obj, dist_cutoff):
         if pose_obj.filtered:
             classes.ProtacPose(parent=protac_obj, protein_parent=pose_obj)
 
-    # if there are no filtered poses, quit the program
+    # TODO if there are no filtered poses, quit the program
         
 
 
