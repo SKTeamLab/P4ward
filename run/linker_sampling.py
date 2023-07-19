@@ -5,7 +5,6 @@ import numpy as np
 from ..tools import decorators
 from ..tools import classes
 from ..tools.logger import logger
-from ..tools.script_tools import create_folder
 
 
 
@@ -156,12 +155,12 @@ def rdkit_sampling(
            
 
     # make folder where the linkers for all pose objs will be stored
-    create_folder(protac_poses_folder)
+    protac_poses_folder.mkdir(exist_ok=True)
     # open receptor ligand - will not change, get its rotation info
-    reclig = Chem.MolFromMol2File(receptor_obj.lig_file, sanitize=False, cleanupSubstructures=False)
+    reclig = Chem.MolFromMol2File(str(receptor_obj.lig_file), sanitize=False, cleanupSubstructures=False)
     ref_rotation  = ligase_obj.rotate
     # open ligase ligand - raw initial position
-    liglig = Chem.MolFromMol2File(ligase_obj.lig_file, sanitize=False, cleanupSubstructures=False)
+    liglig = Chem.MolFromMol2File(str(ligase_obj.lig_file), sanitize=False, cleanupSubstructures=False)
     # combine reclig and liglig into a single molecule
     reference_ligs = Chem.CombineMols(liglig, reclig)
     # open protac and addHs
@@ -189,8 +188,8 @@ def rdkit_sampling(
     for pose_obj in pose_objs:
 
         # make folder for each pose obj linker file to be saved
-        linker_folder = os.path.join(protac_poses_folder, f'protein_pose_{pose_obj.pose_number}')
-        create_folder(linker_folder)
+        linker_folder = protac_poses_folder / f'protein_pose_{pose_obj.pose_number}'
+        linker_folder.mkdir(exist_ok=True)
 
         # open ligase ligand - changes every loop
         liglig_rotate = copy.deepcopy(liglig)
@@ -242,7 +241,7 @@ def rdkit_sampling(
 
         # for each conformation, align and write to single sdf file,
         # capturing only the poses that obey the rmsd tolerance
-        protac_file = os.path.join(linker_folder, 'protac_embedded_confs.sdf')
+        protac_file = linker_folder / 'protac_embedded_confs.sdf'
         try:
             with open(protac_file, 'a+') as confs_file:
                 for i in range(rdkit_number_of_confs):
@@ -265,108 +264,6 @@ def rdkit_sampling(
             protac_pose_obj.active = False
 
 
-
-@decorators.track_run
-@decorators.user_choice
-def dock6_score(pose_objs, dock6_root, linkers_only):
-    """
-    Use dock6 continuous score to rank the linker conformations.
-    If no linker conf has negative energy, then the protein pose is not viable
-    """
-    import subprocess
-    from ..definitions import ROOT_DIR
-    from ..tools.structure_tools import obabel_convert
-
-    logger.info('Scoring protacs coformations using dock6 continuous score')
-
-    for pose_obj in pose_objs:
-
-        # use obabel to convert sdf to mol2:
-        mol2_file = obabel_convert(pose_obj.protac_pose.file, 'sdf', 'mol2')
-        logger.info('Converted conformations sdf file into mol2')
-    
-        folder_path = os.path.dirname(mol2_file)
-
-        # use chimerax to generate complex mol2 file:
-        complex_mol2_file = os.path.join(folder_path, 'complex.mol2')
-        command = (
-             f"open {pose_obj.parent.file};"
-            +f"open {pose_obj.file};"
-            +f"combine modelId 9;"
-            +f"del #1,2;"
-            +f"dockprep acMethod gasteiger;"
-            +f"save {complex_mol2_file} models #9"
-        )
-        subprocess.run(['chimerax', '--nogui'], input=command, encoding='ascii')
-        logger.info('Generated combined protein complex mol2 file.')
-
-        # prepare input file
-        dock6_input = open(os.path.join(ROOT_DIR, 'inputs', 'dock_score_protacs.in')).read()
-        dock6_input = dock6_input.replace('[complex_prep.mol2]',complex_mol2_file)
-        dock6_input = dock6_input.replace('[protac_file.mol2]', mol2_file)
-        dock6_input = dock6_input.replace('[out_folder]', folder_path)
-        dock6_input = dock6_input.replace('[dock6_root]', dock6_root)
-
-        with open(os.path.join(folder_path, 'dock.in'), 'w+') as dock_file:
-            dock_file.write(dock6_input)
-        
-        command = [
-            os.path.join(dock6_root, 'bin', 'dock6'),
-            '-i', os.path.join(folder_path, 'dock.in'),
-            '-o', os.path.join(folder_path, 'dock.out')
-        ]
-        subprocess.run(command)
-        logger.info(f'Ran dock6 rescore for protac conformations on pose {pose_obj.pose_number}')
-
-
-@decorators.track_run
-@decorators.user_choice
-def capture_dock6_scores(pose_objs, filter_linkers):
-
-    def parse_file(file_path):
-        import re
-
-        data = {}
-        patterns = {
-            'conf_number':'Name:\s*(.*)\n',
-            'score':'Continuous_Score:\s*(.*)\n',
-            'vdw':'Continuous_vdw_energy:\s*(.*)\n',
-            'es':'Continuous_es_energy:\s*(.*)\n'
-        }
-        file_text = open(file_path,'r').read()
-        
-        for key in patterns:
-            found = re.findall(patterns[key], file_text)
-            if key == 'conf_number':
-                found = [int(i.split('_')[-1]) for i in found]
-            else:
-                found = [float(i) for i in found]
-            data[key] = found
-        file_text = None
-
-        return(data)
- 
-    for pose_obj in pose_objs:
-
-        folder_path = os.path.dirname(pose_obj.protac_pose.file)
-        scored_file = 'protac_scored.mol2'
-
-        data = parse_file(os.path.join(folder_path, scored_file))
-        pose_obj.linker_scores = data
-
-        if filter_linkers:
-            active_linkers = [i<0 for i in data['score']]
-            if any(active_linkers):
-                active_linkers_ix = []
-                for i in range(len(active_linkers)):
-                    if active_linkers[i]:
-                        active_linkers_ix.append(data['conf_number'][i])
-                pose_obj.active_linkers = active_linkers_ix
-            else:
-                pose_obj.active_linkers = None
-                pose_obj.active = False
-
-
 @decorators.track_run
 @decorators.user_choice
 def detect_clashes(
@@ -385,7 +282,6 @@ def detect_clashes(
 
     from Bio.PDB import Selection, NeighborSearch
     from ..tools.structure_tools import obabel_convert, load_biopython_structures
-    from ..tools.script_tools import create_folder
     
     receptor_struct = receptor_obj.get_protein_struct()
 
@@ -395,8 +291,8 @@ def detect_clashes(
         pose_struct = pose_obj.get_rotated_struct(struct_type='protein')
 
         # convert their poses and split
-        split_confs_folder = os.path.join(protac_poses_folder, f'protein_pose_{pose_obj.pose_number}', 'split_confs')
-        create_folder(split_confs_folder)
+        split_confs_folder = protac_poses_folder/f'protein_pose_{pose_obj.pose_number}'/'split_confs'
+        split_confs_folder.mkdir(exist_ok=True)
         obabel_convert(pose_obj.protac_pose.file, 'sdf', 'pdb', split=True, split_folder=split_confs_folder)
 
         # initialize neighbour search
@@ -409,7 +305,7 @@ def detect_clashes(
         for linker_conf in linker_confs:
 
             conf_file = f'conf_{linker_conf.conf_number}.pdb'
-            conf_struct = load_biopython_structures(os.path.join(split_confs_folder, conf_file))
+            conf_struct = load_biopython_structures(split_confs_folder/conf_file)
 
             atom_selection = Selection.unfold_entities(conf_struct, 'A')
             if restrict_clash_to_linker:

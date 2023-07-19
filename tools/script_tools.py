@@ -1,21 +1,20 @@
 import os
 from shutil import copy
 from pathlib import Path
-from .logger import logger
 from ..definitions import CWD, ROOT_DIR
 
 
-def create_folder(folder_path):
-    """
-    creates a folder if it does not exist, does nothing if it does
-    logs what happened
-    """
+# def create_folder(folder_path):
+#     """
+#     creates a folder if it does not exist, does nothing if it does
+#     logs what happened
+#     """
 
-    if os.path.isdir(folder_path):
-        logger.info(f'Folder {folder_path} exists.')
-    else:
-        os.mkdir(folder_path)
-        logger.info(f'Created {folder_path}')
+#     if os.path.isdir(folder_path):
+#         logger.info(f'Folder {folder_path} exists.')
+#     else:
+#         os.mkdir(folder_path)
+#         logger.info(f'Created {folder_path}')
 
 
 def write_default_conf():

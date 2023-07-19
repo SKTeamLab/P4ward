@@ -11,7 +11,7 @@ def set_logging():
 
     now = dt.datetime.now()
 
-    logfile_name = os.path.join(CWD, PIPELINE_NAME + '.log')
+    logfile_name = CWD/(PIPELINE_NAME + '.log')
     with open(logfile_name, 'w+') as logfile:
         logfile.write(
             f"""

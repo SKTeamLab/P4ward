@@ -1,7 +1,6 @@
 import os
 from ..tools.logger import logger
 from ..tools import decorators
-from ..tools.script_tools import create_folder
 
 @decorators.track_run
 def protein_poses(
@@ -119,18 +118,18 @@ def generate_protein_poses(poses, pose_objs, generated_poses_folder, altlocA):
     else:
         raise Exception("Invalid choice for generate_poses")
     
-    create_folder(generated_poses_folder)
+    generated_poses_folder.mkdir(exist_ok=True)
     for pose in final_poses:
         struct = pose.get_rotated_struct(struct_type='protein', struct_attr='file')
 
         pdbio.set_structure(struct)
-        final_file = os.path.join(generated_poses_folder, f"pose{pose.pose_number}.pdb")
+        final_file = generated_poses_folder / f"pose{pose.pose_number}.pdb"
         pose.file = final_file
 
         if altlocA:
-            pdbio.save(final_file, select=NotDisordered())
+            pdbio.save(str(final_file), select=NotDisordered())
         else:
-            pdbio.save(final_file)
+            pdbio.save(str(final_file))
 
 
 @decorators.track_run

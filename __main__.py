@@ -2,6 +2,7 @@
 if __name__ == '__main__':
 
     from sys import exit
+    from pathlib import Path
     from .config import config
     from .tools import run_tracker
     from .tools.script_tools import write_default_conf
@@ -126,7 +127,7 @@ if __name__ == '__main__':
         neighbour_number=conf.getint('linker_sampling', 'extend_neighbour_number'),
         min_linker_length=conf.getint('linker_sampling', 'min_linker_length'),
         rdkit_number_of_confs=conf.getint('linker_sampling', 'rdkit_number_of_confs'),
-        protac_poses_folder=conf.get('linker_sampling', 'protac_poses_folder'),
+        protac_poses_folder=Path(conf.get('linker_sampling', 'protac_poses_folder')),
         rmsd_tolerance=conf.getfloat('linker_sampling', 'rdkit_pose_rmsd_tolerance'),
         time_tolerance=conf.getint('linker_sampling', 'rdkit_time_tolerance'),
         extend_top_poses_sampled=conf.getboolean('linker_sampling', 'extend_top_poses_sampled'),
@@ -137,7 +138,7 @@ if __name__ == '__main__':
         pose_objs=ligase.conformations,
         poses=conf.get('protein_ranking', 'generate_poses'),
         altlocA = conf.getboolean('protein_ranking', 'generate_poses_altlocA'),
-        generated_poses_folder=conf.get('protein_ranking', 'generated_poses_folder')
+        generated_poses_folder=Path(conf.get('protein_ranking', 'generated_poses_folder'))
     )
 
     # detect linker clashes
@@ -145,7 +146,7 @@ if __name__ == '__main__':
         receptor_obj=receptor,
         protac_obj=protac,
         pose_objs=ligase.active_confs(),
-        protac_poses_folder=conf.get('linker_sampling', 'protac_poses_folder'),
+        protac_poses_folder=Path(conf.get('linker_sampling', 'protac_poses_folder')),
         clash_threshold=conf.getfloat('linker_ranking', 'clash_threshold'),
         restrict_clash_to_linker=conf.getboolean('linker_ranking', 'restrict_clash_to_linker'),
         filter_clashed=conf.getboolean('linker_ranking', 'filter_clashed'),
@@ -160,6 +161,7 @@ if __name__ == '__main__':
         receptor_obj=receptor,
         ligase_obj=ligase,
         minimize=conf.getboolean('linker_ranking','rxdock_minimize'),
+        linker_scoring_folder=Path(conf.get('linker_ranking','linker_scoring_folder')),
         choice=conf.getboolean('linker_ranking','rxdock_score')
     )
 
@@ -172,19 +174,6 @@ if __name__ == '__main__':
         protac_poses=protac.active_poses()
     )
 
-    # # score conformations with dock6
-    # linker_sampling.dock6_score(
-    #     pose_objs=ligase.active_confs(),
-    #     dock6_root=conf.get('program_paths', 'dock6_root'),
-    #     linkers_only=conf.get('linker_ranking', 'dock6_linkers_only'),
-    #     choice=conf.getboolean('linker_ranking', 'dock6_score')
-    # )
-
-    # linker_sampling.capture_dock6_scores(
-    #     pose_objs=ligase.active_confs(),
-    #     filter_linkers=conf.getboolean('linker_ranking', 'filter_scored_linkers'),
-    #     choice=conf.getboolean('linker_ranking', 'dock6_score')
-    # )
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     #~~~~~~~~~~~~~ end session ~~~~~~~~~~~~~#

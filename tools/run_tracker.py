@@ -11,7 +11,7 @@ def load_tracker(overwrite):
     and dump it to the pickle object. Should be run only once in the
     beginning of the run.
     """
-    if not overwrite and os.path.isfile(TRACKER_FILE):
+    if not overwrite and TRACKER_FILE.is_file():
 
         logger.info('Retrieving previous run steps.')
         with open(TRACKER_FILE, 'rb') as pic:
@@ -30,7 +30,7 @@ def load_run_objects(pickle_file, conf, overwrite=False):
     from scratch when first time running or overwrite chosen by user
     """
     
-    if not overwrite and os.path.isfile(pickle_file):
+    if not overwrite and pickle_file.is_file():
         logger.info('Retrieving information from previous run.')
         with open(pickle_file, 'rb') as pic:
             receptor_obj, ligase_obj, protac_obj = pickle.load(pic)

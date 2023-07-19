@@ -4,7 +4,6 @@ import subprocess
 from ..definitions import ROOT_DIR, CWD
 from ..tools import decorators
 from ..tools.logger import logger
-from ..tools.script_tools import create_folder
 from ..tools.structure_tools import pymol_combine
 
 
@@ -14,6 +13,7 @@ def rxdock_rescore(
                         receptor_obj,
                         ligase_obj,
                         minimize,
+                        linker_scoring_folder
 ):
     
     from openbabel import pybel
@@ -21,7 +21,7 @@ def rxdock_rescore(
     # we will operate on all the pose objs that have at least an active linker conf
     pose_objs = [i for i in ligase_obj.active_confs() if i.protac_pose.active and len(i.protac_pose.linker_confs) > 0]
     
-    create_folder('./ligand_scoring')
+    linker_scoring_folder.mkdir(exist_ok=True)
 
     if minimize: dock_prm_file = 'minimize_score.prm'
     else: dock_prm_file = 'score.prm'
@@ -29,21 +29,21 @@ def rxdock_rescore(
     for pose_obj in pose_objs:
 
         # files
-        folder = Path(f'./ligand_scoring/protein_pose_{pose_obj.pose_number}')
+        folder = linker_scoring_folder/f"protein_pose_{pose_obj.pose_number}"
         combined_file = folder/'combined_protein.mol2'
         prep_protacs_file = folder/'protac_prep_confs.sdf'
         cavity_input_file = folder/'cavity.prm'
         scored_protacs_file = folder/'protac_scored_confs.sd'
         ##
 
-        create_folder(folder)
+        folder.mkdir(exist_ok=True)
         # set to rxdock that this will be a folder with definitions (minimize)
         putenv('RBT_HOME', str(Path(ROOT_DIR)/'inputs'))
         # make combined receptor+ligase file with pymol
         pymol_combine(receptor_obj.file, pose_obj.file, out_filename=combined_file)
 
         # prepare protac sdf file with openbabel
-        sampled_confs = pybel.readfile('sdf', pose_obj.protac_pose.file)
+        sampled_confs = pybel.readfile('sdf', str(pose_obj.protac_pose.file))
         prep_confs = pybel.Outputfile('sdf', str(prep_protacs_file), overwrite=True)
         for mol in sampled_confs:
             mol.OBMol.DeleteNonPolarHydrogens()

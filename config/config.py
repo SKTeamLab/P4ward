@@ -1,6 +1,6 @@
 import configparser
 import argparse
-import os
+from pathlib import Path
 
 
 def arg_parser(arguments):
@@ -12,7 +12,7 @@ def arg_parser(arguments):
 
     parser.add_argument(
         "--config_file",
-        type=str,
+        type=Path,
         help='Path to the .ini file where the user configuration is stored'
     )
     parser.add_argument(
@@ -34,7 +34,7 @@ def make_config(config_file, ROOT_DIR):
     """
 
     conf = configparser.ConfigParser()
-    conf.read(os.path.join(ROOT_DIR, 'config', 'default.ini'))
+    conf.read(ROOT_DIR/'config'/'default.ini')
     conf.read(config_file)
 
     return(conf)

@@ -1,4 +1,4 @@
-
+from pathlib import Path
 
 class Protein:
     """
@@ -23,8 +23,8 @@ class Protein:
         """
 
         self.type = ptn_type #type is either 'receptor' or 'ligase'
-        self.file = file
-        self.lig_file = lig_file
+        self.file = Path(file)
+        self.lig_file = Path(lig_file)
 
         if self.type == 'ligase':
             self.conformations = []

@@ -1,8 +1,9 @@
 import os
+from pathlib import Path
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-CWD = os.getcwd()
+ROOT_DIR = Path(__file__).resolve().parent
+CWD = Path.cwd()
 PIPELINE_NAME = 'protacs_pipeline'
-CPT_FILE = os.path.join(CWD, PIPELINE_NAME+'-cpt.pickle')
-TRACKER_FILE = PIPELINE_NAME + '-tracker.pickle'
+CPT_FILE = CWD / (PIPELINE_NAME+'-cpt.pickle')
+TRACKER_FILE = CWD / (PIPELINE_NAME + '-tracker.pickle')
 

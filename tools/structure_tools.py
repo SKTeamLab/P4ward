@@ -67,8 +67,8 @@ def get_protac_dist_cuttoff(
             return(center)
 
         protac = Chem.MolFromSmiles(protac_obj.smiles)
-        reclig = Chem.MolFromMol2File(reclig_file, sanitize=False, cleanupSubstructures=False)
-        liglig = Chem.MolFromMol2File(liglig_file, sanitize=False, cleanupSubstructures=False)
+        reclig = Chem.MolFromMol2File(str(reclig_file), sanitize=False, cleanupSubstructures=False)
+        liglig = Chem.MolFromMol2File(str(liglig_file), sanitize=False, cleanupSubstructures=False)
 
         receptor_lig_smarts_ = rdFMCS.FindMCS([protac, reclig]).smartsString
         pose_lig_smarts_ = rdFMCS.FindMCS([protac, liglig]).smartsString
