@@ -27,10 +27,11 @@ def summary_csv(pose_objects):
         data_dict['protac_pose'].append(pose_obj.protac_pose.active)
         if pose_obj.protac_pose.active:
             active_linkers = [i for i in pose_obj.protac_pose.linker_confs if i.active]
-            top_protac_score = active_linkers[0].rx_score
             if len(active_linkers) == 0:
                 active_linkers = '0'
+                top_protac_score = None
             else:
+                top_protac_score = active_linkers[0].rx_score
                 active_linkers = ','.join([str(i.conf_number) for i in active_linkers])
         else:
             active_linkers = '0'

@@ -28,7 +28,7 @@ def protein_poses(
     # ^ capture the name of the scoring function as it is in the objects' attribute name
 
     # sort based on the chosen score and save sorted list
-    sorted_confs = sorted(ligase_obj.conformations, key=lambda x: getattr(x, ranking), reverse=~ascending)
+    sorted_confs = sorted(ligase_obj.conformations, key=lambda x: getattr(x, ranking), reverse=not ascending)
     ligase_obj.conformations = sorted_confs
 
     # now sorted list and pose_objs must include only actives

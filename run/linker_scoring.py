@@ -19,7 +19,7 @@ def rxdock_rescore(
     from openbabel import pybel
 
     # we will operate on all the pose objs that have at least an active linker conf
-    pose_objs = [i for i in ligase_obj.active_confs() if i.protac_pose.active and len(i.protac_pose.linker_confs) > 0]
+    pose_objs = [i for i in ligase_obj.active_confs() if i.protac_pose.active and len([j for j in i.protac_pose.linker_confs if j.active]) > 0]
     
     linker_scoring_folder.mkdir(exist_ok=True)
 
