@@ -153,7 +153,7 @@ def get_rmsd(obj1, obj2, ca=False):
 
 def reduce(protein_obj_list, file_attribute_name, protein_only=False):
     """
-    use pymol to add hydrogens to proteins.
+    use reduce to add hydrogens to proteins.
     takes the objects as arguments so that they can be updated on the fly
     `file_attribute_name` specifies which file attribute to capture from the obj
     """
@@ -163,11 +163,10 @@ def reduce(protein_obj_list, file_attribute_name, protein_only=False):
         protein_file = getattr(protein_obj, file_attribute_name)
         reduced_protein_file = protein_file.parent/(protein_file.stem + '_h.pdb')
 
-        pymol.cmd.load(protein_file)
-        pymol.cmd.h_add()
-        if protein_only:
-            pymol.cmd.remove('h. and not polymer.protein')
-        pymol.cmd.save(reduced_protein_file)
+        command = ['reduce', '-NOFLIP', str(protein_file)]
+        text = subprocess.run(command, capture_output=True, text=True)
+        with open(reduced_protein_file, 'w+') as out_:
+            out_.write(text.stdout)
 
         setattr(protein_obj, file_attribute_name+'_reduced', reduced_protein_file)
         logger.info(f"Added hydrogens to {protein_file}")
