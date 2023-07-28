@@ -17,8 +17,10 @@ def prep_structures(receptor_obj, ligase_obj):
     receptor_ligand_file = receptor_obj.lig_file
     ligase_ligand_file = ligase_obj.lig_file
 
-    prep_receptor_file = f'mg-{receptor_file}'
-    prep_ligase_file = f'mg-{ligase_file}'
+    prep_receptor_file = receptor_file.parent/('mg-'+receptor_file.name)
+    prep_ligase_file = ligase_file.parent/('mg-'+ligase_file.name)
+    # prep_receptor_file = f'mg-{receptor_file}'
+    # prep_ligase_file = f'mg-{ligase_file}'
     
     command = (
          f"open {receptor_file}; open {receptor_ligand_file};"
@@ -290,8 +292,8 @@ def zrank_rescore(ligase_obj, receptor_obj, zrank_path, run_docking_output_file)
     # the end of the file has an empty line, zrank tries to score that. So strip it out:
     megadock_output_read = megadock_output_read.rstrip()
     # now swap protein file names to reduced file names
-    megadock_output_read = megadock_output_read.replace(receptor_obj.mg_file, receptor_obj.mg_file_reduced)
-    megadock_output_read = megadock_output_read.replace(ligase_obj.mg_file, ligase_obj.mg_file_reduced)
+    megadock_output_read = megadock_output_read.replace(str(receptor_obj.mg_file), str(receptor_obj.mg_file_reduced))
+    megadock_output_read = megadock_output_read.replace(str(ligase_obj.mg_file), str(ligase_obj.mg_file_reduced))
     
     # run zrank using `megadock_output_read` as temporary file
     with tempfile.NamedTemporaryFile(mode='w', dir=CWD, delete=True) as tmp:

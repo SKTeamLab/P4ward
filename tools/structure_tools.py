@@ -153,30 +153,25 @@ def get_rmsd(obj1, obj2, ca=False):
 
 def reduce(protein_obj_list, file_attribute_name, protein_only=False):
     """
-    use chimerax to add hydrogens to proteins.
+    use pymol to add hydrogens to proteins.
     takes the objects as arguments so that they can be updated on the fly
     `file_attribute_name` specifies which file attribute to capture from the obj
     """
+    import pymol
 
     for protein_obj in protein_obj_list:
         protein_file = getattr(protein_obj, file_attribute_name)
-        reduced_protein_file = os.path.splitext(protein_file)[0] + '_h.pdb'
+        reduced_protein_file = protein_file.parent/(protein_file.stem + '_h.pdb')
 
+        pymol.cmd.load(protein_file)
+        pymol.cmd.h_add()
         if protein_only:
-            del_nonstd = 'del ~protein & H;'
-        else: 
-            del_nonstd = ''
-
-        command = (
-             f"open {protein_file};"
-            + "addh;"
-            +  del_nonstd
-            +f"save {os.path.join(reduced_protein_file)}"
-        )
-        subprocess.run(['chimerax', '--nogui'], input=command, encoding='ascii')
+            pymol.cmd.remove('h. and not polymer.protein')
+        pymol.cmd.save(reduced_protein_file)
 
         setattr(protein_obj, file_attribute_name+'_reduced', reduced_protein_file)
         logger.info(f"Added hydrogens to {protein_file}")
+
 
 # TODO remove
 def smiles2smarts(smiles_code):
@@ -233,3 +228,4 @@ def pymol_combine(*args, out_filename='combined.pdb'):
     
     pymol.cmd.create('combined', ' '.join(basenames))
     pymol.cmd.save(out_filename, 'combined')
+    pymol.cmd.quit()
