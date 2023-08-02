@@ -10,8 +10,11 @@ from ..definitions import CWD
 def prep_structures(receptor_obj, ligase_obj):
     """
     Combine and prepare the protein files with their ligands for docking
-    using chimerax
+    using pymol combine
     """
+
+    from ..tools.structure_tools import pymol_combine
+
     receptor_file = receptor_obj.file
     ligase_file = ligase_obj.file
     receptor_ligand_file = receptor_obj.lig_file
@@ -19,21 +22,10 @@ def prep_structures(receptor_obj, ligase_obj):
 
     prep_receptor_file = receptor_file.parent/('mg-'+receptor_file.name)
     prep_ligase_file = ligase_file.parent/('mg-'+ligase_file.name)
-    # prep_receptor_file = f'mg-{receptor_file}'
-    # prep_ligase_file = f'mg-{ligase_file}'
-    
-    command = (
-         f"open {receptor_file}; open {receptor_ligand_file};"
-        +f"combine modelId 9;"
-        +f"save {prep_receptor_file} models #9;"
-        +f"del #*;"
-        
-         f"open {ligase_file}; open {ligase_ligand_file};"
-        +f"combine modelId 9;"
-        +f"save {prep_ligase_file} models #9"
-    )
-    subprocess.run(['chimerax', '--nogui'], input=command, encoding='ascii')
 
+    pymol_combine(receptor_file, receptor_ligand_file, out_filename=prep_receptor_file)
+    pymol_combine(ligase_file,   ligase_ligand_file,   out_filename=prep_ligase_file)
+ 
     logger.info(f'Saved protein files for megadock: {prep_receptor_file}, {prep_ligase_file}')
 
     receptor_obj.mg_file = prep_receptor_file

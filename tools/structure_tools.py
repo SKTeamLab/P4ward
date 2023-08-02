@@ -157,7 +157,6 @@ def reduce(protein_obj_list, file_attribute_name, protein_only=False):
     takes the objects as arguments so that they can be updated on the fly
     `file_attribute_name` specifies which file attribute to capture from the obj
     """
-    import pymol
 
     for protein_obj in protein_obj_list:
         protein_file = getattr(protein_obj, file_attribute_name)
@@ -227,4 +226,4 @@ def pymol_combine(*args, out_filename='combined.pdb'):
     
     pymol.cmd.create('combined', ' '.join(basenames))
     pymol.cmd.save(out_filename, 'combined')
-    pymol.cmd.quit()
+    # pymol.cmd.quit()
