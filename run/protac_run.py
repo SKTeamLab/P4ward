@@ -98,7 +98,7 @@ def sample_protac_pose(q):
     params = q.get()
     params = conf_sampling(params)
 
-    if params['protac_pose']['active'] and params['linker_confs']
+    # if params['protac_pose']['active'] and params['linker_confs']
     # params = linker_scoring(params)
     # params = linker_clashes(params)
 
