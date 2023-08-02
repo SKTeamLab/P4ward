@@ -225,7 +225,7 @@ def rdkit_sampling(
             coordmap[atom_ix] = Point3D(x, y, z)
 
         # make ProtacPose obj:
-        # protac_pose_obj = classes.ProtacPose(parent=protac_obj, protein_parent=pose_obj)
+        protac_pose_obj = classes.ProtacPose(parent=protac_obj, protein_parent=pose_obj)
         protac_pose_obj = pose_obj.protac_pose
         # sample its conformations!
         kwargs = {

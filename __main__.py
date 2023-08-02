@@ -1,4 +1,7 @@
 
+from .run import protac_scoring
+
+
 if __name__ == '__main__':
 
     from sys import exit
@@ -116,7 +119,7 @@ if __name__ == '__main__':
     #~~~~~~~~~~~ ligand sampling ~~~~~~~~~~~#
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
-    from .run import linker_sampling, linker_scoring
+    from .run import linker_sampling
 
     # sample conformations
     linker_sampling.rdkit_sampling(
@@ -157,7 +160,7 @@ if __name__ == '__main__':
     # CHECKPOINT!
     run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_obj=protac)
     # score conformations with rxdock
-    linker_scoring.rxdock_rescore(
+    protac_scoring.rxdock_rescore(
         receptor_obj=receptor,
         ligase_obj=ligase,
         minimize=conf.getboolean('linker_ranking','rxdock_minimize'),
@@ -165,7 +168,7 @@ if __name__ == '__main__':
         choice=conf.getboolean('linker_ranking','rxdock_score')
     )
 
-    linker_scoring.capture_rxdock_scores(
+    protac_scoring.capture_rxdock_scores(
         ligase_obj=ligase,
         choice=conf.getboolean('linker_ranking','rxdock_score')
     )
