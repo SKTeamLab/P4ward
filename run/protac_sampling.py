@@ -32,6 +32,8 @@ def protac_sampling(
                         protac_poses_folder,
                         rmsd_tolerance,
                         time_tolerance,
+                        linker_scoring_folder,
+                        minimize_protac,
                         extend_top_poses_sampled=False,
                         # pose_objs=None
 ):
@@ -42,7 +44,10 @@ def protac_sampling(
         'rdkit_number_of_confs' : rdkit_number_of_confs,
         'protac_poses_folder'   : protac_poses_folder,
         'rmsd_tolerance'        : rmsd_tolerance,
-        'time_tolerance'        : time_tolerance
+        'time_tolerance'        : time_tolerance,
+        'linker_scoring_folder' : linker_scoring_folder,
+        'minimize_protac'       : minimize_protac,
+        'receptor_obj_file'     : receptor_obj.file
     }
 
     # make folder where the linkers for all pose objs will be stored
@@ -79,8 +84,9 @@ def protac_sampling(
 
     for pose_obj in candidate_poses:
         params = {
-            "pose_number" : pose_obj.pose_number,
-            "pose_obj_rotate" : pose_obj.rotate
+            "pose_number"     : pose_obj.pose_number,
+            "pose_obj_rotate" : pose_obj.rotate,
+            "file"            : pose_obj.file
         }
         params = {**global_parameters, **params}
         q.put(params)
@@ -98,6 +104,10 @@ def protac_sampling(
         protac_pose_obj = classes.ProtacPose(parent=protac_obj, protein_parent=pose_obj)
         protac_pose_obj.active = params['protac_pose']['active']
         protac_pose_obj.file   = params['protac_pose']['file']
+        try:
+            protac_pose_obj.scored_file = params['protac_pose']['scored_file']
+        except:
+            pass
         
         for linker_conf_dict in params['linker_confs']:
             linker_conf = classes.LinkerConf(parent=protac_pose_obj, conf_number=linker_conf_dict['conf_number'])

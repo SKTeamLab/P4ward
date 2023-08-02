@@ -95,11 +95,13 @@ def conf_sampling(params):
 
 def sample_protac_pose(q):
 
+    from . import protac_scoring
+
     params = q.get()
     params = conf_sampling(params)
 
-    # if params['protac_pose']['active'] and params['linker_confs']
-    # params = linker_scoring(params)
-    # params = linker_clashes(params)
-
+    if params['protac_pose']['active'] and len(params['linker_confs']) > 0:
+    # ^ we will only try to rescore if the protac pose had at least one successful linker conf
+        params = protac_scoring.rxdock_rescore(params)
+    
     return(params)
