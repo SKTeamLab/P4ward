@@ -61,11 +61,11 @@ def conf_sampling(params):
     # for each conformation, align and write to single sdf file,
     # capturing only the poses that obey the rmsd tolerance
     protac_file = linker_folder / 'protac_embedded_confs.sdf'
-    params['linker_confs'] = []
+    params['linker_confs'] = {}
     try:
         with open(protac_file, 'a+') as confs_file:
             for i in range(params['rdkit_number_of_confs']):
-                # make linker conf object
+                # make linker conf "object"
                 linker_conf = {'conf_number':i, 'active':None}
                 rmsd = Chem.rdMolAlign.AlignMol(protac_embed, reference_ligs_rotate, atomMap=params['alignment_pairs'], prbCid=i)
                 logger.debug(f"pose: {params['pose_number']}, conf: {i}, rmsd: {rmsd}")
@@ -77,7 +77,7 @@ def conf_sampling(params):
                     linker_conf['active'] = True
                 else:
                     linker_conf['active'] = False
-                params['linker_confs'].append(linker_conf)
+                params['linker_confs'][i] = linker_conf
         params['protac_pose'] = {'active':True, 'file':protac_file}
     except:
         logger.info(f'No conformation possible for pose {params["pose_number"]}')
@@ -93,15 +93,20 @@ def conf_sampling(params):
 
 
 
-def sample_protac_pose(q):
+def sample_protac_pose(inQ, outQ, lock):
 
     from . import protac_scoring
 
-    params = q.get()
-    params = conf_sampling(params)
+    while True:
 
-    if params['protac_pose']['active'] and len(params['linker_confs']) > 0:
-    # ^ we will only try to rescore if the protac pose had at least one successful linker conf
-        params = protac_scoring.rxdock_rescore(params)
-    
-    return(params)
+        with lock:
+            params = inQ.get()
+        
+        params = conf_sampling(params)
+
+        if params['protac_pose']['active'] and len(params['linker_confs']) > 0:
+        # ^ we will only try to rescore if the protac pose had at least one successful linker conf
+            params = protac_scoring.rxdock_rescore(params)
+        
+        with lock:
+            outQ.put(params)

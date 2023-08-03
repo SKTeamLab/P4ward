@@ -63,3 +63,16 @@ def rxdock_rescore(params):
 
     return(params)
 
+
+def capture_rxdock_scores(params):
+
+    from openbabel import pybel
+
+    confs = pybel.readfile('sdf', str(params['protac_pose']['scored_file']))
+    for conf in confs:
+        conf_number = conf.data['Name'].split('_')[-1] # name in sdf file is format "conf_X"
+        score = float(conf.data['SCORE'])
+
+        params['linker_confs'][conf_number]['rx_score'] = score
+
+    return(params)
