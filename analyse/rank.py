@@ -88,7 +88,7 @@ def protein_poses(
     """"""
     
 
-@decorators.track_run
+# @decorators.track_run
 def generate_protein_poses(poses, pose_objs, generated_poses_folder, altlocA):
     """
     Subset of protein-protein poses to generate based on conf option `generate_poses`.
@@ -132,7 +132,7 @@ def generate_protein_poses(poses, pose_objs, generated_poses_folder, altlocA):
             pdbio.save(str(final_file))
 
 
-@decorators.track_run
+# @decorators.track_run
 def protac_conformations(protac_poses):
     """
     rank the linker conformations for each protac pose and mark the ones that have negative scores.
@@ -140,15 +140,14 @@ def protac_conformations(protac_poses):
 
     for protac_pose in protac_poses:
 
-        # def get_linker_score(linker_conf):
-        #     if hasattr(linker_conf, 'rx_score'):
-        #         return(getattr(linker_conf, 'rx_score'))
-        #     else:
-        #         return(None)
+        def get_linker_score(linker_conf):
+            if hasattr(linker_conf, 'rx_score'):
+                return(getattr(linker_conf, 'rx_score'))
+            else:
+                return(None)
 
-        sorted_linker_confs = sorted(protac_pose.active_confs(), key=lambda x: getattr(x, 'rx_score'))
+        sorted_linker_confs = sorted(protac_pose.linker_confs, key=get_linker_score)
+        # sorted_linker_confs = sorted(protac_pose.linker_confs, key=lambda x: getattr(x, 'rx_score'))
         protac_pose.linker_confs = sorted_linker_confs
 
-        for linker_conf in protac_pose.linker_confs:
-            if linker_conf.rx_score < 0:
-                linker_conf.neg_score = True
+        print(protac_pose.protein_parent.pose_number, protac_pose.protein_parent.top, [i.rx_score for i in sorted_linker_confs])

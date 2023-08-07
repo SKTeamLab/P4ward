@@ -45,9 +45,9 @@ def rxdock_rescore(params):
     # run cavity generation
     subprocess.run(
         ['rbcavity', '-r', cavity_input_file.name, '-W'],
-        cwd=Path(CWD)/folder # we have to change working dirs for rxdock to work properly
+        cwd=Path(CWD)/folder, # we have to change working dirs for rxdock to work properly
+        stdout=subprocess.DEVNULL
     )
-    logger.info("Ran cavity detection for rxdock rescoring.")
 
     # run rxdock
     command = [
@@ -55,8 +55,7 @@ def rxdock_rescore(params):
         '-r', cavity_input_file.name,
         '-p', dock_prm_file
     ]
-    subprocess.run(command, cwd=Path(CWD)/folder)
-    logger.info("Ran rxdock rescoring.")
+    subprocess.run(command, cwd=Path(CWD)/folder, stdout=subprocess.DEVNULL)
 
     # update dictionary with new scored file
     params['protac_pose']['scored_file'] = scored_protacs_file
@@ -70,7 +69,7 @@ def capture_rxdock_scores(params):
 
     confs = pybel.readfile('sdf', str(params['protac_pose']['scored_file']))
     for conf in confs:
-        conf_number = conf.data['Name'].split('_')[-1] # name in sdf file is format "conf_X"
+        conf_number = int(conf.data['Name'].split('_')[-1]) # name in sdf file is format "conf_X"
         score = float(conf.data['SCORE'])
 
         params['linker_confs'][conf_number]['rx_score'] = score

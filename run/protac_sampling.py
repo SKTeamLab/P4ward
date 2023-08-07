@@ -1,11 +1,7 @@
 from  multiprocessing import Queue, Lock, Process
-from rdkit import Chem
-from rdkit.Chem import AllChem
-from rdkit.Chem import rdFMCS
-from rdkit.Geometry.rdGeometry import Point3D
 from ..tools.logger import logger
 from ..tools import classes
-from . import protac_prep
+from ..tools import decorators
 
 
 # rdkit_protac_sampling() (here)             = coordinate_everything()
@@ -20,7 +16,7 @@ from . import protac_prep
 #           capture_conf_score()    | 
 
 
-
+@decorators.user_choice
 def protac_sampling(
                         receptor_obj,
                         ligase_obj,
@@ -96,18 +92,20 @@ def protac_sampling(
             "file"            : pose_obj.file
         }
         params = {**global_parameters, **params}
+        logger.info(f"Sending pose {params['pose_number']} to protac sampling.")
         inQ.put(params)
     
     # start processes
     procs = []
     for i in range(num_parallel_procs):
-        p = Process(name=i, target=protac_run.sample_protac_pose, args=(inQ, outQ, lock))
+        p = Process(name=i, target=protac_run.sample_protac_pose, args=(inQ, outQ, lock, i))
         p.daemon = True
         p.start()
         procs.append(p)
     
     # start watching the outQ and counting successful poses
-    while len(successful_poses) < top:
+    while len(successful_poses) <= top:
+        print('successful poses:', len(successful_poses))
 
         params = outQ.get()
 
@@ -124,7 +122,10 @@ def protac_sampling(
         for linker_conf_dict in params['linker_confs'].values():
             linker_conf = classes.LinkerConf(parent=protac_pose_obj, conf_number=linker_conf_dict['conf_number'])
             linker_conf.active = linker_conf_dict['active']
-            linker_conf.rx_score = linker_conf_dict['rx_score']
+            try:
+                linker_conf.rx_score = linker_conf_dict['rx_score']
+            except:
+                linker_conf.rx_score = None
 
         success = True
         if extend_top_poses_sampled:
@@ -133,21 +134,56 @@ def protac_sampling(
                 success = False
         if extend_top_poses_score:
             # if all the scores of the linker confs are positive, success = False, else success = True
-            pos_scores = [True if i['rx_score'] > 0 else False for i in params['linker_confs'].values()]
+            pos_scores = []
+            for i in params['linker_confs'].values():
+                if 'rx_score' in i.keys():
+                    if i['rx_score'] > 0 or i['rx_score'] == None:
+                        pos_scores.append(True)
+                    else:
+                        pos_scores.append(False)
+                else:
+                    pos_scores.append(True)
+
+            print(pos_scores)
             if all(pos_scores) or len(pos_scores) == 0:
                 success = False
 
-        if success: successful_poses.append(pose_obj)
-        else: failed_poses.append(pose_obj)
+        if success:
+            successful_poses.append(pose_obj)
+            pose_obj.top = True
+            print('poses: ', [j.conf_number for j in pose_obj.protac_pose.linker_confs])
+            print('scores: ', [j.rx_score for j in pose_obj.protac_pose.linker_confs])
+        else:
+            failed_poses.append(pose_obj)
+            pose_obj.top = False
+
+        logger.info(f"pose {params['pose_number']} - {('success' if success else 'failed')}")
         
+        # check if all poses have been tried
+        if len(candidate_poses) + len(successful_poses) + len(failed_poses) == len(pose_objs):
+            logger.info("All possible poses have been sampled.")
+            break
+            
         # get next candidate
         for i in pose_objs:
             if i not in candidate_poses and i not in successful_poses and i not in failed_poses:
                 next_candidate = i
+                params = {
+                    "pose_number"     : next_candidate.pose_number,
+                    "pose_obj_rotate" : next_candidate.rotate,
+                    "file"            : next_candidate.file
+                }
+                params = {**global_parameters, **params}
                 break
+        
         # send it to be processed
-        inQ.put(next_candidate)
+        candidate_poses.append(next_candidate)
+        logger.info(f"Sending pose {params['pose_number']} to protac sampling.")
+        inQ.put(params)
     
-    
+    print('out of main')
     for p in procs:
-        p.join()
+        p.terminate()
+
+    # for p in procs:
+    #     p.join()

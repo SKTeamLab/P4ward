@@ -119,10 +119,23 @@ if __name__ == '__main__':
     #~~~~~~~~~~~ ligand sampling ~~~~~~~~~~~#
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
-    from .run import linker_sampling
+    from .run import protac_sampling
 
-    # sample conformations
-    linker_sampling.rdkit_sampling(
+    # generate pdbs
+    rank.generate_protein_poses(
+        pose_objs=ligase.conformations,
+        poses=conf.get('protein_ranking', 'generate_poses'),
+        altlocA = conf.getboolean('protein_ranking', 'generate_poses_altlocA'),
+        generated_poses_folder=Path(conf.get('protein_ranking', 'generated_poses_folder'))
+    )
+
+
+    # CHECKPOINT!
+    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_obj=protac)
+
+    # run protac sampling
+
+    protac_sampling.protac_sampling(
         receptor_obj=receptor,
         ligase_obj=ligase,
         protac_obj=protac,
@@ -134,45 +147,15 @@ if __name__ == '__main__':
         rmsd_tolerance=conf.getfloat('linker_sampling', 'rdkit_pose_rmsd_tolerance'),
         time_tolerance=conf.getint('linker_sampling', 'rdkit_time_tolerance'),
         extend_top_poses_sampled=conf.getboolean('linker_sampling', 'extend_top_poses_sampled'),
+        extend_top_poses_score=conf.getboolean('linker_sampling', 'extend_top_poses_score'),
+        linker_scoring_folder=Path(conf.get('linker_ranking','linker_scoring_folder')),
+        minimize_protac=conf.getboolean('linker_ranking','rxdock_minimize'),
+        # top_poses=conf.getint('protein_ranking', 'top_poses'),
+        num_parallel_procs=conf.getint('general', 'num_processors'),
         choice=conf.getboolean('linker_sampling', 'rdkit_sampling')
     )
 
-    rank.generate_protein_poses(
-        pose_objs=ligase.conformations,
-        poses=conf.get('protein_ranking', 'generate_poses'),
-        altlocA = conf.getboolean('protein_ranking', 'generate_poses_altlocA'),
-        generated_poses_folder=Path(conf.get('protein_ranking', 'generated_poses_folder'))
-    )
-
-    # detect linker clashes
-    linker_sampling.detect_clashes(
-        receptor_obj=receptor,
-        protac_obj=protac,
-        pose_objs=ligase.active_confs(),
-        protac_poses_folder=Path(conf.get('linker_sampling', 'protac_poses_folder')),
-        clash_threshold=conf.getfloat('linker_ranking', 'clash_threshold'),
-        restrict_clash_to_linker=conf.getboolean('linker_ranking', 'restrict_clash_to_linker'),
-        filter_clashed=conf.getboolean('linker_ranking', 'filter_clashed'),
-        max_clashes_allowed=conf.getint('linker_ranking', 'max_clashes_allowed'),
-        choice=conf.getboolean('linker_ranking', 'clash_detection')
-    )
-
-    # CHECKPOINT!
-    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_obj=protac)
-    # score conformations with rxdock
-    protac_scoring.rxdock_rescore(
-        receptor_obj=receptor,
-        ligase_obj=ligase,
-        minimize=conf.getboolean('linker_ranking','rxdock_minimize'),
-        linker_scoring_folder=Path(conf.get('linker_ranking','linker_scoring_folder')),
-        choice=conf.getboolean('linker_ranking','rxdock_score')
-    )
-
-    protac_scoring.capture_rxdock_scores(
-        ligase_obj=ligase,
-        choice=conf.getboolean('linker_ranking','rxdock_score')
-    )
-
+    # rank all sampled protacs
     rank.protac_conformations(
         protac_poses=protac.active_poses()
     )
