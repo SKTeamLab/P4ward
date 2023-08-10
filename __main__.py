@@ -1,5 +1,4 @@
 
-from .run import protac_scoring
 
 
 if __name__ == '__main__':
@@ -150,7 +149,7 @@ if __name__ == '__main__':
         extend_top_poses_score=conf.getboolean('linker_sampling', 'extend_top_poses_score'),
         linker_scoring_folder=Path(conf.get('linker_ranking','linker_scoring_folder')),
         minimize_protac=conf.getboolean('linker_ranking','rxdock_minimize'),
-        # top_poses=conf.getint('protein_ranking', 'top_poses'),
+        top_poses=conf.getint('protein_ranking', 'top_poses'),
         num_parallel_procs=conf.getint('general', 'num_processors'),
         choice=conf.getboolean('linker_sampling', 'rdkit_sampling')
     )

@@ -3,11 +3,11 @@ from rdkit.Geometry.rdGeometry import Point3D
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from func_timeout import func_timeout
-from ..tools.logger import logger
+# from ..tools.logger import logger
 from ..run.megadock import rotate_atoms
 
 
-def conf_sampling(params):
+def conf_sampling(params, logger):
 
     # make folder for each pose obj linker file to be saved
     linker_folder = params['protac_poses_folder'] / f'protein_pose_{params["pose_number"]}'
@@ -55,7 +55,7 @@ def conf_sampling(params):
     try:
         func_timeout(params['time_tolerance'], AllChem.EmbedMultipleConfs, kwargs=kwargs)
     except:
-        logger.warning(f"rdkit timeout for pose {params['pose_number']}")
+        # logger.warning(f"rdkit timeout for pose {params['pose_number']}")
         pass
 
     # for each conformation, align and write to single sdf file,
@@ -93,7 +93,7 @@ def conf_sampling(params):
 
 
 
-def sample_protac_pose(inQ, outQ, lock, p):
+def sample_protac_pose(inQ, outQ, lock, p, logger):
 
     from . import protac_scoring
 
@@ -101,9 +101,9 @@ def sample_protac_pose(inQ, outQ, lock, p):
 
         with lock:
             params = inQ.get()
-            logger.debug(f"(proc. {p+1} got pose {params['pose_number']})")
-        
-        params = conf_sampling(params)
+
+        logger.debug(f"(proc. {p+1} got pose {params['pose_number']})")
+        params = conf_sampling(params, logger)
 
         if (
             params['protac_pose']['active'] and  # only rescore if protac pose is active
@@ -115,5 +115,6 @@ def sample_protac_pose(inQ, outQ, lock, p):
         
         logger.info(f"(proc. {p+1}) Sampled protac for protein pose {params['pose_number']}")
         
+        inQ.task_done()
         with lock:
             outQ.put(params)

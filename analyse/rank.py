@@ -140,14 +140,14 @@ def protac_conformations(protac_poses):
 
     for protac_pose in protac_poses:
 
-        def get_linker_score(linker_conf):
-            if hasattr(linker_conf, 'rx_score'):
-                return(getattr(linker_conf, 'rx_score'))
-            else:
-                return(None)
+        # def get_linker_score(linker_conf):
+        #     if hasattr(linker_conf, 'rx_score'):
+        #         return(getattr(linker_conf, 'rx_score'))
+        #     else:
+        #         return(None)
 
-        sorted_linker_confs = sorted(protac_pose.linker_confs, key=get_linker_score)
-        # sorted_linker_confs = sorted(protac_pose.linker_confs, key=lambda x: getattr(x, 'rx_score'))
+        # sorted_linker_confs = sorted(protac_pose.linker_confs, key=get_linker_score)
+        sorted_linker_confs = sorted(protac_pose.linker_confs, key=lambda x: getattr(x, 'rx_score'))
         protac_pose.linker_confs = sorted_linker_confs
 
         print(protac_pose.protein_parent.pose_number, protac_pose.protein_parent.top, [i.rx_score for i in sorted_linker_confs])

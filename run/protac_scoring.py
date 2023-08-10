@@ -3,7 +3,7 @@ from os import putenv
 from pathlib import Path
 from openbabel import pybel
 from ..definitions import ROOT_DIR, CWD
-from ..tools.logger import logger
+# from ..tools.logger import logger
 from ..tools.structure_tools import pymol_combine
 
 def rxdock_rescore(params):
