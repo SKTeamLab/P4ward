@@ -91,8 +91,9 @@ def conf_sampling(params, pose_obj, protac_obj, logger):
         protac_pose_obj.file = protac_file
     except:
         logger.info(f'No conformation possible for pose {params["pose_number"]}')
-        params['protac_pose'] = {'active':False, 'file':None}
+        # params['protac_pose'] = {'active':False, 'file':None}
         protac_pose_obj.active = False
+        protac_pose_obj.file = None
 
     # new variables in params dict:
     #   - ['protac_pose']

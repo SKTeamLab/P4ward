@@ -6,7 +6,7 @@ from ..definitions import ROOT_DIR, CWD
 # from ..tools.logger import logger
 from ..tools.structure_tools import pymol_combine
 
-def rxdock_rescore(params):
+def rxdock_rescore(params, pose_obj, receptor_obj):
 
     params['linker_scoring_folder'].mkdir(exist_ok=True)
 
@@ -14,7 +14,7 @@ def rxdock_rescore(params):
     else: dock_prm_file = 'score.prm'
 
     # files
-    folder = params['linker_scoring_folder']/f"protein_pose_{params['pose_number']}"
+    folder = params['linker_scoring_folder']/f"protein_pose_{pose_obj.pose_number}"
     combined_file = folder/'combined_protein.mol2'
     prep_protacs_file = folder/'protac_prep_confs.sdf'
     cavity_input_file = folder/'cavity.prm'
@@ -25,10 +25,10 @@ def rxdock_rescore(params):
     # set to rxdock that this will be a folder with definitions (minimize)
     putenv('RBT_HOME', str(Path(ROOT_DIR)/'inputs'))
     # make combined receptor+ligase file with pymol
-    pymol_combine(params['receptor_obj_file'], params['file'], out_filename=combined_file)
+    pymol_combine(receptor_obj.file, pose_obj.file, out_filename=combined_file)
 
     # prepare protac sdf file with openbabel
-    sampled_confs = pybel.readfile('sdf', str(params['protac_pose']['file']))
+    sampled_confs = pybel.readfile('sdf', str(pose_obj.protac_pose.file))
     prep_confs = pybel.Outputfile('sdf', str(prep_protacs_file), overwrite=True)
     for mol in sampled_confs:
         mol.OBMol.DeleteNonPolarHydrogens()
@@ -58,20 +58,22 @@ def rxdock_rescore(params):
     subprocess.run(command, cwd=Path(CWD)/folder, stdout=subprocess.DEVNULL)
 
     # update dictionary with new scored file
-    params['protac_pose']['scored_file'] = scored_protacs_file
+    pose_obj.protac_pose.scored_file = scored_protacs_file
+    # params['protac_pose']['scored_file'] = scored_protacs_file
 
     return(params)
 
 
-def capture_rxdock_scores(params):
+def capture_rxdock_scores(params, pose_obj):
 
     from openbabel import pybel
 
-    confs = pybel.readfile('sdf', str(params['protac_pose']['scored_file']))
+    confs = pybel.readfile('sdf', str(pose_obj.protac_pose.scored_file))
     for conf in confs:
         conf_number = int(conf.data['Name'].split('_')[-1]) # name in sdf file is format "conf_X"
         score = float(conf.data['SCORE'])
 
-        params['linker_confs'][conf_number]['rx_score'] = score
+        linker_conf = [i for i in pose_obj.protac_pose.linker_confs if i.conf_number == int(conf_number)][0]
+        linker_conf.rx_score = score
 
     return(params)
