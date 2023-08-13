@@ -26,13 +26,13 @@ def sample_protac_pose(inQ, outQ, lock, p, protac_obj, receptor_obj, logger):
                 params = protac_scoring.rxdock_rescore(params, pose_obj, receptor_obj)
                 params = protac_scoring.capture_rxdock_scores(params, pose_obj)
             
-            print([i.rx_score for i in pose_obj.protac_pose.active_confs()])
+            # print([i.rx_score for i in pose_obj.protac_pose.active_confs()])
         
         logger.info(f"(proc. {p+1}) Sampled protac for protein pose {params['pose_number']}")
         
         inQ.task_done()
         with lock:
-            outQ.put(params)
+            outQ.put((params, pose_obj))
 
 
 
@@ -128,7 +128,11 @@ def protac_sampling(
     while len(successful_poses) <= top_poses:
         print('successful poses:', len(successful_poses))
 
-        params = outQ.get()
+        params, pose_obj = outQ.get()
+
+        print('sampler >>>', pose_obj.__dict__)
+        print('sampler >>>', pose_obj.protac_pose.__dict__)
+        print('sampler >>>', [i.rx_score for i in pose_obj.protac_pose.active_confs()])
 
         # rebuild objects from params
         # pose_obj = [i for i in ligase_obj.conformations if i.pose_number == params['pose_number']][0]
