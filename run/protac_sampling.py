@@ -27,7 +27,7 @@ def sample_protac_pose(inQ, outQ, lock, p, protac_obj, receptor_obj, logger):
         
         inQ.task_done()
         with lock:
-            outQ.put((params, pose_obj))
+            outQ.put(pose_obj)
 
 
 
@@ -81,9 +81,6 @@ def protac_sampling(
 
     global_parameters.update(parameters)
 
-    # global parameters will later be joined with pose specific parameters
-    # and sent to sample_protac_pose()
-
     # ~~~~~~~~~~~~~~
     # start sampling
     # ~~~~~~~~~~~~~~
@@ -116,7 +113,7 @@ def protac_sampling(
     while len(successful_poses) <= top_poses:
         print('successful poses:', len(successful_poses))
 
-        params, pose_obj = outQ.get()
+        pose_obj = outQ.get()
 
         success = True
         if extend_top_poses_sampled:
