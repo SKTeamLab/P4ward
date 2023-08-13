@@ -18,8 +18,8 @@ def sample_protac_pose(inQ, outQ, lock, p, protac_obj, receptor_obj, logger):
         logger.debug(f"(proc. {p+1} got pose {params['pose_number']})")
         params = protac_run.conf_sampling(params, pose_obj, protac_obj, logger)
 
-        if pose_obj.protac_pose.active:
-            print('>>> ', len(pose_obj.protac_pose.linker_confs), pose_obj.protac_pose.linker_confs)
+        # if pose_obj.protac_pose.active:
+        #     print('>>> ', len(pose_obj.protac_pose.linker_confs), pose_obj.protac_pose.linker_confs)
 
         if pose_obj.protac_pose.active:
             if any(i.active for i in pose_obj.protac_pose.linker_confs):
@@ -130,51 +130,30 @@ def protac_sampling(
 
         params, pose_obj = outQ.get()
 
-        print('sampler >>>', pose_obj.__dict__)
-        print('sampler >>>', pose_obj.protac_pose.__dict__)
-        print('sampler >>>', [i.rx_score for i in pose_obj.protac_pose.active_confs()])
-
-        # rebuild objects from params
-        # pose_obj = [i for i in ligase_obj.conformations if i.pose_number == params['pose_number']][0]
-        # protac_pose_obj = classes.ProtacPose(parent=protac_obj, protein_parent=pose_obj)
-        # protac_pose_obj.active = params['protac_pose']['active']
-        # protac_pose_obj.file   = params['protac_pose']['file']
-        # print('protac_pose active in dict: ', params['protac_pose']['active'])
-        # print('protac_pose active in obj: ', protac_pose_obj.active)
-        # try:
-        #     protac_pose_obj.scored_file = params['protac_pose']['scored_file']
-        # except:
-        #     pass
-        
-        # for linker_conf_dict in params['linker_confs'].values():
-        #     linker_conf = classes.LinkerConf(parent=protac_pose_obj, conf_number=linker_conf_dict['conf_number'])
-        #     linker_conf.active = linker_conf_dict['active']
-        #     try:
-        #         linker_conf.rx_score = linker_conf_dict['rx_score']
-        #     except:
-        #         linker_conf.rx_score = None
+        # print('sampler >>>', pose_obj.__dict__)
+        # print('sampler >>>', pose_obj.protac_pose.__dict__)
+        # print('sampler >>>', [i.rx_score for i in pose_obj.protac_pose.active_confs()])
 
         success = True
-        # success = False
         if extend_top_poses_sampled:
             # if the pose is inactive or has no active linker, success = False, else success = True
             if pose_obj.protac_pose.active == False or len(pose_obj.protac_pose.active_confs()) == 0:
                 success = False
-        # if extend_top_poses_score:
-        #     # if all the scores of the linker confs are positive, success = False, else success = True
-        #     pos_scores = []
-        #     for i in params['linker_confs'].values():
-        #         if 'rx_score' in i.keys():
-        #             if i['rx_score'] > 0 or i['rx_score'] == None:
-        #                 pos_scores.append(True)
-        #             else:
-        #                 pos_scores.append(False)
-        #         else:
-        #             pos_scores.append(True)
+            else:
+                if extend_top_poses_score:
+                    # if all the scores of the linker confs are positive, success = False, else success = True
+                    pos_scores = []
+                    for i in pose_obj.protac_pose.active_confs():
+                        if i.rx_score > 0 or i.rx_score == None:
+                            pos_scores.append(True)
+                        else:
+                            pos_scores.append(False)
+                    print(pos_scores)
+                    if all(pos_scores) or len(pos_scores) == 0:
+                        success = False
+                else:
+                    success=True
 
-        #     print(pos_scores)
-        #     if all(pos_scores) or len(pos_scores) == 0:
-        #         success = False
 
         if success:
             successful_poses.append(pose_obj)
