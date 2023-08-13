@@ -15,20 +15,15 @@ def sample_protac_pose(inQ, outQ, lock, p, protac_obj, receptor_obj, logger):
         with lock:
             params, pose_obj = inQ.get()
 
-        logger.debug(f"(proc. {p+1} got pose {params['pose_number']})")
-        params = protac_run.conf_sampling(params, pose_obj, protac_obj, logger)
-
-        # if pose_obj.protac_pose.active:
-        #     print('>>> ', len(pose_obj.protac_pose.linker_confs), pose_obj.protac_pose.linker_confs)
+        logger.debug(f"(proc. {p+1} got pose {pose_obj.pose_number})")
+        protac_run.conf_sampling(params, pose_obj, protac_obj, logger)
 
         if pose_obj.protac_pose.active:
             if any(i.active for i in pose_obj.protac_pose.linker_confs):
-                params = protac_scoring.rxdock_rescore(params, pose_obj, receptor_obj)
-                params = protac_scoring.capture_rxdock_scores(params, pose_obj)
+                protac_scoring.rxdock_rescore(params, pose_obj, receptor_obj)
+                protac_scoring.capture_rxdock_scores(pose_obj)
             
-            # print([i.rx_score for i in pose_obj.protac_pose.active_confs()])
-        
-        logger.info(f"(proc. {p+1}) Sampled protac for protein pose {params['pose_number']}")
+        logger.info(f"(proc. {p+1}) Sampled protac for protein pose {pose_obj.pose_number}")
         
         inQ.task_done()
         with lock:
@@ -66,8 +61,7 @@ def protac_sampling(
         'rmsd_tolerance'        : rmsd_tolerance,
         'time_tolerance'        : time_tolerance,
         'linker_scoring_folder' : linker_scoring_folder,
-        'minimize_protac'       : minimize_protac,
-        'receptor_obj_file'     : receptor_obj.file
+        'minimize_protac'       : minimize_protac
     }
 
     # make folder where the linkers for all pose objs will be stored
@@ -107,14 +101,8 @@ def protac_sampling(
 
     # send top poses as candidates to inQ
     for pose_obj in candidate_poses:
-        params = {
-            "pose_number"     : pose_obj.pose_number,
-            "pose_obj_rotate" : pose_obj.rotate,
-            "file"            : pose_obj.file
-        }
-        params = {**global_parameters, **params}
-        logger.info(f"Sending pose {params['pose_number']} to protac sampling.")
-        inQ.put((params, pose_obj))
+        logger.info(f"Sending pose {pose_obj.pose_number} to protac sampling.")
+        inQ.put((global_parameters, pose_obj))
     
     # start threads
     threads = []
@@ -129,10 +117,6 @@ def protac_sampling(
         print('successful poses:', len(successful_poses))
 
         params, pose_obj = outQ.get()
-
-        # print('sampler >>>', pose_obj.__dict__)
-        # print('sampler >>>', pose_obj.protac_pose.__dict__)
-        # print('sampler >>>', [i.rx_score for i in pose_obj.protac_pose.active_confs()])
 
         success = True
         if extend_top_poses_sampled:
@@ -164,7 +148,7 @@ def protac_sampling(
             failed_poses.append(pose_obj)
             pose_obj.top = False
 
-        logger.info(f"pose {params['pose_number']} - {('success' if success else 'failed')}")
+        logger.info(f"pose {pose_obj.pose_number} - {('success' if success else 'failed')}")
         
         # check if all poses have been tried
         if len(candidate_poses) + len(successful_poses) + len(failed_poses) == len(pose_objs):
@@ -175,16 +159,10 @@ def protac_sampling(
         for i in pose_objs:
             if i not in candidate_poses and i not in successful_poses and i not in failed_poses:
                 next_candidate = i
-                params = {
-                    "pose_number"     : next_candidate.pose_number,
-                    "pose_obj_rotate" : next_candidate.rotate,
-                    "file"            : next_candidate.file
-                }
-                params = {**global_parameters, **params}
                 break
         
         # send it to be processed
         candidate_poses.append(next_candidate)
-        logger.info(f"Sending pose {params['pose_number']} to protac sampling.")
-        inQ.put((params, next_candidate))
+        logger.info(f"Sending pose {next_candidate.pose_number} to protac sampling.")
+        inQ.put((global_parameters, next_candidate))
 

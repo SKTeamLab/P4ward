@@ -59,12 +59,9 @@ def rxdock_rescore(params, pose_obj, receptor_obj):
 
     # update dictionary with new scored file
     pose_obj.protac_pose.scored_file = scored_protacs_file
-    # params['protac_pose']['scored_file'] = scored_protacs_file
-
-    return(params)
 
 
-def capture_rxdock_scores(params, pose_obj):
+def capture_rxdock_scores(pose_obj):
 
     from openbabel import pybel
 
@@ -75,5 +72,3 @@ def capture_rxdock_scores(params, pose_obj):
 
         linker_conf = [i for i in pose_obj.protac_pose.linker_confs if i.conf_number == int(conf_number)][0]
         linker_conf.rx_score = score
-
-    return(params)

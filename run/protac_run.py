@@ -11,7 +11,7 @@ from ..run.megadock import rotate_atoms
 def conf_sampling(params, pose_obj, protac_obj, logger):
 
     # make folder for each pose obj linker file to be saved
-    linker_folder = params['protac_poses_folder'] / f'protein_pose_{params["pose_number"]}'
+    linker_folder = params['protac_poses_folder'] / f'protein_pose_{pose_obj.pose_number}'
     linker_folder.mkdir(exist_ok=True)
 
     # open ligase ligand - changes every loop
@@ -19,7 +19,7 @@ def conf_sampling(params, pose_obj, protac_obj, logger):
     conf = liglig_rotate.GetConformer()
 
     # get final rotation information for the pose
-    pose_rotation = params['pose_obj_rotate']
+    pose_rotation = pose_obj.rotate
 
     # rotate ligase ligand to new position
     for i in range(liglig_rotate.GetNumAtoms()):
@@ -56,14 +56,15 @@ def conf_sampling(params, pose_obj, protac_obj, logger):
     try:
         func_timeout(params['time_tolerance'], AllChem.EmbedMultipleConfs, kwargs=kwargs)
     except:
-        # logger.warning(f"rdkit timeout for pose {params['pose_number']}")
+        logger.warning(f"rdkit timeout for pose {pose_obj.pose_number}")
         pass
-
+    
+    # make obj for protac pose
     protac_pose_obj = classes.ProtacPose(parent=protac_obj, protein_parent=pose_obj)
     # for each conformation, align and write to single sdf file,
     # capturing only the poses that obey the rmsd tolerance
     protac_file = linker_folder / 'protac_embedded_confs.sdf'
-    # params['linker_confs'] = {}
+
     try:
         linker_confs = []
         with open(protac_file, 'a+') as confs_file:
@@ -71,7 +72,7 @@ def conf_sampling(params, pose_obj, protac_obj, logger):
                 # make linker conf "object"
                 linker_conf = {'conf_number':i, 'active':None}
                 rmsd = Chem.rdMolAlign.AlignMol(protac_embed, reference_ligs_rotate, atomMap=params['alignment_pairs'], prbCid=i)
-                logger.debug(f"pose: {params['pose_number']}, conf: {i}, rmsd: {rmsd}")
+                logger.debug(f"pose: {pose_obj.pose_number}, conf: {i}, rmsd: {rmsd}")
                 if rmsd <= params['rmsd_tolerance']:
                     molblock = Chem.MolToMolBlock(protac_embed, confId=i, kekulize=False)
                     confs_file.write(f'conf_{i}')
@@ -81,27 +82,17 @@ def conf_sampling(params, pose_obj, protac_obj, logger):
                 else:
                     linker_conf['active'] = False
                 linker_confs.append(linker_conf)
-                # params['linker_confs'][i] = linker_conf
         # if all linker confs were generated successfully, we create their objects:
         for lconf in linker_confs:
             linker_conf = classes.LinkerConf(parent=protac_pose_obj, conf_number=lconf['conf_number'])
             linker_conf.active = lconf['active']
-        # params['protac_pose'] = {'active':True, 'file':protac_file}
         protac_pose_obj.active = True
         protac_pose_obj.file = protac_file
     except:
-        logger.info(f'No conformation possible for pose {params["pose_number"]}')
-        # params['protac_pose'] = {'active':False, 'file':None}
+        logger.info(f'No conformation possible for pose {pose_obj.pose_number}')
         protac_pose_obj.active = False
         protac_pose_obj.file = None
 
-    # new variables in params dict:
-    #   - ['protac_pose']
-    #   - ['protac_pose']['file']
-    #   - ['protac_pose']['active']
-    #   - ['linker_confs']
-
-    return(params)
 
 
 
