@@ -4,10 +4,11 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 from func_timeout import func_timeout
 # from ..tools.logger import logger
+from ..tools import classes
 from ..run.megadock import rotate_atoms
 
 
-def conf_sampling(params, logger):
+def conf_sampling(params, pose_obj, protac_obj, logger):
 
     # make folder for each pose obj linker file to be saved
     linker_folder = params['protac_poses_folder'] / f'protein_pose_{params["pose_number"]}'
@@ -58,11 +59,13 @@ def conf_sampling(params, logger):
         # logger.warning(f"rdkit timeout for pose {params['pose_number']}")
         pass
 
+    protac_pose_obj = classes.ProtacPose(parent=protac_obj, protein_parent=pose_obj)
     # for each conformation, align and write to single sdf file,
     # capturing only the poses that obey the rmsd tolerance
     protac_file = linker_folder / 'protac_embedded_confs.sdf'
-    params['linker_confs'] = {}
+    # params['linker_confs'] = {}
     try:
+        linker_confs = []
         with open(protac_file, 'a+') as confs_file:
             for i in range(params['rdkit_number_of_confs']):
                 # make linker conf "object"
@@ -77,11 +80,19 @@ def conf_sampling(params, logger):
                     linker_conf['active'] = True
                 else:
                     linker_conf['active'] = False
-                params['linker_confs'][i] = linker_conf
-        params['protac_pose'] = {'active':True, 'file':protac_file}
+                linker_confs.append(linker_conf)
+                # params['linker_confs'][i] = linker_conf
+        # if all linker confs were generated successfully, we create their objects:
+        for lconf in linker_confs:
+            linker_conf = classes.LinkerConf(parent=protac_pose_obj, conf_number=lconf['conf_number'])
+            linker_conf.active = lconf['active']
+        # params['protac_pose'] = {'active':True, 'file':protac_file}
+        protac_pose_obj.active = True
+        protac_pose_obj.file = protac_file
     except:
         logger.info(f'No conformation possible for pose {params["pose_number"]}')
         params['protac_pose'] = {'active':False, 'file':None}
+        protac_pose_obj.active = False
 
     # new variables in params dict:
     #   - ['protac_pose']
