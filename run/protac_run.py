@@ -93,28 +93,3 @@ def conf_sampling(params, logger):
 
 
 
-def sample_protac_pose(inQ, outQ, lock, p, logger):
-
-    from . import protac_scoring
-
-    while True:
-
-        with lock:
-            params = inQ.get()
-
-        logger.debug(f"(proc. {p+1} got pose {params['pose_number']})")
-        params = conf_sampling(params, logger)
-
-        if (
-            params['protac_pose']['active'] and  # only rescore if protac pose is active
-            len(params['linker_confs']) > 0 and  # if it generated at least one linker conf
-            any([i['active'] for i in params['linker_confs'].values()]) # if at least one is active
-        ):
-            params = protac_scoring.rxdock_rescore(params)
-            params = protac_scoring.capture_rxdock_scores(params)
-        
-        logger.info(f"(proc. {p+1}) Sampled protac for protein pose {params['pose_number']}")
-        
-        inQ.task_done()
-        with lock:
-            outQ.put(params)
