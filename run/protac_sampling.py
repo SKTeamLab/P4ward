@@ -154,8 +154,8 @@ def protac_sampling(
         #     except:
         #         linker_conf.rx_score = None
 
-        # success = True
-        success = False
+        success = True
+        # success = False
         # if extend_top_poses_sampled:
         #     # if the pose is inactive or has no active linker, success = False, else success = True
         #     if not params['protac_pose']['active'] or len(params['linker_confs']) == 0:
@@ -180,7 +180,7 @@ def protac_sampling(
             successful_poses.append(pose_obj)
             pose_obj.top = True
             print('poses: ', [j.conf_number for j in pose_obj.protac_pose.linker_confs])
-            print('scores: ', [j.rx_score for j in pose_obj.protac_pose.linker_confs])
+            print('scores: ', [(j.conf_number, j.rx_score) for j in pose_obj.protac_pose.active_confs()])
         else:
             failed_poses.append(pose_obj)
             pose_obj.top = False
