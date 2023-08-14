@@ -133,14 +133,15 @@ def generate_protein_poses(poses, pose_objs, generated_poses_folder, altlocA):
 
 
 # @decorators.track_run
-def protac_conformations(protac_poses):
-    """
-    rank the linker conformations for each active protac pose
-    """
+# def protac_conformations(protac_poses):
+#     """
+#     rank the linker conformations for each active protac pose
+#     """
 
-    for protac_pose in protac_poses:
+#     for protac_pose in protac_poses:
         
-        if len(protac_pose.active_confs()) > 0:
+#         if len(protac_pose.active_confs()) > 0:
+            
 
             # for i in protac_pose.active_confs():
             #     print(protac_pose.protein_parent.pose_number)
