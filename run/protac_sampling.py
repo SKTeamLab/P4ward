@@ -114,6 +114,10 @@ def protac_sampling(
         print('successful poses:', len(successful_poses))
 
         pose_obj = outQ.get()
+    
+        # sort linker conformations based on score
+        pose_obj.protac_pose.linker_confs = sorted(pose_obj.protac_pose.active_confs(), key=lambda x: getattr(x, 'rx_score'))
+        print('>> sorted_linker_confs', pose_obj.protac_pose.linker_confs)
 
         success = True
         if extend_top_poses_sampled:
@@ -125,7 +129,7 @@ def protac_sampling(
                     # if all the scores of the linker confs are positive, success = False, else success = True
                     pos_scores = []
                     for i in pose_obj.protac_pose.active_confs():
-                        if i.rx_score > 0 or i.rx_score == None:
+                        if i.rx_score > 0:
                             pos_scores.append(True)
                         else:
                             pos_scores.append(False)

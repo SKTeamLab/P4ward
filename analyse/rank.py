@@ -135,19 +135,25 @@ def generate_protein_poses(poses, pose_objs, generated_poses_folder, altlocA):
 # @decorators.track_run
 def protac_conformations(protac_poses):
     """
-    rank the linker conformations for each protac pose and mark the ones that have negative scores.
+    rank the linker conformations for each active protac pose
     """
 
     for protac_pose in protac_poses:
+        
+        if len(protac_pose.active_confs()) > 0:
 
-        def get_linker_score(linker_conf):
-            if hasattr(linker_conf, 'rx_score'):
-                return(True, getattr(linker_conf, 'rx_score'))
-            else:
-                return(False, None)
+            # for i in protac_pose.active_confs():
+            #     print(protac_pose.protein_parent.pose_number)
+            #     print(i.__dict__)
 
-        sorted_linker_confs = sorted(protac_pose.linker_confs, key=get_linker_score)
-        # sorted_linker_confs = sorted(protac_pose.linker_confs, key=lambda x: (x is None, getattr(x, 'rx_score')))
-        protac_pose.linker_confs = sorted_linker_confs
+            # inactives = [i for i in protac_pose.linker_confs if i not in protac_pose.active_confs()]
+            # sorted_linker_confs = sorted(protac_pose.active_confs(), key=lambda x: getattr(x, 'rx_score'))
+            # print(sorted_linker_confs)
+            # sorted_linker_confs = sorted_linker_confs.append(inactives)
 
-        print(protac_pose.protein_parent.pose_number, protac_pose.protein_parent.top, [i.rx_score for i in sorted_linker_confs])
+            # print(protac_pose.linker_confs)
+            # protac_pose.linker_confs = sorted_linker_confs
+
+            # for i in protac_pose.linker_confs:
+            #     print(i.__dict__)
+            # print(protac_pose.protein_parent.pose_number, protac_pose.protein_parent.top, [i.rx_score for i in protac_pose.active_confs()])

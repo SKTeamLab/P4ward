@@ -155,9 +155,9 @@ if __name__ == '__main__':
     )
 
     # rank all sampled protacs
-    rank.protac_conformations(
-        protac_poses=protac.active_poses()
-    )
+    # rank.protac_conformations(
+    #     protac_poses=protac.active_poses()
+    # )
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#

@@ -6,6 +6,7 @@ from ..definitions import ROOT_DIR, CWD
 # from ..tools.logger import logger
 from ..tools.structure_tools import pymol_combine
 
+
 def rxdock_rescore(params, pose_obj, receptor_obj):
 
     params['linker_scoring_folder'].mkdir(exist_ok=True)
