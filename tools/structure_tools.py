@@ -49,7 +49,7 @@ def get_protac_dist_cuttoff(
 
         import numpy as np
         from rdkit import Chem
-        from rdkit.Chem import rdFMCS, AllChem
+        from rdkit.Chem import rdFMCS
         
         def center_of_mass(atom_indices, conf):
 
@@ -66,7 +66,8 @@ def get_protac_dist_cuttoff(
             center = np.array([np.sum(xs)/total_mass, np.sum(ys)/total_mass, np.sum(zs)/total_mass])
             return(center)
 
-        protac = Chem.MolFromSmiles(protac_obj.smiles)
+        protac = protac_obj.sample_unbound_confs()
+
         reclig = Chem.MolFromMol2File(str(reclig_file), sanitize=False, cleanupSubstructures=False)
         liglig = Chem.MolFromMol2File(str(liglig_file), sanitize=False, cleanupSubstructures=False)
 
@@ -76,11 +77,6 @@ def get_protac_dist_cuttoff(
         pose_lig_smarts = Chem.MolFromSmarts(pose_lig_smarts_)
         receptor_lig_indices = protac.GetSubstructMatches(receptor_lig_smarts)[0]
         pose_lig_indices = protac.GetSubstructMatches(pose_lig_smarts)[0]
-
-        protac = Chem.AddHs(protac)
-
-        params = AllChem.ETKDGv3()
-        AllChem.EmbedMultipleConfs(protac, numConfs=100, params=params)
        
         distances = []
 

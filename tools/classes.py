@@ -158,6 +158,8 @@ class Protac():
             - self.indices_link
         structure_tools.get_protac_dist_cuttoff()
             - self.dist_cutoff
+        self.sample_unbound_confs()
+            - self.unbound_confs
     """
 
     def __init__(self, smiles) -> None:
@@ -167,10 +169,33 @@ class Protac():
 
 
     def active_poses(self):
-
         active_confs = [pose for pose in self.poses if pose.active]
         return(active_confs)
+    
 
+    def sample_unbound_confs(self, num_unbound_confs=100):
+
+        from rdkit import Chem
+        from rdkit.Chem import AllChem
+
+        protac = Chem.MolFromSmiles(self.smiles)
+        protac = Chem.AddHs(protac)
+        params = AllChem.ETKDGv3()
+        AllChem.EmbedMultipleConfs(protac, numConfs=num_unbound_confs, params=params)
+
+        self.unbound_confs = protac
+
+    
+    def write_unbound_confs(self, num_unbound_confs=100, filename='unbound_protac.sdf'):
+
+        from rdkit import Chem
+
+        with open(filename, 'a+') as protac_file:
+            for i in range(num_unbound_confs):
+                molblock = Chem.MolToMolBlock(self.unbound_confs, confId=i, kekulize=False)
+                protac_file.write(f'conf_{i}')
+                protac_file.write(molblock)
+                protac_file.write('$$$$\n')
 
 
 
@@ -195,6 +220,7 @@ class ProtacPose():
         if self not in parent.poses:
             parent.poses.append(self)
     
+
     def active_confs(self):
         active_confs = [pose for pose in self.linker_confs if pose.active]
         return(active_confs)
@@ -215,6 +241,8 @@ class LinkerConf():
             - self.rx_score
         rank.protac_conformations()
             - self.neg_score
+        protac_scoring.get_unbound_rmsd()
+            - self.unbound_stats
     """
 
     def __init__(self, parent, conf_number) -> None:
@@ -223,3 +251,4 @@ class LinkerConf():
 
         if self not in parent.linker_confs:
             parent.linker_confs.append(self)
+    
