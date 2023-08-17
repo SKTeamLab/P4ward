@@ -5,7 +5,7 @@ from ..tools import classes
 from ..tools import decorators
 
 
-def sample_protac_pose(inQ, outQ, lock, p, protac_obj, receptor_obj, logger):
+def sample_protac_pose(inQ, outQ, lock, p, protac_obj, receptor_obj, ligase_obj, logger):
 
     from . import protac_scoring
     from . import protac_run
@@ -20,7 +20,7 @@ def sample_protac_pose(inQ, outQ, lock, p, protac_obj, receptor_obj, logger):
 
         if pose_obj.protac_pose.active:
             if any(i.active for i in pose_obj.protac_pose.linker_confs):
-                protac_scoring.rxdock_rescore(params, pose_obj, receptor_obj)
+                protac_scoring.rxdock_rescore(params, pose_obj, receptor_obj, ligase_obj)
                 protac_scoring.capture_rxdock_scores(pose_obj)
             
         logger.debug(f"(proc. {p+1}) Sampled protac for protein pose {pose_obj.pose_number}")
@@ -104,7 +104,7 @@ def protac_sampling(
     # start threads
     threads = []
     for i in range(num_parallel_procs):
-        t = Thread(name=i, target=sample_protac_pose, args=(inQ, outQ, lock, i, protac_obj, receptor_obj, logger))
+        t = Thread(name=i, target=sample_protac_pose, args=(inQ, outQ, lock, i, protac_obj, receptor_obj, ligase_obj, logger))
         t.daemon = True
         t.start()
         threads.append(t)
