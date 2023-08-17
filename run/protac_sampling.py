@@ -32,7 +32,7 @@ def sample_protac_pose(inQ, outQ, lock, p, protac_obj, receptor_obj, logger):
 
 
 @decorators.user_choice
-# @decorators.track_run
+@decorators.track_run
 def protac_sampling(
                         receptor_obj,
                         ligase_obj,
@@ -47,7 +47,6 @@ def protac_sampling(
                         linker_scoring_folder,
                         minimize_protac,
                         num_parallel_procs,
-                        top_poses,
                         extend_top_poses_score,
                         extend_top_poses_sampled=False,
                         # pose_objs=None
@@ -89,6 +88,7 @@ def protac_sampling(
 
     pose_objs = [i for i in ligase_obj.conformations if i.active]
     candidate_poses = [i for i in pose_objs if i.top]
+    top_poses = len(candidate_poses)
     successful_poses = []
     failed_poses = []
 
@@ -111,13 +111,10 @@ def protac_sampling(
     
     # start watching the outQ and counting successful poses
     while len(successful_poses) <= top_poses:
-        print('successful poses:', len(successful_poses))
 
-        pose_obj = outQ.get()
-    
+        pose_obj = outQ.get()  
         # sort linker conformations based on score
         pose_obj.protac_pose.linker_confs = sorted(pose_obj.protac_pose.active_confs(), key=lambda x: getattr(x, 'rx_score'))
-        print('>> sorted_linker_confs', pose_obj.protac_pose.linker_confs)
 
         success = True
         if extend_top_poses_sampled:
@@ -133,7 +130,6 @@ def protac_sampling(
                             pos_scores.append(True)
                         else:
                             pos_scores.append(False)
-                    print(pos_scores)
                     if all(pos_scores) or len(pos_scores) == 0:
                         success = False
                 else:
@@ -143,8 +139,6 @@ def protac_sampling(
         if success:
             successful_poses.append(pose_obj)
             pose_obj.top = True
-            print('poses: ', [j.conf_number for j in pose_obj.protac_pose.linker_confs])
-            print('scores: ', [(j.conf_number, j.rx_score) for j in pose_obj.protac_pose.active_confs()])
         else:
             failed_poses.append(pose_obj)
             pose_obj.top = False

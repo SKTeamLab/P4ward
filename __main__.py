@@ -149,7 +149,6 @@ if __name__ == '__main__':
         extend_top_poses_score=conf.getboolean('linker_sampling', 'extend_top_poses_score'),
         linker_scoring_folder=Path(conf.get('linker_ranking','linker_scoring_folder')),
         minimize_protac=conf.getboolean('linker_ranking','rxdock_minimize'),
-        top_poses=conf.getint('protein_ranking', 'top_poses'),
         num_parallel_procs=conf.getint('general', 'num_processors'),
         choice=conf.getboolean('linker_sampling', 'rdkit_sampling')
     )
@@ -167,4 +166,9 @@ if __name__ == '__main__':
 
     run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_obj=protac)
     summaries.summary_csv([i for i in ligase.conformations if i.top])
-    summaries.chimerax_view(receptor, [i for i in ligase.conformations if i.top])
+    summaries.chimerax_view(
+        receptor_obj=receptor,
+        pose_objs=[i for i in ligase.conformations if i.top],
+        generated_poses_folder=conf.get('protein_ranking', 'generated_poses_folder'),
+        protac_poses_folder=conf.get('linker_sampling', 'protac_poses_folder')
+    )

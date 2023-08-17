@@ -45,7 +45,7 @@ def get_protac_dist_cuttoff(
     if dist_cutoff == 'auto':
 
         logger.info("Ligands distance cutoff set to automatic.")
-        logger.info('Sampling unbound protac conformations to determine distace cutoff.')
+        logger.info('Sampling unbound protac conformations to determine distance cutoff.')
 
         import numpy as np
         from rdkit import Chem
@@ -66,7 +66,8 @@ def get_protac_dist_cuttoff(
             center = np.array([np.sum(xs)/total_mass, np.sum(ys)/total_mass, np.sum(zs)/total_mass])
             return(center)
 
-        protac = protac_obj.sample_unbound_confs()
+        protac_obj.sample_unbound_confs()
+        protac = protac_obj.unbound_confs
 
         reclig = Chem.MolFromMol2File(str(reclig_file), sanitize=False, cleanupSubstructures=False)
         liglig = Chem.MolFromMol2File(str(liglig_file), sanitize=False, cleanupSubstructures=False)

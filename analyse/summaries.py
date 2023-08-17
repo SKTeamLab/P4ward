@@ -43,32 +43,24 @@ def summary_csv(pose_objects):
     data.to_csv('summary.csv')
 
 
-def chimerax_view(receptor_obj, pose_objs):
+def chimerax_view(receptor_obj, pose_objs, generated_poses_folder, protac_poses_folder):
     """
     Make a chimerax visualization script to see the final successful poses
     """
     
     import seaborn as sns
 
-    script = f"open {receptor_obj.file};\n color #1 #afafaf target asr;\n"
-    model_num = 1
+    script = f'open {receptor_obj.file} name receptor;\ncolor ##name="receptor" #afafaf target asr;\n'
+    palette = sns.color_palette('viridis', len(pose_objs)).as_hex()
 
-    models = [i for i in pose_objs if i.protac_pose.active and len(i.protac_pose.linker_confs) > 0]
-    models = sorted(models, key=lambda x: getattr(x, 'megadock_score'), reverse=True)
-    palette = sns.color_palette('viridis', len(models)).as_hex()
-
-    for i in range(len(models)):
-        pose_obj = models[i]
-        model_num += 2
+    for i in range(len(pose_objs)):
+        pose_obj = pose_objs[i]
         script += (
-             f"open protein_docking/pose{pose_obj.pose_number}.pdb;\n"
-            +f"open ligand_sampling/protein_pose_{pose_obj.pose_number}/protac_embedded_confs.sdf;\n"
-            +f"color #{model_num-1},{model_num} {palette[i]} target asr;\n"
-            +f"color #{model_num} byhet;\n"
+             f'open {generated_poses_folder}/pose{pose_obj.pose_number}.pdb name pose{pose_obj.pose_number};\n'
+            +f'open {protac_poses_folder}/protein_pose_{pose_obj.pose_number}/protac_embedded_confs.sdf name pose{pose_obj.pose_number}_protac;\n'
+            +f'color ##name="pose{pose_obj.pose_number}" | ##name="pose{pose_obj.pose_number}_protac" {palette[i]} target asr;\n'
+            +f'color ##name="pose{pose_obj.pose_number}_protac" byhet;\n'
         )
-        for i in pose_obj.protac_pose.linker_confs:
-            if not i.active:
-                script += (f'close #{model_num} &  ##name="conf_{i.conf_number}";\n')
     
     script += (
          f"hide H;\n"
