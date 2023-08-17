@@ -28,6 +28,19 @@ if __name__ == '__main__':
         overwrite=conf.getboolean('general', 'overwrite')
     )
 
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    #~~~~~~~~~~~~ prep proteins ~~~~~~~~~~~~#
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+   
+    from .run import md
+    md.fix_proteins(
+        receptor,
+        ligase,
+        fixed_suffix='_fixed',
+        ignore_extremities=conf.get('protein_prep', 'pdbfixer_ignore_extremities'),
+        ph=conf.getfloat('protein_prep', 'pdbfixer_ph'),
+        choice=conf.getboolean('protein_prep', 'pdbfixer')
+    )
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     #~~~~~~~~~~~~ start docking ~~~~~~~~~~~~#

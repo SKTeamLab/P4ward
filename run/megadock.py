@@ -15,8 +15,8 @@ def prep_structures(receptor_obj, ligase_obj):
 
     from ..tools.structure_tools import pymol_combine
 
-    receptor_file = receptor_obj.file
-    ligase_file = ligase_obj.file
+    receptor_file = receptor_obj.active_file
+    ligase_file = ligase_obj.active_file
     receptor_ligand_file = receptor_obj.lig_file
     ligase_ligand_file = ligase_obj.lig_file
 

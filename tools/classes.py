@@ -7,6 +7,9 @@ class Protein:
 
     """
     attributes added/modified by the functions:
+        openmm.fix_protein()
+            - self.fixed_file
+            - self.active_file
         megadock.prep_structures()
             - self.mg_file
             - self.mg_file
@@ -22,9 +25,11 @@ class Protein:
         automatically loads the biopython object for the protein
         """
 
-        self.type = ptn_type #type is either 'receptor' or 'ligase'
+        self.type = ptn_type # type is either 'receptor' or 'ligase'
         self.file = Path(file)
         self.lig_file = Path(lig_file)
+
+        self.active_file = self.file # active file starts as the raw one
 
         if self.type == 'ligase':
             self.conformations = []
