@@ -115,7 +115,12 @@ def get_protein_charges(*protein_objs):
         charges = []
         for i in range(system.getNumParticles()):
             charge, _, _ = nonbonded.getParticleParameters(i)
-            charges.append(charge._value)
+            coords = ( # mult by 10 because openmm uses nm
+                round(pdb.positions[i]._value.x * 10, 5),
+                round(pdb.positions[i]._value.y * 10, 5),
+                round(pdb.positions[i]._value.z * 10, 5),
+            )
+            charges.append((coords, charge._value))
         
         protein_obj.charges = charges
 

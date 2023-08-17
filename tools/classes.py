@@ -38,7 +38,7 @@ class Protein:
             self.conformations = []
     
 
-    def get_protein_struct(self, struct_attr='file'):
+    def get_protein_struct(self, struct_attr='active_file'):
         """
         Use the function load_biopython_structures to get the biopython object
         for the protein. 
@@ -124,7 +124,7 @@ class ProteinPose():
             parent.conformations.append(self)
     
 
-    def get_rotated_struct(self, struct_type, struct_attr='file'):
+    def get_rotated_struct(self, struct_type, struct_attr='active_file'):
         """
         Use the rotate_atoms function to return a completely rotated
         coordinate set for the protein pose.

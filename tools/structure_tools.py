@@ -223,4 +223,3 @@ def pymol_combine(*args, out_filename='combined.pdb'):
     
     pymol.cmd.create('combined', ' '.join(basenames))
     pymol.cmd.save(out_filename, 'combined')
-    # pymol.cmd.quit()

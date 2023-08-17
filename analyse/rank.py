@@ -120,7 +120,7 @@ def generate_protein_poses(poses, pose_objs, generated_poses_folder, altlocA):
     
     generated_poses_folder.mkdir(exist_ok=True)
     for pose in final_poses:
-        struct = pose.get_rotated_struct(struct_type='protein', struct_attr='file')
+        struct = pose.get_rotated_struct(struct_type='protein')
 
         pdbio.set_structure(struct)
         final_file = generated_poses_folder / f"pose{pose.pose_number}.pdb"
