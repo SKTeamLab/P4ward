@@ -1,16 +1,16 @@
-from openmm.app import PDBFile, ForceField
-from pdbfixer.pdbfixer import PDBFixer
+from openmm.app import PDBFile
 from ..tools import decorators
 from ..tools.logger import logger
 
 
 @decorators.user_choice
-@decorators.track_run
+# @decorators.track_run
 def fix_proteins(*protein_objs, fixed_suffix='_fixed', ignore_extremities=True, ph=7.0):
     """
     accepts any number of protein_obj (Path obj) to fix using pdbfixer
     creates attribute with fixed filepath and makes it active
     """
+    from pdbfixer.pdbfixer import PDBFixer
 
     for protein_obj in protein_objs:
 
@@ -51,10 +51,59 @@ def fix_proteins(*protein_objs, fixed_suffix='_fixed', ignore_extremities=True, 
 
 
 @decorators.user_choice
+# @decorators.track_run
+def minimize_proteins(
+                            *protein_objs,
+                            maxiterations=0,
+                            minimized_suffix='_minim'
+):
+    
+    import openmm.app as omm
+    import openmm.unit as omu
+    from openmm import NoseHooverIntegrator
+
+    ff = omm.ForceField('amber14/protein.ff14SB.xml', 'implicit/gbn2.xml')
+    
+    for protein_obj in protein_objs:
+
+        filepath = protein_obj.active_file
+        minim_path = filepath.parent / (filepath.stem + minimized_suffix + filepath.suffix)
+
+        # prepare system
+        pdb = PDBFile(str(filepath))
+        system = ff.createSystem(
+            pdb.topology,
+            nonbondedMethod=omm.NoCutoff,
+            constraints=omm.HBonds
+        )
+        integrator = NoseHooverIntegrator(300*omu.kelvin, 1/omu.picosecond, 0.002*omu.picoseconds)
+        simulation = omm.Simulation(pdb.topology, system, integrator)
+        simulation.context.setPositions(pdb.positions)
+
+        # minimize
+        logger.info(f'Minimizing energy for {filepath.name} ...')
+        simulation.minimizeEnergy(maxIterations=maxiterations)
+
+        # save pdb file
+        minimized_positions = simulation.context.getState(getPositions=True).getPositions()
+        with open(minim_path, 'w+') as minimfile:
+            omm.PDBFile.writeFile(simulation.topology, minimized_positions, file=minimfile)
+        
+        # add the attribute file path and activate it
+        protein_obj.minim_file = minim_path
+        protein_obj.active_file = protein_obj.minim_file
+
+        logger.info(f'Saved minimized file as {protein_obj.minim_file}')
+
+
+
+@decorators.user_choice
 @decorators.track_run
 def get_protein_charges(*protein_objs):
 
     from openmm import NonbondedForce
+    from openmm.app import ForceField
+
     ff = ForceField('amber14/protein.ff14SB.xml')
 
     for protein_obj in protein_objs:

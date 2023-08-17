@@ -7,8 +7,11 @@ class Protein:
 
     """
     attributes added/modified by the functions:
-        openmm.fix_protein()
+        md.fix_protein()
             - self.fixed_file
+            - self.active_file
+        md.minimize_proteins()
+            - self.minim_file
             - self.active_file
         megadock.prep_structures()
             - self.mg_file

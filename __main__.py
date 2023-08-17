@@ -43,6 +43,14 @@ if __name__ == '__main__':
         choice=conf.getboolean('protein_prep', 'pdbfixer')
     )
 
+    md.minimize_proteins(
+        receptor,
+        ligase,
+        minimized_suffix='_minim',
+        maxiterations=conf.getint('protein_prep', 'minimize_maxiter'),
+        choice=conf.getboolean('protein_prep', 'minimize')
+    )
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     #~~~~~~~~~~~~ start docking ~~~~~~~~~~~~#
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
