@@ -33,6 +33,7 @@ if __name__ == '__main__':
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
    
     from .run import md
+
     md.fix_proteins(
         receptor,
         ligase,

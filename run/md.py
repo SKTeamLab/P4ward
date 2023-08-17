@@ -6,13 +6,13 @@ from ..tools.logger import logger
 
 @decorators.user_choice
 @decorators.track_run
-def fix_proteins(*args, fixed_suffix='_fixed', ignore_extremities=True, ph=7.0):
+def fix_proteins(*protein_objs, fixed_suffix='_fixed', ignore_extremities=True, ph=7.0):
     """
     accepts any number of protein_obj (Path obj) to fix using pdbfixer
     creates attribute with fixed filepath and makes it active
     """
 
-    for protein_obj in args:
+    for protein_obj in protein_objs:
 
         filepath = protein_obj.active_file
         fixed_path = filepath.parent / (filepath.stem + fixed_suffix + filepath.suffix)
@@ -47,6 +47,27 @@ def fix_proteins(*args, fixed_suffix='_fixed', ignore_extremities=True, ph=7.0):
         protein_obj.active_file = protein_obj.fixed_file
 
     # logit
-    logger.info('Fixed proteins and saved them as: '+ ', '.join([str(i.fixed_file) for i in args]))
+    logger.info('Fixed proteins and saved them as: '+ ', '.join([str(i.fixed_file) for i in protein_objs]))
+
+
+@decorators.user_choice
+@decorators.track_run
+def get_protein_charges(*protein_objs):
+
+    from openmm import NonbondedForce
+    ff = ForceField('amber14/protein.ff14SB.xml')
+
+    for protein_obj in protein_objs:
+
+        pdb = PDBFile(str(protein_obj.active_file)) # ideally should be fixed_file
+        system = ff.createSystem(pdb.topology)
+
+        nonbonded = [f for f in system.getForces() if isinstance(f, NonbondedForce)][0]
+        charges = []
+        for i in range(system.getNumParticles()):
+            charge, _, _ = nonbonded.getParticleParameters(i)
+            charges.append(charge._value)
+        
+        protein_obj.charges = charges
 
 
