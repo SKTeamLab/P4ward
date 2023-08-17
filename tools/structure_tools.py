@@ -223,3 +223,24 @@ def pymol_combine(*args, out_filename='combined.pdb'):
     
     pymol.cmd.create('combined', ' '.join(basenames))
     pymol.cmd.save(out_filename, 'combined')
+
+
+def write_charges(*charge_lists, filepath):
+
+    charges = []
+    for charge_list in charge_lists:
+        charges.extend(charge_list)
+    
+    rawfile = open(filepath, 'r').read().splitlines()
+
+    for coords, charge in charges:
+        
+        coord_str = f"{format(coords[0],'.3f')}\t{format(coords[1],'.3f')}\t{format(coords[2],'.3f')}\t"
+        for i in range(len(rawfile)):
+            line = rawfile[i]
+            if coord_str in line:
+                line = line.replace('0.000', str(charge)) # format(i,'.3f')
+                rawfile[i] = line
+    
+    with open(filepath, 'w') as newfile:
+        newfile.write('\n'.join(rawfile))

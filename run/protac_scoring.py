@@ -26,7 +26,7 @@ def rxdock_rescore(params, pose_obj, receptor_obj):
     # set to rxdock that this will be a folder with definitions (minimize)
     putenv('RBT_HOME', str(Path(ROOT_DIR)/'inputs'))
     # make combined receptor+ligase file with pymol
-    pymol_combine(receptor_obj.file, pose_obj.file, out_filename=combined_file)
+    pymol_combine(receptor_obj.active_file, pose_obj.file, out_filename=combined_file)
 
     # prepare protac sdf file with openbabel
     sampled_confs = pybel.readfile('sdf', str(pose_obj.protac_pose.file))

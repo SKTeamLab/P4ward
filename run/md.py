@@ -97,8 +97,8 @@ def minimize_proteins(
 
 
 
-@decorators.user_choice
-@decorators.track_run
+# @decorators.user_choice
+# @decorators.track_run
 def get_protein_charges(*protein_objs):
 
     from openmm import NonbondedForce
@@ -108,7 +108,7 @@ def get_protein_charges(*protein_objs):
 
     for protein_obj in protein_objs:
 
-        pdb = PDBFile(str(protein_obj.active_file)) # ideally should be fixed_file
+        pdb = PDBFile(str(protein_obj.active_file)) # ideally should be fixed
         system = ff.createSystem(pdb.topology)
 
         nonbonded = [f for f in system.getForces() if isinstance(f, NonbondedForce)][0]
