@@ -273,9 +273,9 @@ def zrank_rescore(ligase_obj, receptor_obj, zrank_path, run_docking_output_file)
     from ..tools.structure_tools import reduce
 
     # check if receptor and ligase were already reduced
-    for protein_obj in (ligase_obj, receptor_obj):
-        if not hasattr(protein_obj, 'mg_file_reduced'):
-            reduce([protein_obj], file_attribute_name='mg_file')
+    # for protein_obj in (ligase_obj, receptor_obj):
+    #     if not hasattr(protein_obj, 'mg_file_reduced'):
+    #         reduce([protein_obj], file_attribute_name='mg_file')
 
     # zrank considers all conformations + 1
     conf_count = len(ligase_obj.conformations)
@@ -284,8 +284,8 @@ def zrank_rescore(ligase_obj, receptor_obj, zrank_path, run_docking_output_file)
     # the end of the file has an empty line, zrank tries to score that. So strip it out:
     megadock_output_read = megadock_output_read.rstrip()
     # now swap protein file names to reduced file names
-    megadock_output_read = megadock_output_read.replace(str(receptor_obj.mg_file), str(receptor_obj.mg_file_reduced))
-    megadock_output_read = megadock_output_read.replace(str(ligase_obj.mg_file), str(ligase_obj.mg_file_reduced))
+    # megadock_output_read = megadock_output_read.replace(str(receptor_obj.mg_file), str(receptor_obj.mg_file_reduced))
+    # megadock_output_read = megadock_output_read.replace(str(ligase_obj.mg_file), str(ligase_obj.mg_file_reduced))
     
     # run zrank using `megadock_output_read` as temporary file
     with tempfile.NamedTemporaryFile(mode='w', dir=CWD, delete=True) as tmp:

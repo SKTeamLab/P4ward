@@ -23,7 +23,7 @@ def sample_protac_pose(inQ, outQ, lock, p, protac_obj, receptor_obj, logger):
                 protac_scoring.rxdock_rescore(params, pose_obj, receptor_obj)
                 protac_scoring.capture_rxdock_scores(pose_obj)
             
-        logger.info(f"(proc. {p+1}) Sampled protac for protein pose {pose_obj.pose_number}")
+        logger.debug(f"(proc. {p+1}) Sampled protac for protein pose {pose_obj.pose_number}")
         
         inQ.task_done()
         with lock:
@@ -98,7 +98,7 @@ def protac_sampling(
 
     # send top poses as candidates to inQ
     for pose_obj in candidate_poses:
-        logger.info(f"Sending pose {pose_obj.pose_number} to protac sampling.")
+        logger.debug(f"Sending pose {pose_obj.pose_number} to protac sampling.")
         inQ.put((global_parameters, pose_obj))
     
     # start threads
