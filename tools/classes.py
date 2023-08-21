@@ -168,6 +168,7 @@ class Protac():
             - self.dist_cutoff
         self.sample_unbound_confs()
             - self.unbound_confs
+            - self.unbound_energy
     """
 
     def __init__(self, smiles) -> None:
@@ -183,15 +184,25 @@ class Protac():
 
     def sample_unbound_confs(self, num_unbound_confs=100):
 
+        import numpy as np
         from rdkit import Chem
         from rdkit.Chem import AllChem
 
         protac = Chem.MolFromSmiles(self.smiles)
         protac = Chem.AddHs(protac)
         params = AllChem.ETKDGv3()
-        AllChem.EmbedMultipleConfs(protac, numConfs=num_unbound_confs, params=params)
+        confs = AllChem.EmbedMultipleConfs(protac, numConfs=num_unbound_confs, params=params)
+        ps = AllChem.MMFFGetMoleculeProperties(protac)
+
+        # final energy value
+        energies = []
+        for confid in confs:
+            ff = AllChem.MMFFGetMoleculeForceField(protac, ps, confId=confid)
+            ff.Initialize()
+            energies.append(ff.CalcEnergy())
 
         self.unbound_confs = protac
+        self.unbound_energy = np.max(energies)
 
     
     def write_unbound_confs(self, num_unbound_confs=100, filename='unbound_protac.sdf'):

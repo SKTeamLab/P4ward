@@ -4,7 +4,7 @@ from ..tools.logger import logger
 
 
 @decorators.user_choice
-# @decorators.track_run
+@decorators.track_run
 def fix_proteins(*protein_objs, fixed_suffix='_fixed', ignore_extremities=True, ph=7.0):
     """
     accepts any number of protein_obj (Path obj) to fix using pdbfixer
@@ -51,7 +51,7 @@ def fix_proteins(*protein_objs, fixed_suffix='_fixed', ignore_extremities=True, 
 
 
 @decorators.user_choice
-# @decorators.track_run
+@decorators.track_run
 def minimize_proteins(
                             *protein_objs,
                             maxiterations=0,

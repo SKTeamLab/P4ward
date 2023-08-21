@@ -66,14 +66,23 @@ def conf_sampling(params, pose_obj, protac_obj, logger):
     protac_file = linker_folder / 'protac_embedded_confs.sdf'
 
     try:
+        ps = AllChem.MMFFGetMoleculeProperties(protac_embed)
         linker_confs = []
+
         with open(protac_file, 'a+') as confs_file:
             for i in range(params['rdkit_number_of_confs']):
+
                 # make linker conf "object"
                 linker_conf = {'conf_number':i, 'active':None}
                 rmsd = Chem.rdMolAlign.AlignMol(protac_embed, reference_ligs_rotate, atomMap=params['alignment_pairs'], prbCid=i)
                 logger.debug(f"pose: {pose_obj.pose_number}, conf: {i}, rmsd: {rmsd}")
+
                 if rmsd <= params['rmsd_tolerance']:
+                    # get internal energy for this conformation
+                    ff = AllChem.MMFFGetMoleculeForceField(protac_embed, ps, confId=i)
+                    ff.Initialize()
+                    linker_conf['energy'] = ff.CalcEnergy()
+                    # write this conformation to file
                     molblock = Chem.MolToMolBlock(protac_embed, confId=i, kekulize=False)
                     confs_file.write(f'conf_{i}')
                     confs_file.write(molblock)
@@ -81,11 +90,15 @@ def conf_sampling(params, pose_obj, protac_obj, logger):
                     linker_conf['active'] = True
                 else:
                     linker_conf['active'] = False
+                    linker_conf['energy'] = None
+                
                 linker_confs.append(linker_conf)
+
         # if all linker confs were generated successfully, we create their objects:
         for lconf in linker_confs:
             linker_conf = classes.LinkerConf(parent=protac_pose_obj, conf_number=lconf['conf_number'])
             linker_conf.active = lconf['active']
+            linker_conf.energy = lconf['energy']
         protac_pose_obj.active = True
         protac_pose_obj.file = protac_file
     except:

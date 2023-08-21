@@ -169,6 +169,7 @@ if __name__ == '__main__':
         time_tolerance=conf.getint('linker_sampling', 'rdkit_time_tolerance'),
         extend_top_poses_sampled=conf.getboolean('linker_sampling', 'extend_top_poses_sampled'),
         extend_top_poses_score=conf.getboolean('linker_sampling', 'extend_top_poses_score'),
+        extend_top_poses_energy=conf.getboolean('linker_sampling', 'extend_top_poses_energy'),
         linker_scoring_folder=Path(conf.get('linker_ranking','linker_scoring_folder')),
         minimize_protac=conf.getboolean('linker_ranking','rxdock_minimize'),
         num_parallel_procs=conf.getint('general', 'num_processors'),

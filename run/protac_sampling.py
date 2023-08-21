@@ -49,6 +49,7 @@ def protac_sampling(
                         num_parallel_procs,
                         extend_top_poses_score,
                         extend_top_poses_sampled=False,
+                        extend_top_poses_energy=False
                         # pose_objs=None
 ):
 
@@ -131,6 +132,18 @@ def protac_sampling(
                         else:
                             pos_scores.append(False)
                     if all(pos_scores) or len(pos_scores) == 0:
+                        success = False
+                else:
+                    success=True
+                if extend_top_poses_energy:
+                    higher_energies = []
+                    for i in pose_obj.protac_pose.active_confs():
+                        if i.energy > protac_obj.unbound_energy:
+                            higher_energies.append(True)
+                        else:
+                            higher_energies.append(False)
+                    print(higher_energies)
+                    if all(higher_energies) or len(higher_energies) == 0:
                         success = False
                 else:
                     success=True
