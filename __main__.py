@@ -89,7 +89,7 @@ if __name__ == '__main__':
     megadock.zrank_rescore(
         ligase_obj=ligase,
         receptor_obj=receptor,
-        zrank_path=conf.get('megadock', 'zrank_path'),
+        zrank_path=conf.get('program_paths', 'zrank_path'),
         run_docking_output_file=conf.get('megadock', 'run_docking_output_file'),
         choice=conf.getboolean('megadock', 'zrank_rescore'),
     )
@@ -128,6 +128,7 @@ if __name__ == '__main__':
         top_poses=conf.getint('protein_ranking', 'top_poses'),
         final_ranking_megadock_score=conf.getboolean('protein_ranking', 'final_ranking_megadock_score'),
         final_ranking_z_score=conf.getboolean('protein_ranking', 'final_ranking_z_score'),
+        cluster_proteins_choice=conf.getboolean('megadock', 'cluster_poses'),
         cluster_rep=conf.get('protein_ranking', 'cluster_rep'),
         rank_cluster_reps_only=conf.getboolean('protein_ranking', 'rank_cluster_reps_only'),
     )

@@ -142,7 +142,6 @@ def protac_sampling(
                             higher_energies.append(True)
                         else:
                             higher_energies.append(False)
-                    print(higher_energies)
                     if all(higher_energies) or len(higher_energies) == 0:
                         success = False
                 else:
@@ -159,7 +158,7 @@ def protac_sampling(
         logger.info(f"pose {pose_obj.pose_number} - {('success' if success else 'failed')}")
         
         # check if all poses have been tried
-        if len(candidate_poses) + len(successful_poses) + len(failed_poses) == len(pose_objs):
+        if len(successful_poses) + len(failed_poses) == len(pose_objs):
             logger.info("All possible poses have been sampled.")
             break
             

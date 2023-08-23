@@ -8,6 +8,7 @@ def protein_poses(
                     final_ranking_megadock_score,
                     final_ranking_z_score,
                     top_poses,
+                    cluster_proteins_choice,
                     cluster_rep,
                     rank_cluster_reps_only
 ):
@@ -35,33 +36,35 @@ def protein_poses(
     # pose_objs = [i for i in ligase_obj.conformations if i.active]
     sorted_confs = [i for i in sorted_confs if i.active]
     
-    # assign cluster representatives:
-    if cluster_rep == 'centroid':
-        for i in sorted_confs:
-            if i.centroid:
-                i.clrep = True
-            else: i.clrep = False
-    elif cluster_rep == 'best':
-        # the best scoring cluster member will appear first
-        clusters_ = []
-        for i in sorted_confs:
-            if i.cluster not in clusters_:
-                i.clrep = True
-                clusters_.append(i.cluster)
-            else:
-                i.clrep = False
+    # if the protein poses were clustered, we use the information in the ranking:
+    if cluster_proteins_choice:
+        # assign cluster representatives:
+        if cluster_rep == 'centroid':
+            for i in sorted_confs:
+                if i.centroid:
+                    i.clrep = True
+                else: i.clrep = False
+        elif cluster_rep == 'best':
+            # the best scoring cluster member will appear first
+            clusters_ = []
+            for i in sorted_confs:
+                if i.cluster not in clusters_:
+                    i.clrep = True
+                    clusters_.append(i.cluster)
+                else:
+                    i.clrep = False
 
 
-    if rank_cluster_reps_only:
-        # previously the actives came from previous function.
-        # now if we must consider only the cluster reps for next stage,
-        # then only those should be active
-        sorted_confs = [i for i in sorted_confs if i.clrep]
-        for pose_obj in ligase_obj.conformations:
-            if pose_obj in sorted_confs:
-                pose_obj.active = True
-            else:
-                pose_obj.active = False
+        if rank_cluster_reps_only:
+            # previously the actives came from previous function.
+            # now if we must consider only the cluster reps for next stage,
+            # then only those should be active
+            sorted_confs = [i for i in sorted_confs if i.clrep]
+            for pose_obj in ligase_obj.conformations:
+                if pose_obj in sorted_confs:
+                    pose_obj.active = True
+                else:
+                    pose_obj.active = False
 
     # grab top poses
     sorted_confs = sorted_confs[:top_poses]
