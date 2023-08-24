@@ -36,7 +36,7 @@ def load_biopython_structures(structure_file, mol2=False):
 @decorators.user_choice
 @decorators.track_run
 def get_protac_dist_cuttoff(
-        protac_obj,
+        protac_objs,
         reclig_file,
         liglig_file,
         dist_cutoff
@@ -45,58 +45,61 @@ def get_protac_dist_cuttoff(
     if dist_cutoff == 'auto':
 
         logger.info("Ligands distance cutoff set to automatic.")
-        logger.info('Sampling unbound protac conformations to determine distance cutoff.')
 
-        import numpy as np
-        from rdkit import Chem
-        from rdkit.Chem import rdFMCS
+        for protac_obj in protac_objs:
+            logger.info(f'Sampling unbound conformations for {protac_obj.name} to determine distance cutoff.')
+
+            import numpy as np
+            from rdkit import Chem
+            from rdkit.Chem import rdFMCS
+            
+            def center_of_mass(atom_indices, conf):
+
+                total_mass = 0.0
+                xs = []; ys = []; zs = []
+                for j in atom_indices:
+                    atom = conf.GetAtomWithIdx(j)
+                    mass = atom.GetMass()
+                    total_mass += mass
+                    x,y,z = conf.GetConformer().GetAtomPosition(j)
+                    xs.append(mass*x)
+                    ys.append(mass*y)
+                    zs.append(mass*z)
+                center = np.array([np.sum(xs)/total_mass, np.sum(ys)/total_mass, np.sum(zs)/total_mass])
+                return(center)
+
+            protac_obj.sample_unbound_confs()
+            protac = protac_obj.unbound_confs
+
+            reclig = Chem.MolFromMol2File(str(reclig_file), sanitize=False, cleanupSubstructures=False)
+            liglig = Chem.MolFromMol2File(str(liglig_file), sanitize=False, cleanupSubstructures=False)
+
+            receptor_lig_smarts_ = rdFMCS.FindMCS([protac, reclig]).smartsString
+            pose_lig_smarts_ = rdFMCS.FindMCS([protac, liglig]).smartsString
+            receptor_lig_smarts = Chem.MolFromSmarts(receptor_lig_smarts_)
+            pose_lig_smarts = Chem.MolFromSmarts(pose_lig_smarts_)
+            receptor_lig_indices = protac.GetSubstructMatches(receptor_lig_smarts)[0]
+            pose_lig_indices = protac.GetSubstructMatches(pose_lig_smarts)[0]
         
-        def center_of_mass(atom_indices, conf):
+            distances = []
 
-            total_mass = 0.0
-            xs = []; ys = []; zs = []
-            for j in atom_indices:
-                atom = conf.GetAtomWithIdx(j)
-                mass = atom.GetMass()
-                total_mass += mass
-                x,y,z = conf.GetConformer().GetAtomPosition(j)
-                xs.append(mass*x)
-                ys.append(mass*y)
-                zs.append(mass*z)
-            center = np.array([np.sum(xs)/total_mass, np.sum(ys)/total_mass, np.sum(zs)/total_mass])
-            return(center)
+            for i in range(100):
 
-        protac_obj.sample_unbound_confs()
-        protac = protac_obj.unbound_confs
+                conf = Chem.Mol(protac, confId=i)
+                center_reclig = center_of_mass(receptor_lig_indices, conf)
+                center_liglig = center_of_mass(pose_lig_indices, conf)
 
-        reclig = Chem.MolFromMol2File(str(reclig_file), sanitize=False, cleanupSubstructures=False)
-        liglig = Chem.MolFromMol2File(str(liglig_file), sanitize=False, cleanupSubstructures=False)
+                distance = np.linalg.norm(center_liglig - center_reclig)
+                distances.append(distance)
 
-        receptor_lig_smarts_ = rdFMCS.FindMCS([protac, reclig]).smartsString
-        pose_lig_smarts_ = rdFMCS.FindMCS([protac, liglig]).smartsString
-        receptor_lig_smarts = Chem.MolFromSmarts(receptor_lig_smarts_)
-        pose_lig_smarts = Chem.MolFromSmarts(pose_lig_smarts_)
-        receptor_lig_indices = protac.GetSubstructMatches(receptor_lig_smarts)[0]
-        pose_lig_indices = protac.GetSubstructMatches(pose_lig_smarts)[0]
-       
-        distances = []
+            cutoff = np.mean(distances)
+            protac_obj.dist_cutoff = cutoff
 
-        for i in range(100):
-
-            conf = Chem.Mol(protac, confId=i)
-            center_reclig = center_of_mass(receptor_lig_indices, conf)
-            center_liglig = center_of_mass(pose_lig_indices, conf)
-
-            distance = np.linalg.norm(center_liglig - center_reclig)
-            distances.append(distance)
-
-        cutoff = np.mean(distances)
-        protac_obj.dist_cutoff = cutoff
-
-        logger.info(f"Setting distance cutoff to {cutoff}")
+            logger.info(f"Setting distance cutoff to {cutoff}")
     
     else:
-        protac_obj.dist_cutoff = float(dist_cutoff)
+        for protac_obj in protac_objs:
+            protac_obj.dist_cutoff = float(dist_cutoff)
         logger.info(f"Ligands distance cutoff set to {dist_cutoff}.")
 
 

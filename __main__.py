@@ -22,7 +22,7 @@ if __name__ == '__main__':
     tracker = run_tracker.load_tracker(overwrite=conf.getboolean('general', 'overwrite'))
 
     # load pickle from previous run
-    receptor, ligase, protac = run_tracker.load_run_objects(
+    receptor, ligase, protacs = run_tracker.load_run_objects(
         pickle_file=CPT_FILE,
         conf=conf,
         overwrite=conf.getboolean('general', 'overwrite')
@@ -84,7 +84,7 @@ if __name__ == '__main__':
     )
 
     # CHECKPOINT!
-    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_obj=protac)
+    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_objs=protacs)
 
     megadock.zrank_rescore(
         ligase_obj=ligase,
@@ -95,7 +95,7 @@ if __name__ == '__main__':
     )
 
     structure_tools.get_protac_dist_cuttoff(
-        protac_obj=protac,
+        protac_objs=protacs,
         reclig_file=receptor.lig_file,
         liglig_file=ligase.lig_file,
         dist_cutoff=conf.get('megadock', 'filter_dist_cutoff'),
@@ -105,13 +105,12 @@ if __name__ == '__main__':
     megadock.filter_poses(
         receptor_obj=receptor,
         ligase_obj=ligase,
-        protac_obj=protac,
-        dist_cutoff=protac.dist_cutoff,
+        protac_objs=protacs,
         choice=conf.getboolean('megadock', 'filter_poses')
     )
 
     # CHECKPOINT!
-    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_obj=protac)
+    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_objs=protacs)
 
     megadock.cluster(
         pose_objects=ligase.active_confs(), # structures are now the saved confs attr
@@ -134,7 +133,7 @@ if __name__ == '__main__':
     )
 
     # CHECKPOINT!
-    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_obj=protac)
+    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_objs=protacs)
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
@@ -153,14 +152,14 @@ if __name__ == '__main__':
 
 
     # CHECKPOINT!
-    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_obj=protac)
+    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_objs=protacs)
 
     # run protac sampling
 
     protac_sampling.protac_sampling(
         receptor_obj=receptor,
         ligase_obj=ligase,
-        protac_obj=protac,
+        protac_objs=protacs,
         extend_flexible_small_linker=conf.getboolean('linker_sampling', 'extend_flexible_small_linker'),
         neighbour_number=conf.getint('linker_sampling', 'extend_neighbour_number'),
         min_linker_length=conf.getint('linker_sampling', 'min_linker_length'),
@@ -188,11 +187,11 @@ if __name__ == '__main__':
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     from .analyse import summaries
 
-    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_obj=protac)
-    summaries.summary_csv([i for i in ligase.conformations if i.top])
-    summaries.chimerax_view(
-        receptor_obj=receptor,
-        pose_objs=[i for i in ligase.conformations if i.top],
-        generated_poses_folder=conf.get('protein_ranking', 'generated_poses_folder'),
-        protac_poses_folder=conf.get('linker_sampling', 'protac_poses_folder')
-    )
+    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_objs=protacs)
+    summaries.summary_csv(protacs)
+    # summaries.chimerax_view(
+    #     receptor_obj=receptor,
+    #     pose_objs=[i for i in ligase.conformations if i.top],
+    #     generated_poses_folder=conf.get('protein_ranking', 'generated_poses_folder'),
+    #     protac_poses_folder=conf.get('linker_sampling', 'protac_poses_folder')
+    # )

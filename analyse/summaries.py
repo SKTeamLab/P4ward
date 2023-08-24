@@ -1,46 +1,50 @@
 import pandas as pd
 
-def summary_csv(pose_objects):
+def summary_csv(protac_objs):
 
-    # get protein pose attributes
-    data_dict = {
-        'pose_number':[],
-        'megadock_score':[],
-        'z_score':[],
-        'cluster':[],
-        'clrep':[],
-    }
-    for pose_obj in pose_objects:
-        for attr in data_dict.keys():
-            try:
-                attr_value = getattr(pose_obj, attr)
-            except:
-                attr_value = None
-            data_dict[attr].append(attr_value)
-    
-    # get protac pose and linkers attributes
-    data_dict['protac_pose'] = []
-    data_dict['active_linkers'] = []
-    data_dict['top_protac_score'] = []
+    for protac_obj in protac_objs:
 
-    for pose_obj in pose_objects:
-        data_dict['protac_pose'].append(pose_obj.protac_pose.active)
-        if pose_obj.protac_pose.active:
-            active_linkers = [i for i in pose_obj.protac_pose.linker_confs if i.active]
-            if len(active_linkers) == 0:
+        pose_objs = protac_obj.protein_poses
+        # get protein pose attributes
+        data_dict = {
+            'pose_number':[],
+            'megadock_score':[],
+            'z_score':[],
+            'cluster':[],
+            'clrep':[],
+        }
+        for pose_obj in pose_objs:
+            for attr in data_dict.keys():
+                try:
+                    attr_value = getattr(pose_obj, attr)
+                except:
+                    attr_value = None
+                data_dict[attr].append(attr_value)
+        
+        # get protac pose and linkers attributes
+        data_dict['protac_pose'] = []
+        data_dict['active_linkers'] = []
+        data_dict['top_protac_score'] = []
+
+        for pose_obj in pose_objs:
+            protac_pose = protac_obj.get_pose(pose_obj)
+            data_dict['protac_pose'].append(protac_pose.active)
+            if protac_pose.active:
+                active_linkers = [i for i in protac_pose.linker_confs if i.active]
+                if len(active_linkers) == 0:
+                    active_linkers = None
+                    top_protac_score = None
+                else:
+                    top_protac_score = active_linkers[0].rx_score
+                    active_linkers = ','.join([str(i.conf_number) for i in active_linkers])
+            else:
                 active_linkers = None
                 top_protac_score = None
-            else:
-                top_protac_score = active_linkers[0].rx_score
-                active_linkers = ','.join([str(i.conf_number) for i in active_linkers])
-        else:
-            active_linkers = None
-            top_protac_score = None
-        data_dict['active_linkers'].append(active_linkers)
-        data_dict['top_protac_score'].append(top_protac_score)
-    
-    data = pd.DataFrame.from_dict(data_dict)
-    data.to_csv('summary.csv')
+            data_dict['active_linkers'].append(active_linkers)
+            data_dict['top_protac_score'].append(top_protac_score)
+        
+        data = pd.DataFrame.from_dict(data_dict)
+        data.to_csv(f'summary-{protac_obj.name}.csv')
 
 
 def chimerax_view(receptor_obj, pose_objs, generated_poses_folder, protac_poses_folder):

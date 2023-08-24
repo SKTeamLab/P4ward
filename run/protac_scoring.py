@@ -7,25 +7,23 @@ from ..definitions import ROOT_DIR, CWD
 from ..tools import structure_tools
 
 
-def rxdock_rescore(params, pose_obj, receptor_obj, ligase_obj):
+def rxdock_rescore(params, pose_obj, receptor_obj, ligase_obj, protac_obj):
 
     from . import md
     from . import megadock
-
-    params['linker_scoring_folder'].mkdir(exist_ok=True)
 
     if params['minimize_protac']: dock_prm_file = 'minimize_score.prm'
     else: dock_prm_file = 'score.prm'
 
     # files
-    folder = params['linker_scoring_folder']/f"protein_pose_{pose_obj.pose_number}"
+    folder = params['linker_scoring_folder']/ f'protac_{protac_obj.name}' / f"protein_pose_{pose_obj.pose_number}"
     combined_file = folder/'combined_protein.mol2'
     prep_protacs_file = folder/'protac_prep_confs.sdf'
     cavity_input_file = folder/'cavity.prm'
     scored_protacs_file = folder/'protac_scored_confs.sd'
     ##
 
-    folder.mkdir(exist_ok=True)
+    folder.mkdir(exist_ok=True, parents=True)
     # set to rxdock that this will be a folder with definitions (minimize)
     putenv('RBT_HOME', str(Path(ROOT_DIR)/'inputs'))
     # make combined receptor+ligase file with pymol
@@ -74,18 +72,28 @@ def rxdock_rescore(params, pose_obj, receptor_obj, ligase_obj):
     ]
     subprocess.run(command, cwd=Path(CWD)/folder, stdout=subprocess.DEVNULL)
 
-    # update dictionary with new scored file
-    pose_obj.protac_pose.scored_file = scored_protacs_file
+    # update with new scored file
+    protac_pose = protac_obj.get_pose(pose_obj)
+    protac_pose.scored_file = scored_protacs_file
 
 
-def capture_rxdock_scores(pose_obj):
+def capture_rxdock_scores(pose_obj, protac_obj):
 
     from openbabel import pybel
 
-    confs = pybel.readfile('sdf', str(pose_obj.protac_pose.scored_file))
+    protac_pose = protac_obj.get_pose(pose_obj)
+    confs = pybel.readfile('sdf', str(protac_pose.scored_file))
     for conf in confs:
         conf_number = int(conf.data['Name'].split('_')[-1]) # name in sdf file is format "conf_X"
         score = float(conf.data['SCORE'])
 
-        linker_conf = [i for i in pose_obj.protac_pose.linker_confs if i.conf_number == int(conf_number)][0]
-        linker_conf.rx_score = score
+        try:
+            linker_conf = [i for i in protac_pose.linker_confs if i.conf_number == int(conf_number)][0]
+            linker_conf.rx_score = score
+        except:
+            print('LINKER CONF ERROR')
+            print(protac_pose.__dict__)
+            print(protac_obj.name, protac_pose.protein_parent.pose_number, protac_pose.scored_file)
+            print('~~~ conf_number ~~~', conf_number)
+            for i in protac_pose.linker_confs:
+                print(i.__dict__)

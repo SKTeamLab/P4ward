@@ -162,12 +162,15 @@ def rotate_atoms(atom_coords, ref_rotation, pose_rotation):
 
 @decorators.user_choice
 @decorators.track_run
-def filter_poses(receptor_obj, ligase_obj, protac_obj, dist_cutoff):
+def filter_poses(receptor_obj, ligase_obj, protac_objs):
     """
     Use Biopython to filter the megadock poses which satisfy a
     distance cutoff for both binding sites. Takes the a Protein object
     and handles the rest by accessing its attributes.
     """
+
+    import numpy as np
+    dist_cutoff = np.max([i.dist_cutoff for i in protac_objs])
     logger.info(f'Filtering megadock poses with cuttoff {dist_cutoff}')
 
     from ..tools.structure_tools import structure_proximity
@@ -193,9 +196,10 @@ def filter_poses(receptor_obj, ligase_obj, protac_obj, dist_cutoff):
             pose_obj.active = False
     
     # make a protac_obj for each filtered 
-    for pose_obj in pose_objs:
-        if pose_obj.filtered:
-            classes.ProtacPose(parent=protac_obj, protein_parent=pose_obj)
+    # for protac_obj in protac_objs:
+    #     for pose_obj in pose_objs:
+    #         if pose_obj.filtered:
+    #             classes.ProtacPose(parent=protac_obj, protein_parent=pose_obj)
 
     # TODO if there are no filtered poses, quit the program
         

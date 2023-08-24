@@ -155,6 +155,8 @@ class ProteinPose():
         return(ligase_obj)
 
 
+    def top_protac(self, protac_obj):
+        protac_obj.protein_poses.append(self)
 
 
 class Protac():
@@ -171,9 +173,12 @@ class Protac():
             - self.unbound_energy
     """
 
-    def __init__(self, smiles) -> None:
+    def __init__(self, smiles, name, number) -> None:
         self.smiles = smiles
+        self.name = name
+        self.number = number
         self.poses = []
+        self.protein_poses = []
         self.indices_ligs = None
 
 
@@ -181,6 +186,10 @@ class Protac():
         active_confs = [pose for pose in self.poses if pose.active]
         return(active_confs)
     
+    def get_pose(self, pose_obj):
+        for i in self.poses:
+            if i.protein_parent is pose_obj:
+                return(i)
 
     def sample_unbound_confs(self, num_unbound_confs=100):
 

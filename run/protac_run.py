@@ -11,11 +11,11 @@ from ..run.megadock import rotate_atoms
 def conf_sampling(params, pose_obj, protac_obj, logger):
 
     # make folder for each pose obj linker file to be saved
-    linker_folder = params['protac_poses_folder'] / f'protein_pose_{pose_obj.pose_number}'
-    linker_folder.mkdir(exist_ok=True)
+    linker_folder = params['protac_poses_folder'] /f'protac_{protac_obj.name}' / f'protein_pose_{pose_obj.pose_number}'
+    linker_folder.mkdir(exist_ok=True, parents=True)
 
     # open ligase ligand - changes every loop
-    liglig_rotate = copy.deepcopy(params['liglig'])
+    liglig_rotate = copy.deepcopy(protac_obj.parameters['liglig'])
     conf = liglig_rotate.GetConformer()
 
     # get final rotation information for the pose
@@ -24,26 +24,26 @@ def conf_sampling(params, pose_obj, protac_obj, logger):
     # rotate ligase ligand to new position
     for i in range(liglig_rotate.GetNumAtoms()):
         x, y, z = conf.GetAtomPosition(i)
-        newX, newY, newZ = rotate_atoms((x, y, z), ref_rotation=params['ref_rotation'], pose_rotation=pose_rotation)
+        newX, newY, newZ = rotate_atoms((x, y, z), ref_rotation=protac_obj.parameters['ref_rotation'], pose_rotation=pose_rotation)
         conf.SetAtomPosition(i,Point3D(newX, newY, newZ))
 
     # combine both ligs
-    reference_ligs_rotate = Chem.CombineMols(liglig_rotate, params['reclig'])
+    reference_ligs_rotate = Chem.CombineMols(liglig_rotate, protac_obj.parameters['reclig'])
 
     # copy protac to be embedded
-    protac_embed = copy.deepcopy(params['protac'])
+    protac_embed = copy.deepcopy(protac_obj.parameters['protac'])
 
     # build the dict that will contain the mapping btwn indices and coords:
     coordmap = {}
     mol = reference_ligs_rotate.GetConformer()
-    for i in range(len(params['matches']['receptor_lig_indices'])):
-        atom_ix = params['matches']['receptor_lig_indices'][i]
-        atom_coord = params['matches']['receptor_lig_coords'][i]
+    for i in range(len(protac_obj.parameters['matches']['receptor_lig_indices'])):
+        atom_ix = protac_obj.parameters['matches']['receptor_lig_indices'][i]
+        atom_coord = protac_obj.parameters['matches']['receptor_lig_coords'][i]
         x, y, z = mol.GetAtomPosition(atom_coord)
         coordmap[atom_ix] = Point3D(x, y, z)
-    for i in range(len(params['matches']['pose_lig_indices'])):
-        atom_ix = params['matches']['pose_lig_indices'][i]
-        atom_coord = params['matches']['pose_lig_coords'][i]
+    for i in range(len(protac_obj.parameters['matches']['pose_lig_indices'])):
+        atom_ix = protac_obj.parameters['matches']['pose_lig_indices'][i]
+        atom_coord = protac_obj.parameters['matches']['pose_lig_coords'][i]
         x, y, z = mol.GetAtomPosition(atom_coord)
         coordmap[atom_ix] = Point3D(x, y, z)
     
@@ -74,7 +74,7 @@ def conf_sampling(params, pose_obj, protac_obj, logger):
 
                 # make linker conf "object"
                 linker_conf = {'conf_number':i, 'active':None}
-                rmsd = Chem.rdMolAlign.AlignMol(protac_embed, reference_ligs_rotate, atomMap=params['alignment_pairs'], prbCid=i)
+                rmsd = Chem.rdMolAlign.AlignMol(protac_embed, reference_ligs_rotate, atomMap=protac_obj.parameters['alignment_pairs'], prbCid=i)
                 logger.debug(f"pose: {pose_obj.pose_number}, conf: {i}, rmsd: {rmsd}")
 
                 if rmsd <= params['rmsd_tolerance']:
@@ -102,7 +102,7 @@ def conf_sampling(params, pose_obj, protac_obj, logger):
         protac_pose_obj.active = True
         protac_pose_obj.file = protac_file
     except:
-        logger.info(f'No conformation possible for pose {pose_obj.pose_number}')
+        logger.info(f'No conformation possible for protac {protac_obj.name} on pose {pose_obj.pose_number}')
         protac_pose_obj.active = False
         protac_pose_obj.file = None
 

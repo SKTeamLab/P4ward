@@ -91,7 +91,7 @@ def protein_poses(
     """"""
     
 
-# @decorators.track_run
+@decorators.track_run
 def generate_protein_poses(poses, pose_objs, generated_poses_folder, altlocA):
     """
     Subset of protein-protein poses to generate based on conf option `generate_poses`.
