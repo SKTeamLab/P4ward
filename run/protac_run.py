@@ -102,7 +102,7 @@ def conf_sampling(params, pose_obj, protac_obj, logger):
         protac_pose_obj.active = True
         protac_pose_obj.file = protac_file
     except:
-        logger.info(f'No conformation possible for protac {protac_obj.name} on pose {pose_obj.pose_number}')
+        logger.debug(f'No conformation possible for protac {protac_obj.name} on pose {pose_obj.pose_number}')
         protac_pose_obj.active = False
         protac_pose_obj.file = None
 

@@ -47,7 +47,7 @@ def summary_csv(protac_objs):
         data.to_csv(f'summary-{protac_obj.name}.csv')
 
 
-def chimerax_view(receptor_obj, pose_objs, generated_poses_folder, protac_poses_folder):
+def chimerax_view(receptor_obj, protac_objs, pose_objs, generated_poses_folder, protac_poses_folder):
     """
     Make a chimerax visualization script to see the final successful poses
     """

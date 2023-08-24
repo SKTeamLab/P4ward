@@ -1,11 +1,11 @@
-from  threading import Lock, Thread
+from  threading import Thread
 from queue import Queue
 from ..tools.logger import logger
 from ..tools import classes
 from ..tools import decorators
 
 
-def sample_protac_pose(inQ, outQ, lock, p, receptor_obj, ligase_obj, global_parameters, logger):
+def sample_protac_pose(inQ, outQ, p, receptor_obj, ligase_obj, global_parameters, logger):
 
     from . import protac_scoring
     from . import protac_run
@@ -81,8 +81,6 @@ def protac_sampling(
             neighbour_number
         )
 
-    # global_parameters.update(parameters)
-
     # ~~~~~~~~~~~~~~
     # start sampling
     # ~~~~~~~~~~~~~~
@@ -91,12 +89,11 @@ def protac_sampling(
 
     inQ  = Queue()
     outQ = Queue()
-    lock = Lock()
 
     # start threads
     threads = []
     for i in range(num_parallel_procs):
-        t = Thread(name=i, target=sample_protac_pose, args=(inQ, outQ, lock, i, receptor_obj, ligase_obj, global_parameters, logger))
+        t = Thread(name=i, target=sample_protac_pose, args=(inQ, outQ, i, receptor_obj, ligase_obj, global_parameters, logger))
         t.daemon = True
         t.start()
         threads.append(t)
@@ -104,7 +101,7 @@ def protac_sampling(
 
     for protac_obj in protac_objs:
 
-        print(f'~~~~~~~~~ moving to protac {protac_obj.name} ~~~~~~~~~~~~~~~~~')
+        logger.info(f"Now sampling protac {protac_obj.name}")
 
         candidate_poses = [i for i in pose_objs if i.top]
         top_poses = len(candidate_poses)
@@ -119,7 +116,7 @@ def protac_sampling(
         # start watching the outQ and counting successful poses
         while True:
 
-            print(len(successful_poses))
+            logger.info(f"Sampled {len(successful_poses)}/{top_poses} successful poses.")
             if len(successful_poses) == top_poses:
                 break
 
@@ -165,7 +162,7 @@ def protac_sampling(
             else:
                 failed_poses.append(pose_obj)
 
-            logger.info(f"pose {pose_obj.pose_number}, protac {protac_obj.name} - {('success' if success else 'failed')}")
+            logger.debug(f"pose {pose_obj.pose_number}, protac {protac_obj.name} - {('success' if success else 'failed')}")
             
             # check if all poses have been tried
             if len(successful_poses) + len(failed_poses) == len(pose_objs):
@@ -182,13 +179,10 @@ def protac_sampling(
                 
                 # send it to be processed
                 candidate_poses.append(next_candidate)
-                logger.info(f"Sending pose {next_candidate.pose_number} to sample protac {protac_obj.name}.")
+                logger.debug(f"Sending pose {next_candidate.pose_number} to sample protac {protac_obj.name}.")
                 inQ.put((protac_obj, next_candidate))
 
             outQ.task_done()
-        
-        # outQ.join()
-        # inQ.join()
-        
+                
         logger.info(f"Finished sampling for protac {protac_obj.name}")
-    logger.info(f"Sampling done for all {len(protac_objs)} protacs.")
+    logger.info(f"Sampling done for all {len(protac_objs)} protac linker variations.")

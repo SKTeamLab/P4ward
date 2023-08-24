@@ -87,13 +87,5 @@ def capture_rxdock_scores(pose_obj, protac_obj):
         conf_number = int(conf.data['Name'].split('_')[-1]) # name in sdf file is format "conf_X"
         score = float(conf.data['SCORE'])
 
-        try:
-            linker_conf = [i for i in protac_pose.linker_confs if i.conf_number == int(conf_number)][0]
-            linker_conf.rx_score = score
-        except:
-            print('LINKER CONF ERROR')
-            print(protac_pose.__dict__)
-            print(protac_obj.name, protac_pose.protein_parent.pose_number, protac_pose.scored_file)
-            print('~~~ conf_number ~~~', conf_number)
-            for i in protac_pose.linker_confs:
-                print(i.__dict__)
+        linker_conf = [i for i in protac_pose.linker_confs if i.conf_number == int(conf_number)][0]
+        linker_conf.rx_score = score
