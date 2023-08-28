@@ -118,7 +118,7 @@ def structure_proximity(struct1, struct2, dist_cutoff=None):
     return(distance, distance <= dist_cutoff)
 
 
-def get_rmsd(obj1, obj2, ca=False):
+def get_rmsd(obj1, obj2, ca=False, backbone=True):
     """
     Use biopython to get the atomic coordinates of both objects
     and the pip tool rmsd.rmsd to calulate the rmsd. Returns rmsd value
@@ -133,12 +133,17 @@ def get_rmsd(obj1, obj2, ca=False):
         'obj1_coords':[],
         'obj2_coords':[]
     }
+    backbone_atoms = ['C','CA','N','O']
     
     for obj in ('obj1', 'obj2'):
         for res in objects[obj].get_residues():
             for atom in res.get_atoms():
                 if ca:
                     if atom.get_name() == 'CA':
+                        objects[f'{obj}_coords'].append(atom.get_coord())
+                    else: continue
+                elif backbone:
+                    if atom.get_name() in backbone_atoms:
                         objects[f'{obj}_coords'].append(atom.get_coord())
                     else: continue
                 else:
