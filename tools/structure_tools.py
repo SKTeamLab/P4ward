@@ -103,7 +103,6 @@ def get_protac_dist_cuttoff(
         logger.info(f"Ligands distance cutoff set to {dist_cutoff}.")
 
 
-
 def structure_proximity(struct1, struct2, dist_cutoff=None):
     """
     Calculate the distance between the center of mass of two biopython struct objects
@@ -118,7 +117,7 @@ def structure_proximity(struct1, struct2, dist_cutoff=None):
     return(distance, distance <= dist_cutoff)
 
 
-def get_rmsd(obj1, obj2, ca=False, backbone=True):
+def get_rmsd(obj1, obj2, fit=False, ca=False, backbone=True):
     """
     Use biopython to get the atomic coordinates of both objects
     and the pip tool rmsd.rmsd to calulate the rmsd. Returns rmsd value
@@ -152,7 +151,10 @@ def get_rmsd(obj1, obj2, ca=False, backbone=True):
     obj1_coords = np.asarray(objects['obj1_coords'])
     obj2_coords = np.asarray(objects['obj2_coords'])
 
-    rmsd = rmsd.rmsd(obj1_coords, obj2_coords)
+    if fit:
+        rmsd = rmsd.kabsch_rmsd(obj1_coords, obj2_coords, translate=True)
+    else:
+        rmsd = rmsd.rmsd(obj1_coords, obj2_coords)
     return(rmsd)
 
 
