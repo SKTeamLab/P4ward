@@ -20,6 +20,16 @@ def arg_parser(arguments):
         action='store_true',
         help='Copy full configuration file and quit the program.'
     )
+    parser.add_argument(
+        "--benchmark",
+        action='store_true',
+        help='Benchmark a modelling run.'
+    )
+    parser.add_argument(
+        "--ref_ligase",
+        type=Path,
+        help="Path to the reference pose for the E3 ligase."
+    )
 
     if arguments == None:
         args = parser.parse_args()

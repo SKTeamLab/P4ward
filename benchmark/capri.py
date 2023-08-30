@@ -1,4 +1,4 @@
-
+from ..tools import decorators
 
 def get_interface(interface_struct, search_struct, cutoff=5.0):
     
@@ -177,7 +177,7 @@ def calc_rank(fnat, lrms, irms):
     return(rank)
 
 
-
+@decorators.user_choice
 def benchmark(protac_objs, receptor_obj, ligase_obj, ref_ligase_file):
 
     from ..tools.structure_tools import load_biopython_structures

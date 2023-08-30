@@ -155,7 +155,6 @@ if __name__ == '__main__':
     run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_objs=protacs)
 
     # run protac sampling
-
     protac_sampling.protac_sampling(
         receptor_obj=receptor,
         ligase_obj=ligase,
@@ -176,15 +175,24 @@ if __name__ == '__main__':
         choice=conf.getboolean('linker_sampling', 'rdkit_sampling')
     )
 
-    # rank all sampled protacs
-    # rank.protac_conformations(
-    #     protac_poses=protac.active_poses()
-    # )
-
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     #~~~~~~~~~~~~~ end session ~~~~~~~~~~~~~#
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
+    #~~~~~~~~~~~~~ benchmark if applicable ~~~~~~~~~~~~~
+
+    from .benchmark import capri
+    capri.benchmark(
+        protac_objs=protacs,
+        receptor_obj=receptor,
+        ligase_obj=ligase,
+        ref_ligase_file=args.ref_ligase,
+        choice=args.benchmark
+    )
+
+    #~~~~~~~~~~~~~~~~~~ make outputs ~~~~~~~~~~~~~~~~~~~
+
     from .analyse import summaries
 
     run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_objs=protacs)
