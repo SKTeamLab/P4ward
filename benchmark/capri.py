@@ -16,6 +16,29 @@ def get_interface(interface_struct, search_struct, cutoff=5.0):
     return(interface)
 
 
+def get_atom_pairs(interface_struct, search_struct, cutoff=5.0):
+
+    from Bio.PDB import NeighborSearch
+
+    ns = NeighborSearch(list(search_struct.get_atoms()))
+    residue_pairs = []
+
+    neighbours = []
+    for residue in interface_struct.get_residues():
+        neighbours = []
+        for atom in residue.get_atoms():
+            nss = ns.search(atom.get_coord(), cutoff, level="R")
+            for ns_res in nss:
+                if ns_res not in neighbours:
+                    neighbours.append(ns_res)
+        for neighbour in neighbours:
+            pair = [residue, neighbour]
+            if pair not in residue_pairs:
+                residue_pairs.append(pair)
+
+    return(residue_pairs)
+
+
 def make_structure(*lists_of_residues, structure_name="structure"):
 
     from Bio.PDB import Structure, Model, Chain
@@ -41,16 +64,14 @@ def make_structure(*lists_of_residues, structure_name="structure"):
 
 def calc_fnat(receptor_struct, ref_ligase_struct, pose_struct):
 
-    from itertools import product
+    ligase_if = get_atom_pairs(ref_ligase_struct, receptor_struct)
+    rec_ligase_if = get_atom_pairs(receptor_struct, ref_ligase_struct)
 
-    ligase_if = get_interface(ref_ligase_struct, receptor_struct)
-    rec_ligase_if = get_interface(receptor_struct, ref_ligase_struct)
+    pose_if = get_atom_pairs(pose_struct, receptor_struct)
+    rec_pose_if = get_atom_pairs(receptor_struct, pose_struct)
 
-    pose_if = get_interface(pose_struct, receptor_struct)
-    rec_pose_if = get_interface(receptor_struct, pose_struct)
-
-    ref_pairs = list(product(ligase_if, rec_ligase_if))
-    pose_pairs = list(product(pose_if, rec_pose_if))
+    ref_pairs = [*ligase_if, *rec_ligase_if]
+    pose_pairs = [*pose_if, *rec_pose_if]
     correct_pairs = [i for i in pose_pairs if i in ref_pairs]
 
     fnat = len(correct_pairs) / len(ref_pairs)
