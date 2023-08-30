@@ -148,8 +148,10 @@ def calc_irms(receptor_struct, ref_ligase_struct, ligase_obj, pose_obj):
 
 def calc_rank(fnat, lrms, irms):
 
+    print(fnat, lrms, irms)
+
     if (
-        ( fnat >= 5.0 ) and
+        ( fnat >= 0.5 ) and
         ( lrms <= 1.0 or irms <= 1.0 )
     ):
         rank = 'high'
