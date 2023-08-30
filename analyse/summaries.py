@@ -1,7 +1,7 @@
 import pandas as pd
 from pathlib import Path
 
-def summary_csv(protac_objs):
+def summary_csv(protac_objs, benchmark):
 
     results_folder = Path("./results_summaries")
     results_folder.mkdir(exist_ok=True)
@@ -17,6 +17,15 @@ def summary_csv(protac_objs):
             'cluster':[],
             'clrep':[],
         }
+
+        if benchmark:
+            data_dict = {**data_dict, **{
+                'l_rms':[],
+                'i_rms':[],
+                'fnat':[],
+                'rank':[]
+            }}
+
         for pose_obj in pose_objs:
             for attr in data_dict.keys():
                 try:
@@ -51,7 +60,7 @@ def summary_csv(protac_objs):
         data.to_csv(results_folder / f'summary-{protac_obj.name}.csv')
 
 
-def chimerax_view(receptor_obj, protac_objs, pose_objs, generated_poses_folder, protac_poses_folder):
+def chimerax_view(receptor_obj, protac_objs, pose_objs, generated_poses_folder, protac_poses_folder, benchmark, ref_ligase):
     """
     Make a chimerax visualization script to see the final successful poses
     """
@@ -75,6 +84,19 @@ def chimerax_view(receptor_obj, protac_objs, pose_objs, generated_poses_folder, 
                 +f'color ##name="pose{pose_obj.pose_number}_protac" byhet;\n'
             )
         
+        if benchmark:
+            script += (
+                 f'open ../{ref_ligase} name ref_ligase'
+                + 'color ##name="ref_ligase" #b44b49 target asr'
+            )
+            good_poses = []
+            for pose_obj in protac_obj.protein_poses:
+                if pose_obj.capri_rank in ['acceptable', 'medium', 'high']:
+                    good_poses.append(pose_obj.pose_number)
+            script += (
+                f'transparency ~(##name="receptor" | ##name="ref_ligase" | #{",".join(good_poses)}) 50 target asr'
+            )
+ 
         script += (
             f"hide H;\n"
             +f"lighting full;\n"

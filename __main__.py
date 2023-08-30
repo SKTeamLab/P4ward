@@ -196,7 +196,7 @@ if __name__ == '__main__':
     from .analyse import summaries
 
     run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_objs=protacs)
-    summaries.summary_csv(protacs)
+    summaries.summary_csv(protacs, benchmark=args.benchmark)
     summaries.chimerax_view(
         receptor_obj=receptor,
         pose_objs=[i for i in ligase.conformations if i.top],
