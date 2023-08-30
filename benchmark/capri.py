@@ -148,8 +148,6 @@ def calc_irms(receptor_struct, ref_ligase_struct, ligase_obj, pose_obj):
 
 def calc_rank(fnat, lrms, irms):
 
-    print(fnat, lrms, irms)
-
     if (
         ( fnat >= 0.5 ) and
         ( lrms <= 1.0 or irms <= 1.0 )
@@ -197,5 +195,7 @@ def benchmark(protac_objs, receptor_obj, ligase_obj, ref_ligase_file):
             irms = calc_irms(receptor_struct, ref_ligase_struct, ligase_obj, pose_obj)
             rank = calc_rank(fnat, lrms, irms)
 
-            pose_obj.capri = {'fnat':fnat, 'l_rms':lrms, 'i_rms':irms}
-            pose_obj.capri_rank = rank
+            pose_obj.fnat = round(fnat, 3)
+            pose_obj.l_rms = round(lrms, 3)
+            pose_obj.i_rms = round(irms, 3)
+            pose_obj.capri_rank = round(rank, 3)

@@ -205,5 +205,7 @@ if __name__ == '__main__':
         pose_objs=[i for i in ligase.conformations if i.top],
         protac_objs=protacs,
         generated_poses_folder=conf.get('protein_ranking', 'generated_poses_folder'),
-        protac_poses_folder=conf.get('linker_sampling', 'protac_poses_folder')
+        protac_poses_folder=conf.get('linker_sampling', 'protac_poses_folder'),
+        benchmark=args.benchmark,
+        ref_ligase=args.ref_ligase
     )
