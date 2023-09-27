@@ -1,5 +1,6 @@
 from ..tools import decorators
 
+
 def get_interface(interface_struct, search_struct, cutoff=5.0):
     
     from Bio.PDB import NeighborSearch
@@ -59,7 +60,6 @@ def make_structure(*lists_of_residues, structure_name="structure"):
             chain.add(residue)
 
     return(struct)
-
 
 
 def calc_fnat(receptor_struct, ref_ligase_struct, pose_struct):
