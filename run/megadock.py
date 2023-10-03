@@ -1,6 +1,6 @@
 import subprocess
 import os
-from ..tools import decorators, classes
+from ..tools import decorators
 from ..tools.logger import logger
 from ..definitions import CWD
 
@@ -158,51 +158,6 @@ def rotate_atoms(atom_coords, ref_rotation, pose_rotation):
     final_z = tz2-t3*spacing+r3
 
     return(final_x, final_y, final_z)
-
-
-@decorators.user_choice
-@decorators.track_run
-def filter_poses(receptor_obj, ligase_obj, protac_objs):
-    """
-    Use Biopython to filter the megadock poses which satisfy a
-    distance cutoff for both binding sites. Takes the a Protein object
-    and handles the rest by accessing its attributes.
-    """
-
-    import numpy as np
-    dist_cutoff = np.max([i.dist_cutoff for i in protac_objs])
-    logger.info(f'Filtering megadock poses with cuttoff {dist_cutoff}')
-
-    from ..tools.structure_tools import structure_proximity
-
-    pose_objs = ligase_obj.active_confs()
-
-    for pose_obj in pose_objs:
-        receptor_lig_obj = receptor_obj.get_ligand_struct()
-        ligand_lig_obj = pose_obj.get_rotated_struct(struct_type='ligand')
-
-        distance, proximity = structure_proximity(
-            receptor_lig_obj,
-            ligand_lig_obj,
-            dist_cutoff=dist_cutoff
-        )
-
-        if proximity:
-            pose_obj.active = True
-            pose_obj.filtered = True
-            logger.info(f'Activating filtered pose {pose_obj.pose_number}, with distance of {distance} between ligands.')
-        else:
-            pose_obj.filtered = False
-            pose_obj.active = False
-    
-    # make a protac_obj for each filtered 
-    # for protac_obj in protac_objs:
-    #     for pose_obj in pose_objs:
-    #         if pose_obj.filtered:
-    #             classes.ProtacPose(parent=protac_obj, protein_parent=pose_obj)
-
-    # TODO if there are no filtered poses, quit the program
-        
 
 
 @decorators.user_choice

@@ -2,3 +2,4 @@
 *.pyc
 protacs_pipeline.log
 docs/build
+__pycache__

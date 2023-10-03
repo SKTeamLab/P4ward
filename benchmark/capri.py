@@ -198,4 +198,4 @@ def benchmark(protac_objs, receptor_obj, ligase_obj, ref_ligase_file):
             pose_obj.fnat = round(fnat, 3)
             pose_obj.l_rms = round(lrms, 3)
             pose_obj.i_rms = round(irms, 3)
-            pose_obj.capri_rank = round(rank, 3)
+            pose_obj.capri_rank = rank

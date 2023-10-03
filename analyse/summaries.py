@@ -1,14 +1,18 @@
 import pandas as pd
 from pathlib import Path
 
-def summary_csv(protac_objs, benchmark):
+def summary_csv(protac_objs, ligase_obj, benchmark):
 
     results_folder = Path("./results_summaries")
     results_folder.mkdir(exist_ok=True)
 
     for protac_obj in protac_objs:
 
-        pose_objs = protac_obj.protein_poses
+        pose_objs = [i for i in ligase_obj.active_confs() if i in protac_obj.protein_poses]
+        # ^ this ensures that the pose_objs list is still ranked as done by .rank.protein_poses()
+        # otherwise if I had done `pose_objs = protac_obj.protein_poses`, the list would not be
+        # ranked according to the docking score of choice
+
         # get protein pose attributes
         data_dict = {
             'pose_number':[],
@@ -16,6 +20,7 @@ def summary_csv(protac_objs, benchmark):
             'z_score':[],
             'cluster':[],
             'clrep':[],
+            'crl':[]
         }
 
         if benchmark:

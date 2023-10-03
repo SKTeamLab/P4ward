@@ -5,11 +5,13 @@ if __name__ == '__main__':
 
     from sys import exit
     from pathlib import Path
+    import warnings
     from .config import config
     from .tools import run_tracker
     from .tools.script_tools import write_default_conf
     from .definitions import ROOT_DIR, CPT_FILE
 
+    warnings.filterwarnings("ignore")
     # prepare internals:
     args = config.arg_parser(None)
 
@@ -56,7 +58,7 @@ if __name__ == '__main__':
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     
     # run megadock
-    from .run import megadock
+    from .run import megadock, protein_filter
     from .tools import structure_tools
 
     megadock.prep_structures(
@@ -99,14 +101,32 @@ if __name__ == '__main__':
         reclig_file=receptor.lig_file,
         liglig_file=ligase.lig_file,
         dist_cutoff=conf.get('megadock', 'filter_dist_cutoff'),
-        choice=conf.getboolean('megadock', 'filter_poses')
+        choice=conf.getboolean('protein_filter', 'ligand_distances')
     )
 
-    megadock.filter_poses(
+    protein_filter.ligand_distances(
         receptor_obj=receptor,
         ligase_obj=ligase,
         protac_objs=protacs,
-        choice=conf.getboolean('megadock', 'filter_poses')
+        choice=conf.getboolean('protein_filter', 'ligand_distances')
+    )
+
+    protein_filter.crl_filters(
+        receptor_obj=receptor,
+        ligase_obj=ligase,
+        crl_model_clash=conf.getboolean('protein_filter','crl_model_clash'),
+        clash_threshold=conf.getfloat('protein_filter','clash_threshold'),
+        clash_count_tol=conf.getint('protein_filter','clash_count_tol'),
+        accessible_lysines=conf.getboolean('protein_filter','accessible_lysines'),
+        lys_sasa_cutoff=conf.getfloat('protein_filter', 'lys_sasa_cutoff'),
+        overlap_dist_cutoff=conf.getfloat('protein_filter','overlap_dist_cutoff'),
+        vhl_ubq_dist_cutoff=conf.getfloat('protein_filter','vhl_ubq_dist_cutoff'),
+        crbn_ubq_dist_cutoff=conf.getfloat('protein_filter','crbn_ubq_dist_cutoff'),
+        e3=conf.get('protein_filter','e3'),
+        choice=(
+            conf.getboolean('protein_filter','crl_model_clash') or
+            conf.getboolean('protein_filter','accessible_lysines') 
+        )
     )
 
     # CHECKPOINT!
@@ -199,7 +219,7 @@ if __name__ == '__main__':
     from .analyse import summaries
 
     run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_objs=protacs)
-    summaries.summary_csv(protacs, benchmark=args.benchmark)
+    summaries.summary_csv(protacs, ligase, benchmark=args.benchmark)
     summaries.chimerax_view(
         receptor_obj=receptor,
         pose_objs=[i for i in ligase.conformations if i.top],

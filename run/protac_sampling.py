@@ -170,17 +170,21 @@ def protac_sampling(
                 break
             
             # IMPORTANT! we can only send a next candidate if the current one was NOT successful
+            # and only if there is a next candidate
             if not success:
                 # get next candidate
                 for i in pose_objs:
                     if i not in candidate_poses and i not in successful_poses and i not in failed_poses:
                         next_candidate = i
                         break
+                    else:
+                        next_candidate = None
                 
                 # send it to be processed
-                candidate_poses.append(next_candidate)
-                logger.debug(f"Sending pose {next_candidate.pose_number} to sample protac {protac_obj.name}.")
-                inQ.put((protac_obj, next_candidate))
+                if next_candidate != None:
+                    candidate_poses.append(next_candidate)
+                    logger.debug(f"Sending pose {next_candidate.pose_number} to sample protac {protac_obj.name}.")
+                    inQ.put((protac_obj, next_candidate))
 
             outQ.task_done()
                 
