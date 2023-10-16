@@ -95,6 +95,7 @@ def crl_filters(
                         vhl_ubq_dist_cutoff,
                         crbn_ubq_dist_cutoff,
                         e3,
+                        num_procs
 ):
     
     from copy import deepcopy
@@ -252,68 +253,102 @@ def crl_filters(
     ##
     ## we check each model number for each pose_obj
     ##
-    pose_objs = ligase_obj.active_confs()
-    for pose_obj in pose_objs:
 
-        pose_struct = pose_obj.get_rotated_struct('protein')
+    def worker(inQ, outQ):
+        """
+        The worker function in this case takes a pose_obj and does its filtering for each
+        crl model number
+        """
 
-        ##              ##
-        ## begin checks ##
-        ##              ##        
-        accepted_models = []
+        while True:
 
-        for model_number in model_info[e3]['model_numbers']:
+            pose_obj = inQ.get()
+            pose_struct = pose_obj.get_rotated_struct('protein')
 
-            model_file = get_e3_modelfile(e3, model_number, subrec_only=True)
-            full_model_file = get_e3_modelfile(e3, model_number)
-            aligned_ligase_struct = aligned_ligase_structs[model_number]
+            ##              ##
+            ## begin checks ##
+            ##              ##  
+            accepted_models = []
 
-            # now that the ligase in CRL model conformation is identical to the ligase that was docked
-            # (thanks to prep_alignment()), they can be aligned by biopython
-            superimposer = Superimposer()
-            superimposer.set_atoms(
-                list(aligned_ligase_struct.get_atoms()),
-                list(pose_struct.get_atoms())
-            )    
-            ## apply the rotation to the receptor
-            rec_struct_align = deepcopy(receptor_struct)
-            superimposer.apply(rec_struct_align)
+            for model_number in model_info[e3]['model_numbers']:
 
-            if crl_model_clash:
+                model_file = get_e3_modelfile(e3, model_number, subrec_only=True)
+                full_model_file = get_e3_modelfile(e3, model_number)
+                aligned_ligase_struct = aligned_ligase_structs[model_number]
 
-                full_model_struct = load_biopython_structures(full_model_file)
-                clash = check_model_clash(
-                    full_model_struct,
-                    rec_struct_align,
-                    clash_threshold,
-                    clash_count_tol
-                )
+                # now that the ligase in CRL model conformation is identical to the ligase that was docked
+                # (thanks to prep_alignment()), they can be aligned by biopython
+                superimposer = Superimposer()
+                superimposer.set_atoms(
+                    list(aligned_ligase_struct.get_atoms()),
+                    list(pose_struct.get_atoms())
+                )    
+                ## apply the rotation to the receptor
+                rec_struct_align = deepcopy(receptor_struct)
+                superimposer.apply(rec_struct_align)
 
-                if clash:
-                    accepted_models.append(False)
-                    pose_obj.crl = -1
-                    continue
+                if crl_model_clash:
 
-                else:
-                    if accessible_lysines:
-                        accessible_lys, lys_count = check_access_lys(
-                            rec_struct_align,
-                            ubq=model_info[e3]['ubq_point'],
-                            lys_sasa_cutoff=lys_sasa_cutoff,
-                            dist_cutoff=model_info[e3]['dist_cutoff'],
-                            overlap_dist_cutoff=overlap_dist_cutoff
-                        )
-                        pose_obj.crl = lys_count
+                    full_model_struct = load_biopython_structures(full_model_file)
+                    clash = check_model_clash(
+                        full_model_struct,
+                        rec_struct_align,
+                        clash_threshold,
+                        clash_count_tol
+                    )
 
-                        if accessible_lys:
-                            accepted_models.append(True)
-                        else:
-                            accepted_models.append(False)
-                    
+                    if clash:
+                        accepted_models.append(False)
+                        pose_obj.crl = -1
+                        continue
+
                     else:
-                        accepted_models.append(True)
+                        if accessible_lysines:
+                            accessible_lys, lys_count = check_access_lys(
+                                rec_struct_align,
+                                ubq=model_info[e3]['ubq_point'],
+                                lys_sasa_cutoff=lys_sasa_cutoff,
+                                dist_cutoff=model_info[e3]['dist_cutoff'],
+                                overlap_dist_cutoff=overlap_dist_cutoff
+                            )
+                            pose_obj.crl = lys_count
+
+                            if accessible_lys:
+                                accepted_models.append(True)
+                            else:
+                                accepted_models.append(False)
                         
-        accepted_pose = np.any(accepted_models)
+                        else:
+                            accepted_models.append(True)
+
+            accepted_pose = np.any(accepted_models)
+            outQ.put((pose_obj.pose_number, accepted_pose))
+
+
+    ######################
+
+    pose_objs = ligase_obj.active_confs()
+
+    inQ = JoinableQueue()
+    outQ = JoinableQueue()
+
+    for i in pose_objs:
+        inQ.put(i)
+
+    procs = []
+    for i in range(num_procs):
+        p = Process(name=i, target=worker, args=(inQ, outQ))
+        p.daemon = True
+        p.start()
+        procs.append(p)
+
+    done_count = 0
+    while True:
+
+        pose_number, accepted_pose = outQ.get()
+        done_count += 1
+
+        pose_obj = [i for i in pose_objs if i.pose_number == pose_number][0]
         if accepted_pose:
             pose_obj.filtered = True
             pose_obj.active = True
@@ -321,4 +356,8 @@ def crl_filters(
             pose_obj.filtered = False
             pose_obj.active = False
         
+        outQ.task_done()
         logger.debug(f'Pose number {pose_obj.pose_number} filtered: {pose_obj.filtered}')
+
+        if done_count == len(pose_objs):
+            break

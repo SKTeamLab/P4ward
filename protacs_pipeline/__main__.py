@@ -126,6 +126,7 @@ if __name__ == '__main__':
         vhl_ubq_dist_cutoff=conf.getfloat('protein_filter','vhl_ubq_dist_cutoff'),
         crbn_ubq_dist_cutoff=conf.getfloat('protein_filter','crbn_ubq_dist_cutoff'),
         e3=conf.get('protein_filter','e3'),
+        num_procs=conf.getint('general', 'num_processors'),
         choice=(
             conf.getboolean('protein_filter','crl_model_clash') or
             conf.getboolean('protein_filter','accessible_lysines') 
