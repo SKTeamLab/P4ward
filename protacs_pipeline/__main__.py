@@ -104,10 +104,13 @@ if __name__ == '__main__':
         choice=conf.getboolean('protein_filter', 'ligand_distances')
     )
 
+    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_objs=protacs)
+
     protein_filter.ligand_distances(
         receptor_obj=receptor,
         ligase_obj=ligase,
         protac_objs=protacs,
+        num_procs=conf.getint('general', 'num_processors'),
         choice=conf.getboolean('protein_filter', 'ligand_distances')
     )
 

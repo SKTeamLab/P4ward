@@ -1,12 +1,15 @@
 from pathlib import Path
+from multiprocessing import Process, JoinableQueue
+from itertools import product
 from ..tools import decorators
 from ..tools.logger import logger
 from ..tools.structure_tools import load_biopython_structures
 from ..definitions import ROOT_DIR
 
+
 @decorators.user_choice
 @decorators.track_run
-def ligand_distances(receptor_obj, ligase_obj, protac_objs):
+def ligand_distances(receptor_obj, ligase_obj, protac_objs, num_procs):
     """
     Use Biopython to filter the megadock poses which satisfy a
     distance cutoff for both binding sites. Takes the a Protein object
@@ -14,37 +17,67 @@ def ligand_distances(receptor_obj, ligase_obj, protac_objs):
     """
 
     import numpy as np
+    from ..tools.structure_tools import structure_proximity
+
     dist_cutoff = np.max([i.dist_cutoff for i in protac_objs])
     logger.info(f'Filtering megadock poses with cuttoff {dist_cutoff}')
 
-    from ..tools.structure_tools import structure_proximity
-
     pose_objs = ligase_obj.active_confs()
 
-    for pose_obj in pose_objs:
-        receptor_lig_obj = receptor_obj.get_ligand_struct()
-        ligand_lig_obj = pose_obj.get_rotated_struct(struct_type='ligand')
+    inQ = JoinableQueue()
+    outQ = JoinableQueue()
 
-        distance, proximity = structure_proximity(
-            receptor_lig_obj,
-            ligand_lig_obj,
-            dist_cutoff=dist_cutoff
-        )
+    receptor_lig_obj = receptor_obj.get_ligand_struct()
 
-        if proximity:
-            pose_obj.active = True
-            pose_obj.filtered = True
-            logger.info(f'Activating filtered pose {pose_obj.pose_number}, with distance of {distance} between ligands.')
-        else:
-            pose_obj.filtered = False
-            pose_obj.active = False
+    def worker(inQ, outQ, receptor_lig_obj):
+
+        while True:
+            pose_obj = inQ.get()
+            ligand_lig_obj = pose_obj.get_rotated_struct(struct_type='ligand')
+            _, proximity = structure_proximity(
+                receptor_lig_obj,
+                ligand_lig_obj,
+                dist_cutoff=dist_cutoff
+            )
+            inQ.task_done()
+            outQ.put((pose_obj.pose_number, proximity))
+            
+
+    for i in pose_objs:
+        inQ.put(i)
+
+    procs = []
+    for i in range(num_procs):
+        p = Process(name=i, target=worker, args=(inQ, outQ, receptor_lig_obj))
+        p.daemon = True
+        p.start()
+        procs.append(p)
+
+
+    done_count = 0
+    while True:
+
+        pose_number, proximity = outQ.get()
+        done_count += 1
+
+        pose_obj = [i for i in pose_objs if i.pose_number == pose_number][0]
+        pose_obj.active = proximity
+        pose_obj.filtered = proximity
+
+        outQ.task_done()
+        logger.debug(f"filter pose {pose_obj.pose_number}: {pose_obj.active}")
+
+        if done_count == len(pose_objs):
+            break
+
+
+    results = [i.filtered for i in pose_objs]
+    if any(results):
+        logger.info(f'Finished filtering {len(results)} protein poses according to ligand distance criteria.')
+    else:
+        logger.info('There are no poses which satisfy the ligand distance filtering criteria. Exiting now.')
+        exit(0)
     
-    # make a protac_obj for each filtered 
-    # for protac_obj in protac_objs:
-    #     for pose_obj in pose_objs:
-    #         if pose_obj.filtered:
-    #             classes.ProtacPose(parent=protac_obj, protein_parent=pose_obj)
-
     # TODO if there are no filtered poses, quit the program
 
 
