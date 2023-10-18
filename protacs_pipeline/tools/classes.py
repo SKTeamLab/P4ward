@@ -43,7 +43,7 @@ class Protein:
         Use the function load_biopython_structures to get the biopython object
         for the protein. 
         """ 
-        from .structure_tools import load_biopython_structures
+        from ..run.structure_tools import load_biopython_structures
         structure_file = getattr(self, struct_attr)
         protein_struct = load_biopython_structures(structure_file=structure_file)
         return(protein_struct)
@@ -54,7 +54,7 @@ class Protein:
         Use the function load_biopython_structures to get the biopython object
         for the protein ligand. 
         """
-        from .structure_tools import load_biopython_structures
+        from ..run.structure_tools import load_biopython_structures
 
         ligand_struct = load_biopython_structures(
             structure_file=self.lig_file,

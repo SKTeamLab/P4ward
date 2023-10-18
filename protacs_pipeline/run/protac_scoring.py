@@ -4,7 +4,7 @@ from pathlib import Path
 from openbabel import pybel
 from ..definitions import ROOT_DIR, CWD
 # from ..tools.logger import logger
-from ..tools import structure_tools
+from . import structure_tools
 
 
 def rxdock_rescore(params, pose_obj, receptor_obj, ligase_obj, protac_obj):

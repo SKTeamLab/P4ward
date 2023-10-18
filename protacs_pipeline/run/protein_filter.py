@@ -3,7 +3,7 @@ from multiprocessing import Process, JoinableQueue
 from itertools import product
 from ..tools import decorators
 from ..tools.logger import logger
-from ..tools.structure_tools import load_biopython_structures
+from .structure_tools import load_biopython_structures, pymol_align
 from ..definitions import ROOT_DIR
 
 
@@ -17,7 +17,7 @@ def ligand_distances(receptor_obj, ligase_obj, protac_objs, num_procs):
     """
 
     import numpy as np
-    from ..tools.structure_tools import structure_proximity
+    from .structure_tools import structure_proximity
 
     dist_cutoff = np.max([i.dist_cutoff for i in protac_objs])
     logger.info(f'Filtering megadock poses with cuttoff {dist_cutoff}')
@@ -78,7 +78,6 @@ def ligand_distances(receptor_obj, ligase_obj, protac_objs, num_procs):
         logger.info('There are no poses which satisfy the ligand distance filtering criteria. Exiting now.')
         exit(0)
     
-    # TODO if there are no filtered poses, quit the program
 
 
 @decorators.user_choice
@@ -245,7 +244,15 @@ def crl_filters(
     for model_number in model_info[e3]['model_numbers']:
         model_file = get_e3_modelfile(e3, model_number, subrec_only=True)
         aligned_ligase_file = models_folder / f'model{model_number}_aligned_ligase.pdb'
-        prep_alignment(model_file, str(aligned_ligase_file), ligase_obj)
+
+        pymol_align(
+            target_file=model_file,
+            moving_file=ligase_obj.active_file,
+            outfilename=str(aligned_ligase_file)
+        )
+        # ^ Use pymol to align the active ligase file, which was the one actually used for 
+        # docking to the ligase structure in the full CRL model. This way the operations that are
+        # performed downstream will use identical structures.
 
         aligned_ligase_struct = load_biopython_structures(aligned_ligase_file)
         aligned_ligase_structs[model_number] = aligned_ligase_struct

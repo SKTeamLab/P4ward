@@ -13,7 +13,7 @@ def prep_structures(receptor_obj, ligase_obj):
     using pymol combine
     """
 
-    from ..tools.structure_tools import pymol_combine
+    from .structure_tools import pymol_combine
 
     receptor_file = receptor_obj.active_file
     ligase_file = ligase_obj.active_file
@@ -172,7 +172,7 @@ def cluster(pose_objects, clustering_cutoff):
     from sklearn.cluster import AgglomerativeClustering
     from sklearn.neighbors import NearestCentroid
     from sklearn.neighbors import NearestNeighbors
-    from ..tools.structure_tools import get_rmsd
+    from .structure_tools import get_rmsd
     import numpy as np
 
     logger.info(f'Clustering protein poses using cutoff of {clustering_cutoff}')
@@ -229,7 +229,7 @@ def zrank_rescore(ligase_obj, receptor_obj, zrank_path, run_docking_output_file)
     use zrank to rescore a previous "pure" megadock run
     """
     import tempfile
-    from ..tools.structure_tools import reduce
+    from .structure_tools import reduce
 
     # check if receptor and ligase were already reduced
     # for protein_obj in (ligase_obj, receptor_obj):

@@ -1,6 +1,8 @@
 import configparser
 import argparse
+from shutil import copy
 from pathlib import Path
+from ..definitions import CWD, ROOT_DIR
 
 
 def arg_parser(arguments):
@@ -48,3 +50,14 @@ def make_config(config_file, ROOT_DIR):
     conf.read(config_file)
 
     return(conf)
+
+
+def write_default_conf():
+    """
+    replicate default.ini into working dir for user reference.
+    """
+
+    src = Path(ROOT_DIR)/'config'/'default.ini'
+    copy(src=str(src), dst=CWD)
+
+    print("Copied default.ini configuration file into current working directory.")

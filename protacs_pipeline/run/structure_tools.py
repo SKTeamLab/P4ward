@@ -158,6 +158,7 @@ def get_rmsd(obj1, obj2, fit=False, ca=False, backbone=True):
     return(rmsd)
 
 
+# TODO remove
 def reduce(protein_obj_list, file_attribute_name, protein_only=False):
     """
     use reduce to add hydrogens to proteins.
@@ -233,6 +234,18 @@ def pymol_combine(*args, out_filename='combined.pdb'):
     
     pymol.cmd.create('combined', ' '.join(basenames))
     pymol.cmd.save(out_filename, 'combined')
+
+
+def pymol_align(target_file, moving_file, outfilename):
+
+    import pymol
+
+    pymol.cmd.load(target_file)
+    pymol.cmd.load(moving_file)
+    pymol.cmd.align(moving_file.stem, target_file.stem)
+    pymol.cmd.save(outfilename, moving_file.stem)
+
+    return(outfilename)
 
 
 def write_charges(*charge_lists, filepath):

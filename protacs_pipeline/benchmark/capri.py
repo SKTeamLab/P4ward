@@ -83,7 +83,7 @@ def calc_lrms(receptor_struct, ref_ligase_struct, pose_struct):
 
     from copy import deepcopy
     from Bio.PDB import Superimposer
-    from ..tools.structure_tools import get_rmsd
+    from ..run.structure_tools import get_rmsd
 
     if len(list(ref_ligase_struct.get_atoms())) <= len(list(receptor_struct.get_atoms())):
         l_rms = get_rmsd(ref_ligase_struct, pose_struct, backbone=True)
@@ -105,7 +105,7 @@ def calc_irms(receptor_struct, ref_ligase_struct, ligase_obj, pose_obj):
     from Bio.PDB import Selection
     from ..run.megadock import rotate_atoms
     from Bio.PDB import Superimposer
-    from ..tools.structure_tools import get_rmsd
+    from ..run.structure_tools import get_rmsd
 
     # get residues in receptor that are within 10 of reflig
     rec_if = get_interface(
@@ -180,17 +180,24 @@ def calc_rank(fnat, lrms, irms):
 @decorators.user_choice
 def benchmark(protac_objs, receptor_obj, ligase_obj, ref_ligase_file):
 
-    from ..tools.structure_tools import load_biopython_structures
+    from ..run.structure_tools import load_biopython_structures, pymol_align
 
     for protac_obj in protac_objs:
 
         for pose_obj in protac_obj.protein_poses:
 
-            receptor_struct = receptor_obj.get_protein_struct()
-            ref_ligase_struct = load_biopython_structures(ref_ligase_file)
-            pose_struct = pose_obj.get_rotated_struct('protein')
 
-            fnat  = calc_fnat(receptor_struct, ref_ligase_struct, pose_struct)
+            receptor_struct = receptor_obj.get_protein_struct()
+            pose_struct = pose_obj.get_rotated_struct('protein')
+            # align the active ligase file to the reference file
+            pymol_align(
+                target_file=ref_ligase_file,
+                moving_file=ligase_obj.active_file,
+                outfilename='ref_ligase_aln.pdb'
+            )
+            ref_ligase_struct = load_biopython_structures('ref_ligase_aln.pdb')
+
+            fnat = calc_fnat(receptor_struct, ref_ligase_struct, pose_struct)
             lrms = calc_lrms(receptor_struct, ref_ligase_struct, pose_struct)
             irms = calc_irms(receptor_struct, ref_ligase_struct, ligase_obj, pose_obj)
             rank = calc_rank(fnat, lrms, irms)
