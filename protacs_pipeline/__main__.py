@@ -8,7 +8,6 @@ if __name__ == '__main__':
     import warnings
     from .config import config
     from .tools import run_tracker
-    from .tools.script_tools import write_default_conf
     from .definitions import ROOT_DIR, CPT_FILE
 
     warnings.filterwarnings("ignore")
@@ -16,7 +15,7 @@ if __name__ == '__main__':
     args = config.arg_parser(None)
 
     if args.write_default:
-        write_default_conf()
+        config.write_default_conf()
         exit(0)
 
     conf = config.make_config(args.config_file, ROOT_DIR)
@@ -59,7 +58,7 @@ if __name__ == '__main__':
     
     # run megadock
     from .run import megadock, protein_filter
-    from .tools import structure_tools
+    from .run import structure_tools
 
     megadock.prep_structures(
         receptor_obj=receptor,
