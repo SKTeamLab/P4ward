@@ -226,24 +226,28 @@ def obabel_convert(file_path, input_format, output_format, split=False, split_fo
 
 def pymol_combine(*args, out_filename='combined.pdb'):
 
-    import pymol
+    import pymol2
 
-    basenames = [Path(filename).stem for filename in args]
-    for filename in args:
-        pymol.cmd.load(filename)
-    
-    pymol.cmd.create('combined', ' '.join(basenames))
-    pymol.cmd.save(out_filename, 'combined')
+    with pymol2.PyMOL() as pm:
+
+        basenames = [Path(filename).stem for filename in args]
+        for filename in args:
+            pm.cmd.load(filename)
+        
+        pm.cmd.create('combined', ' '.join(basenames))
+        pm.cmd.save(out_filename, 'combined')
 
 
 def pymol_align(target_file, moving_file, outfilename):
 
-    import pymol
+    import pymol2
 
-    pymol.cmd.load(target_file)
-    pymol.cmd.load(moving_file)
-    pymol.cmd.align(moving_file.stem, target_file.stem)
-    pymol.cmd.save(outfilename, moving_file.stem)
+    with pymol2.PyMOL() as pm:
+
+        pm.cmd.load(target_file, 'target')
+        pm.cmd.load(moving_file, 'moving')
+        pm.cmd.align('moving', 'target')
+        pm.cmd.save(outfilename, 'moving')
 
     return(outfilename)
 

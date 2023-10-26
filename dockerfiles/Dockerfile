@@ -46,7 +46,7 @@ RUN ln -s ${MEGADOCK_WORK_DIR}/megadock /usr/local/bin/megadock && \
 ###### conda ######
 ###################
 
-ADD ./conda_requirements.txt /home/conda_requirements.txt
+COPY ./dockerfiles/conda_requirements.txt /home/conda_requirements.txt
 RUN conda config --add channels conda-forge
 RUN conda config --add channels bioconda
 RUN conda create -n protacs_pipeline python=3.11 --file /home/conda_requirements.txt
@@ -55,7 +55,7 @@ RUN conda create -n protacs_pipeline python=3.11 --file /home/conda_requirements
 ##### protacs #####
 ###################
 
-ADD ./protacs_pipeline /home/python/protacs_pipeline
+COPY ./protacs_pipeline /home/python/protacs_pipeline
 ENV PYTHONPATH /home/python:$PYTHONPATH
 
 SHELL ["conda", "run", "-n", "protacs_pipeline", "/bin/bash", "-c"]

@@ -1,6 +1,5 @@
 
 
-
 if __name__ == '__main__':
 
     from sys import exit
@@ -52,6 +51,10 @@ if __name__ == '__main__':
         choice=conf.getboolean('protein_prep', 'minimize')
     )
 
+    # CHECKPOINT!
+    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_objs=protacs)
+
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     #~~~~~~~~~~~~ start docking ~~~~~~~~~~~~#
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
@@ -87,13 +90,10 @@ if __name__ == '__main__':
     # CHECKPOINT!
     run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_objs=protacs)
 
-    megadock.zrank_rescore(
-        ligase_obj=ligase,
-        receptor_obj=receptor,
-        zrank_path=conf.get('program_paths', 'zrank_path'),
-        run_docking_output_file=conf.get('megadock', 'run_docking_output_file'),
-        choice=conf.getboolean('megadock', 'zrank_rescore'),
-    )
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    #~~~~~~~~~~~~ protein filter ~~~~~~~~~~~~#
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
     structure_tools.get_protac_dist_cuttoff(
         protac_objs=protacs,
@@ -134,6 +134,11 @@ if __name__ == '__main__':
 
     # CHECKPOINT!
     run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_objs=protacs)
+
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    #~~~~~~~~~~~ protein ranking ~~~~~~~~~~~#
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
     megadock.cluster(
         pose_objects=ligase.active_confs(), # structures are now the saved confs attr

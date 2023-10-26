@@ -129,21 +129,21 @@ def crl_filters(
         modelfile =  ROOT_DIR / 'structures' / 'crl_models' / e3 / filename
         return(modelfile)
         
-    def prep_alignment(modelfile, outfilename, ligase_obj):
-        """
-        Uses pymol to align the active ligase file, which was the one actually used for 
-        docking to the ligase structure in the full CRL model. This way the operations that are
-        performed downstream will use identical structures.
-        """
+    # def prep_alignment(modelfile, outfilename, ligase_obj):
+    #     """
+    #     Uses pymol to align the active ligase file, which was the one actually used for 
+    #     docking to the ligase structure in the full CRL model. This way the operations that are
+    #     performed downstream will use identical structures.
+    #     """
             
-        import pymol
+    #     import pymol
 
-        pymol.cmd.load(modelfile)
-        pymol.cmd.load(ligase_obj.active_file)
-        pymol.cmd.align(ligase_obj.active_file.stem, modelfile.stem)
-        pymol.cmd.save(outfilename, ligase_obj.active_file.stem)
+    #     pymol.cmd.load(modelfile)
+    #     pymol.cmd.load(ligase_obj.active_file)
+    #     pymol.cmd.align(ligase_obj.active_file.stem, modelfile.stem)
+    #     pymol.cmd.save(outfilename, ligase_obj.active_file.stem)
 
-        return(outfilename)
+    #     return(outfilename)
     
     def check_model_clash(
             full_model_struct, rec_struct_align,
@@ -368,3 +368,10 @@ def crl_filters(
 
         if done_count == len(pose_objs):
             break
+    
+    results = [i.filtered for i in pose_objs]
+    if any(results):
+        logger.info(f'Finished filtering {len(results)} protein poses according to CRL models.')
+    else:
+        logger.info('There are no poses which satisfy the ligand distance filtering criteria. Exiting now.')
+        exit(0)
