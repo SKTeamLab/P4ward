@@ -306,7 +306,7 @@ def crl_filters(
 
                     if clash:
                         accepted_models.append(False)
-                        pose_obj.crl = -1
+                        crl = -1
                         continue
 
                     else:
@@ -318,7 +318,7 @@ def crl_filters(
                                 dist_cutoff=model_info[e3]['dist_cutoff'],
                                 overlap_dist_cutoff=overlap_dist_cutoff
                             )
-                            pose_obj.crl = lys_count
+                            crl = lys_count
 
                             if accessible_lys:
                                 accepted_models.append(True)
@@ -329,7 +329,7 @@ def crl_filters(
                             accepted_models.append(True)
 
             accepted_pose = np.any(accepted_models)
-            outQ.put((pose_obj.pose_number, accepted_pose))
+            outQ.put((pose_obj.pose_number, accepted_pose, crl))
 
 
     ######################
@@ -352,10 +352,11 @@ def crl_filters(
     done_count = 0
     while True:
 
-        pose_number, accepted_pose = outQ.get()
+        pose_number, accepted_pose, crl = outQ.get()
         done_count += 1
 
         pose_obj = [i for i in pose_objs if i.pose_number == pose_number][0]
+        pose_obj.crl = crl
         if accepted_pose:
             pose_obj.filtered = True
             pose_obj.active = True
