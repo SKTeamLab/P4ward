@@ -17,7 +17,6 @@ def summary_csv(protac_objs, ligase_obj, benchmark):
         data_dict = {
             'pose_number':[],
             'megadock_score':[],
-            'z_score':[],
             'cluster':[],
             'clrep':[],
             'crl':[]

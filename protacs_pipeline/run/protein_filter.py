@@ -129,22 +129,6 @@ def crl_filters(
         modelfile =  ROOT_DIR / 'structures' / 'crl_models' / e3 / filename
         return(modelfile)
         
-    # def prep_alignment(modelfile, outfilename, ligase_obj):
-    #     """
-    #     Uses pymol to align the active ligase file, which was the one actually used for 
-    #     docking to the ligase structure in the full CRL model. This way the operations that are
-    #     performed downstream will use identical structures.
-    #     """
-            
-    #     import pymol
-
-    #     pymol.cmd.load(modelfile)
-    #     pymol.cmd.load(ligase_obj.active_file)
-    #     pymol.cmd.align(ligase_obj.active_file.stem, modelfile.stem)
-    #     pymol.cmd.save(outfilename, ligase_obj.active_file.stem)
-
-    #     return(outfilename)
-    
     def check_model_clash(
             full_model_struct, rec_struct_align,
             clash_threshold, clash_count_tol
@@ -162,8 +146,8 @@ def crl_filters(
                 # then this receptor atom is clashing with at least one atom for the model
                 clash_count+=1
             if clash_count >= clash_count_tol:
-                return(True)
                 
+                return(True)
         return(False)
 
     def check_access_lys(
@@ -276,6 +260,7 @@ def crl_filters(
             ## begin checks ##
             ##              ##  
             accepted_models = []
+            crls = []
 
             for model_number in model_info[e3]['model_numbers']:
 
@@ -327,9 +312,11 @@ def crl_filters(
                         
                         else:
                             accepted_models.append(True)
+                    
+                    crls.append(crl)
 
             accepted_pose = np.any(accepted_models)
-            outQ.put((pose_obj.pose_number, accepted_pose, crl))
+            outQ.put((pose_obj.pose_number, accepted_pose, crls))
 
 
     ######################
@@ -374,5 +361,5 @@ def crl_filters(
     if any(results):
         logger.info(f'Finished filtering {len(results)} protein poses according to CRL models.')
     else:
-        logger.info('There are no poses which satisfy the ligand distance filtering criteria. Exiting now.')
+        logger.info('There are no poses which satisfy the CRL model filtering criteria. Exiting now.')
         exit(0)

@@ -2,7 +2,6 @@ from ..tools.logger import logger
 from ..tools import decorators
 from pathlib import Path
 import subprocess
-import os
 
 
 def load_biopython_structures(structure_file, mol2=False):
@@ -39,7 +38,8 @@ def get_protac_dist_cuttoff(
         protac_objs,
         reclig_file,
         liglig_file,
-        dist_cutoff
+        dist_cutoff,
+        unbound_protac_num_confs
 ):
 
     if dist_cutoff == 'auto':
@@ -68,7 +68,7 @@ def get_protac_dist_cuttoff(
                 center = np.array([np.sum(xs)/total_mass, np.sum(ys)/total_mass, np.sum(zs)/total_mass])
                 return(center)
 
-            protac_obj.sample_unbound_confs()
+            protac_obj.sample_unbound_confs(num_unbound_confs=unbound_protac_num_confs)
             protac = protac_obj.unbound_confs
 
             reclig = Chem.MolFromMol2File(str(reclig_file), sanitize=False, cleanupSubstructures=False)
@@ -156,72 +156,6 @@ def get_rmsd(obj1, obj2, fit=False, ca=False, backbone=True):
     else:
         rmsd = rmsd.rmsd(obj1_coords, obj2_coords)
     return(rmsd)
-
-
-# TODO remove
-def reduce(protein_obj_list, file_attribute_name, protein_only=False):
-    """
-    use reduce to add hydrogens to proteins.
-    takes the objects as arguments so that they can be updated on the fly
-    `file_attribute_name` specifies which file attribute to capture from the obj
-    """
-
-    for protein_obj in protein_obj_list:
-        protein_file = getattr(protein_obj, file_attribute_name)
-        reduced_protein_file = protein_file.parent/(protein_file.stem + '_h.pdb')
-
-        command = ['reduce', '-NOFLIP', str(protein_file)]
-        text = subprocess.run(command, capture_output=True, text=True)
-        with open(reduced_protein_file, 'w+') as out_:
-            out_.write(text.stdout)
-
-        setattr(protein_obj, file_attribute_name+'_reduced', reduced_protein_file)
-        logger.info(f"Added hydrogens to {protein_file}")
-
-
-# TODO remove
-def smiles2smarts(smiles_code):
-    """
-    turn a smiles code into a smarts code that is a wildcard,
-    all atoms that are not carbon are changed into a *
-    """
-    smiles_code = smiles_code.split('\t')[0]
-
-    atomlist = ['s','h','o','n','p','f','i','Cl','Br']
-
-    for atom in atomlist:
-
-        # replace atoms with number
-        for i in range(9):
-            smiles_code = smiles_code.replace(f'[{atom}-{i}]', '[*]')
-            smiles_code = smiles_code.replace(f'[{atom.upper()}-{i}]', '[*]')
-
-        smiles_code = smiles_code.replace(f'[{atom}-]', '[*]')
-        smiles_code = smiles_code.replace(f'[{atom}-]', '[*]')
-        smiles_code = smiles_code.replace(atom, '*')
-        smiles_code = smiles_code.replace(f'[{atom.upper()}-]', '[*]')
-        smiles_code = smiles_code.replace(f'[{atom.upper()}-]', '[*]')
-        smiles_code = smiles_code.replace(atom.upper(), '*')
-        smiles_code = smiles_code.replace('.', '')
-    
-    return(smiles_code)
-
-
-def obabel_convert(file_path, input_format, output_format, split=False, split_folder=''):
-
-    if split:
-        split_str = '--split'
-        new_file = os.path.join(split_folder, f'template.{output_format}')
-    else:
-        split_str = ''
-        new_file = file_path.replace(input_format, output_format)
-
-    command = [
-        'obabel', f'-i{input_format}', file_path, split_str, '-d'
-        f'-o{output_format}', '-O', new_file
-    ]
-    subprocess.run(command)
-    return(new_file)
 
 
 def pymol_combine(*args, out_filename='combined.pdb'):

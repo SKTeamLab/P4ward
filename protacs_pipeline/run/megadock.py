@@ -35,7 +35,7 @@ def prep_structures(receptor_obj, ligase_obj):
 @decorators.user_choice
 @decorators.track_run
 def run_docking(program_path, receptor_file, ligase_file, num_threads, run_docking_output_file,
-                num_predictions, num_predictions_per_rotation, log_file):
+                num_predictions, num_predictions_per_rotation, num_rotational_angles, log_file):
     """
     Run the megadock main step
     """
@@ -50,6 +50,7 @@ def run_docking(program_path, receptor_file, ligase_file, num_threads, run_docki
         '-L', ligase_file,
         '-N', num_predictions,
         '-t', num_predictions_per_rotation,
+        '-r', num_rotational_angles,
         '-o', run_docking_output_file
     ]
 
@@ -220,51 +221,3 @@ def cluster(pose_objects, clustering_cutoff):
             pose_obj.centroid = True
         else:
             pose_obj.centroid = False
-
-
-@decorators.user_choice
-@decorators.track_run
-def zrank_rescore(ligase_obj, receptor_obj, zrank_path, run_docking_output_file):
-    """
-    use zrank to rescore a previous "pure" megadock run
-    """
-    import tempfile
-    from .structure_tools import reduce
-
-    # check if receptor and ligase were already reduced
-    # for protein_obj in (ligase_obj, receptor_obj):
-    #     if not hasattr(protein_obj, 'mg_file_reduced'):
-    #         reduce([protein_obj], file_attribute_name='mg_file')
-
-    # zrank considers all conformations + 1
-    conf_count = len(ligase_obj.conformations)
-    # read megadock output
-    megadock_output_read = open(run_docking_output_file, 'r').read()
-    # the end of the file has an empty line, zrank tries to score that. So strip it out:
-    megadock_output_read = megadock_output_read.rstrip()
-    # now swap protein file names to reduced file names
-    # megadock_output_read = megadock_output_read.replace(str(receptor_obj.mg_file), str(receptor_obj.mg_file_reduced))
-    # megadock_output_read = megadock_output_read.replace(str(ligase_obj.mg_file), str(ligase_obj.mg_file_reduced))
-    
-    # run zrank using `megadock_output_read` as temporary file
-    with tempfile.NamedTemporaryFile(mode='w', dir=CWD, delete=True) as tmp:
-        tmp.write(megadock_output_read)
-        command = [
-            zrank_path,
-            tmp.name,
-            '1', str(conf_count)
-        ]
-        subprocess.run(command)
-        zrank_out_file = f'{tmp.name}.zr.out'
-    
-    # grab results from ranked file
-    with open (zrank_out_file, 'r') as zrank_out:
-        for line in zrank_out:
-            pose, score = line.split('\t')
-            pose = int(pose)
-            score = float(score)
-
-            pose_obj = ligase_obj.conformations[pose - 1]
-            pose_obj.z_score = score
-    
-    logger.info('Scored protein poses with ZRank.')

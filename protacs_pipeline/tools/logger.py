@@ -1,5 +1,4 @@
 import logging
-import os
 import datetime as dt
 from ..definitions import PIPELINE_NAME, CWD
 

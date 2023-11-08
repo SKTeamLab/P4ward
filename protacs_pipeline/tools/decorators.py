@@ -1,7 +1,7 @@
 import functools
 import pickle
 from ..tools.logger import logger
-from ..definitions import TRACKER_FILE, CPT_FILE
+from ..definitions import TRACKER_FILE
 
 def user_choice(func):
     """
@@ -28,7 +28,7 @@ def track_run(func):
 
     @functools.wraps(func)
     def wrapper(*args, track=True, **kwargs):
-        
+
         if track:
 
             with open(TRACKER_FILE, 'rb') as pic:
@@ -46,5 +46,8 @@ def track_run(func):
                 
             else:
                 logger.debug(f'Skipping run for function {func_path}')
+        
+        else:
+            func(*args, **kwargs)
         
     return(wrapper)

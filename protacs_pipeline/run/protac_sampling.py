@@ -44,6 +44,7 @@ def protac_sampling(
                         protac_poses_folder,
                         rmsd_tolerance,
                         time_tolerance,
+                        unbound_protac_num_confs,
                         linker_scoring_folder,
                         minimize_protac,
                         num_parallel_procs,
@@ -72,6 +73,11 @@ def protac_sampling(
     # ~~~~~~~~~~~~~~
 
     from .protac_prep import protac_prep
+
+    # if protac unbound energy will be needed but it has not been sampled yet:
+    for protac_obj in protac_objs:
+        if extend_top_poses_energy and not hasattr(protac_obj, 'unbound_energy'):
+            protac_obj.sample_unbound_confs(num_unbound_confs=unbound_protac_num_confs)
 
     for protac_obj in protac_objs:
         protac_obj.parameters = protac_prep(

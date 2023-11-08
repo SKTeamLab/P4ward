@@ -7,7 +7,6 @@ Program Paths
 * ``megadock``
 * ``obabel``
 * ``rxdock_root``
-* ``zrank``
 
 
 General
@@ -54,7 +53,7 @@ Default: ``2000``, from Megadock's default configuration values.
 
 * ``num_predictions_per_rotation`` 
 
-.. FILL THIS UP WITH DECENT INFORMATIONå
+.. FILL THIS UP WITH DECENT INFORMATION
 Default: ``1``, from Megadock's default configuration values.
 
 * ``num_threads`` 
@@ -90,19 +89,9 @@ Default: ``False``
 RMSD cutoff for clustering, in angstroms.
 Default: 2.0
 
-* ``zrank_rescore``
-
-Flag to perform rescoring with zrank. This does not mean the poses will be automatically ranked using this score. In orded to determine which score the poses must be ranked by, use the config ``final_ranking_z_score`` in the section ``protein_ranking``.
-Default: True
-
 
 Protein ranking
 ---------------
-
-* ``final_ranking_z_score``
-
-Use ZScore as the final score for ranking the protein docked poses.
-Default: False
 
 * ``final_ranking_megadock_score``
 

@@ -77,6 +77,7 @@ if __name__ == '__main__':
         run_docking_output_file=conf.get('megadock', 'run_docking_output_file'),
         num_predictions=conf.get('megadock', 'num_predictions'),
         num_predictions_per_rotation=conf.get('megadock', 'num_predictions_per_rotation'),
+        num_rotational_angles=conf.get('megadock', 'num_rotational_angles'),
         log_file=conf.get('megadock', 'run_docking_log_file'),
         choice=conf.getboolean('megadock', 'run_docking')
     )
@@ -92,14 +93,15 @@ if __name__ == '__main__':
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-    #~~~~~~~~~~~~ protein filter ~~~~~~~~~~~~#
+    #~~~~~~~~~~~~ protein filter ~~~~~~~~~~~#
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
     structure_tools.get_protac_dist_cuttoff(
         protac_objs=protacs,
         reclig_file=receptor.lig_file,
         liglig_file=ligase.lig_file,
-        dist_cutoff=conf.get('megadock', 'filter_dist_cutoff'),
+        unbound_protac_num_confs=conf.getint('protac_sampling','unbound_protac_num_confs'),
+        dist_cutoff=conf.get('protein_filter', 'filter_dist_cutoff'),
         choice=conf.getboolean('protein_filter', 'ligand_distances')
     )
 
@@ -124,6 +126,7 @@ if __name__ == '__main__':
         overlap_dist_cutoff=conf.getfloat('protein_filter','overlap_dist_cutoff'),
         vhl_ubq_dist_cutoff=conf.getfloat('protein_filter','vhl_ubq_dist_cutoff'),
         crbn_ubq_dist_cutoff=conf.getfloat('protein_filter','crbn_ubq_dist_cutoff'),
+        model_accept_cutoff=conf.get('protein_filter','model_accept_cutoff'),
         e3=conf.get('protein_filter','e3'),
         num_procs=conf.getint('general', 'num_processors'),
         choice=(
@@ -191,6 +194,7 @@ if __name__ == '__main__':
         neighbour_number=conf.getint('linker_sampling', 'extend_neighbour_number'),
         min_linker_length=conf.getint('linker_sampling', 'min_linker_length'),
         rdkit_number_of_confs=conf.getint('linker_sampling', 'rdkit_number_of_confs'),
+        unbound_protac_num_confs=conf.getint('protac_sampling','unbound_protac_num_confs'),
         protac_poses_folder=Path(conf.get('linker_sampling', 'protac_poses_folder')),
         rmsd_tolerance=conf.getfloat('linker_sampling', 'rdkit_pose_rmsd_tolerance'),
         time_tolerance=conf.getint('linker_sampling', 'rdkit_time_tolerance'),

@@ -1,4 +1,3 @@
-import os
 from ..tools.logger import logger
 from ..tools import decorators
 
@@ -19,17 +18,8 @@ def protein_poses(
     takes all arguments from protein_ranking section in the config file
     """
 
-    rankings = {   
-        'final_ranking_megadock_score':{'user_choice':final_ranking_megadock_score, 'ascending':False},
-        'final_ranking_z_score':{'user_choice':final_ranking_z_score, 'ascending':True}
-    }
-    ranking_score_config = [i for i in rankings if rankings[i]['user_choice']][-1]
-    ranking = ranking_score_config.replace('final_ranking_','')
-    ascending = rankings[ranking_score_config]['ascending']
-    # ^ capture the name of the scoring function as it is in the objects' attribute name
-
     # sort based on the chosen score and save sorted list
-    sorted_confs = sorted(ligase_obj.conformations, key=lambda x: getattr(x, ranking), reverse=not ascending)
+    sorted_confs = sorted(ligase_obj.conformations, key=lambda x: getattr(x, 'megadock_score'), reverse=True)
     ligase_obj.conformations = sorted_confs
 
     # now sorted list and pose_objs must include only actives
@@ -76,7 +66,7 @@ def protein_poses(
             pose_obj.top = True
 
     # by the end of the ranking process we have:
-    #   - ligase.conformations sorted by chosen score
+    #   - ligase.conformations sorted by megadock score
     #   - then filtered by only the active confs that came from previous function (probably filtering)
     #   - assigned protein cluster representatives based on user choice 'best' or 'centroid'
     #   - if user wants to consider clustering for ranking, deactivated not cluster reps
@@ -84,8 +74,7 @@ def protein_poses(
     #   - assigned the `top` attribute to the top poses. Note that non-top poses should not be deactivated.
 
     """log user choices"""
-    logger.info('generated a final protein-protein ranking:')
-    logger.info(f'poses scored by {ranking}')
+    logger.info('generated a final protein-protein ranking by megadock score')
     if rank_cluster_reps_only:
         logger.info(f'grabbing top {top_poses} poses which are also cluster representatives')
     """"""
@@ -113,11 +102,10 @@ def generate_protein_poses(poses, pose_objs, generated_poses_folder, altlocA):
         final_poses = [i for i in pose_objs if i.filtered]
     elif poses == 'top':
         final_poses = [i for i in pose_objs if i.top]
-    elif poses == 'filtered_centroids':
-        # TODO CHANGE THIS TO REFLECT NEW CLREP
-        final_poses = [i for i in pose_objs if i.filtered and i.centroid]
-    elif poses == 'top_centroids':
-        final_poses = [i for i in pose_objs if i.top and i.centroid]
+    elif poses == 'filtered_clreps':
+        final_poses = [i for i in pose_objs if i.filtered and i.clrep]
+    elif poses == 'top_clreps':
+        final_poses = [i for i in pose_objs if i.top and i.clrep]
     else:
         raise Exception("Invalid choice for generate_poses")
     
@@ -134,30 +122,3 @@ def generate_protein_poses(poses, pose_objs, generated_poses_folder, altlocA):
         else:
             pdbio.save(str(final_file))
 
-
-# @decorators.track_run
-# def protac_conformations(protac_poses):
-#     """
-#     rank the linker conformations for each active protac pose
-#     """
-
-#     for protac_pose in protac_poses:
-        
-#         if len(protac_pose.active_confs()) > 0:
-            
-
-            # for i in protac_pose.active_confs():
-            #     print(protac_pose.protein_parent.pose_number)
-            #     print(i.__dict__)
-
-            # inactives = [i for i in protac_pose.linker_confs if i not in protac_pose.active_confs()]
-            # sorted_linker_confs = sorted(protac_pose.active_confs(), key=lambda x: getattr(x, 'rx_score'))
-            # print(sorted_linker_confs)
-            # sorted_linker_confs = sorted_linker_confs.append(inactives)
-
-            # print(protac_pose.linker_confs)
-            # protac_pose.linker_confs = sorted_linker_confs
-
-            # for i in protac_pose.linker_confs:
-            #     print(i.__dict__)
-            # print(protac_pose.protein_parent.pose_number, protac_pose.protein_parent.top, [i.rx_score for i in protac_pose.active_confs()])

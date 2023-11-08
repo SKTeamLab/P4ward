@@ -96,9 +96,6 @@ def minimize_proteins(
         logger.info(f'Saved minimized file as {protein_obj.minim_file}')
 
 
-
-# @decorators.user_choice
-# @decorators.track_run
 def get_protein_charges(*protein_objs):
 
     from openmm import NonbondedForce
