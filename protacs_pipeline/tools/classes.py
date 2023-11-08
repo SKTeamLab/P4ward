@@ -263,12 +263,9 @@ class LinkerConf():
         linker_sampling.rdkit_sampling()
         linker_sampling.capture_dock6_scores()
         linker_sampling.detect_clashes()
-            - self.clash_count
             - self.active
         linker_scoring.capture_rxdock_scores()
             - self.rx_score
-        rank.protac_conformations()
-            - self.neg_score
         protac_scoring.get_unbound_rmsd()
             - self.unbound_stats
     """

@@ -9,7 +9,12 @@ if __name__ == '__main__':
     from .tools import run_tracker
     from .definitions import ROOT_DIR, CPT_FILE
 
+    # disable warnings
     warnings.filterwarnings("ignore")
+    ## rdkit c++ logging:
+    from rdkit import RDLogger
+    RDLogger.DisableLog('rdApp.*')
+
     # prepare internals:
     args = config.arg_parser(None)
 
@@ -126,7 +131,6 @@ if __name__ == '__main__':
         overlap_dist_cutoff=conf.getfloat('protein_filter','overlap_dist_cutoff'),
         vhl_ubq_dist_cutoff=conf.getfloat('protein_filter','vhl_ubq_dist_cutoff'),
         crbn_ubq_dist_cutoff=conf.getfloat('protein_filter','crbn_ubq_dist_cutoff'),
-        model_accept_cutoff=conf.get('protein_filter','model_accept_cutoff'),
         e3=conf.get('protein_filter','e3'),
         num_procs=conf.getint('general', 'num_processors'),
         choice=(
@@ -201,6 +205,7 @@ if __name__ == '__main__':
         extend_top_poses_sampled=conf.getboolean('linker_sampling', 'extend_top_poses_sampled'),
         extend_top_poses_score=conf.getboolean('linker_sampling', 'extend_top_poses_score'),
         extend_top_poses_energy=conf.getboolean('linker_sampling', 'extend_top_poses_energy'),
+        rxdock_score=conf.getboolean('linker_ranking', 'rxdock_score'),
         linker_scoring_folder=Path(conf.get('linker_ranking','linker_scoring_folder')),
         minimize_protac=conf.getboolean('linker_ranking','rxdock_minimize'),
         num_parallel_procs=conf.getint('general', 'num_processors'),

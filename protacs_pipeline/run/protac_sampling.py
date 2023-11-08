@@ -19,8 +19,8 @@ def sample_protac_pose(inQ, outQ, p, receptor_obj, ligase_obj, global_parameters
 
         protac_pose = protac_obj.get_pose(pose_obj)
         
-        if protac_pose.active == True:
-            if any(i.active for i in protac_pose.linker_confs):
+        if protac_pose.active == True and global_parameters['rxdock_score']:
+            if any(i.active for i in protac_pose.linker_confs): 
                 protac_scoring.rxdock_rescore(global_parameters, pose_obj, receptor_obj, ligase_obj, protac_obj)
                 protac_scoring.capture_rxdock_scores(pose_obj, protac_obj)
             
@@ -45,6 +45,7 @@ def protac_sampling(
                         rmsd_tolerance,
                         time_tolerance,
                         unbound_protac_num_confs,
+                        rxdock_score,
                         linker_scoring_folder,
                         minimize_protac,
                         num_parallel_procs,
@@ -61,6 +62,7 @@ def protac_sampling(
         'protac_poses_folder'   : protac_poses_folder,
         'rmsd_tolerance'        : rmsd_tolerance,
         'time_tolerance'        : time_tolerance,
+        'rxdock_score'          : rxdock_score,
         'linker_scoring_folder' : linker_scoring_folder,
         'minimize_protac'       : minimize_protac
     }

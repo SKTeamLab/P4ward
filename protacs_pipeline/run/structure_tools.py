@@ -7,7 +7,7 @@ import subprocess
 def load_biopython_structures(structure_file, mol2=False):
     """
     load a structure as biopython object. If file in mol2 format,
-    convert first using rdkit. Intended for use with the ligands.
+    convert first using obabel. Intended for use with the ligands.
     """
 
     from Bio.PDB.PDBParser import PDBParser as pdbp

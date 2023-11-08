@@ -41,8 +41,8 @@ def run_docking(program_path, receptor_file, ligase_file, num_threads, run_docki
     """
 
     # if num_threads not specified, megadock uses all
-    if num_threads == 'all': pass 
-    else: os.putenv('OMP_THREAD_LIMIT', num_threads)
+    if num_threads != 'all':
+        os.putenv('OMP_THREAD_LIMIT', num_threads)
 
     command = [
         program_path,
