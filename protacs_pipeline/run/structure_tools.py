@@ -83,7 +83,7 @@ def get_protac_dist_cuttoff(
         
             distances = []
 
-            for i in range(100):
+            for i in range(unbound_protac_num_confs):
 
                 conf = Chem.Mol(protac, confId=i)
                 center_reclig = center_of_mass(receptor_lig_indices, conf)

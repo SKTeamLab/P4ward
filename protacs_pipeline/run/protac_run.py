@@ -83,10 +83,11 @@ def conf_sampling(params, pose_obj, protac_obj, logger):
                     ff.Initialize()
                     linker_conf['energy'] = ff.CalcEnergy()
                     # write this conformation to file
-                    molblock = Chem.MolToMolBlock(protac_embed, confId=i, kekulize=False)
-                    confs_file.write(f'conf_{i}')
-                    confs_file.write(molblock)
-                    confs_file.write('$$$$\n')
+                    if params['write_protac_conf']:
+                        molblock = Chem.MolToMolBlock(protac_embed, confId=i, kekulize=False)
+                        confs_file.write(f'conf_{i}')
+                        confs_file.write(molblock)
+                        confs_file.write('$$$$\n')
                     linker_conf['active'] = True
                 else:
                     linker_conf['active'] = False

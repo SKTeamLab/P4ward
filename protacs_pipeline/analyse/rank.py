@@ -4,8 +4,6 @@ from ..tools import decorators
 @decorators.track_run
 def protein_poses(
                     ligase_obj,
-                    final_ranking_megadock_score,
-                    final_ranking_z_score,
                     top_poses,
                     cluster_proteins_choice,
                     cluster_rep,

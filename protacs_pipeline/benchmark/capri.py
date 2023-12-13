@@ -122,10 +122,23 @@ def calc_irms(receptor_struct, ref_ligase_struct, ligase_obj, pose_obj):
     # build reference interface struct with both interfaces
     ref_if_struct = make_structure(rec_if, ref_lig_if, structure_name='ref_if_struct')
 
-    # now we make a struct from interface residues of reflig
-    lig_if_struct = make_structure(ref_lig_if)
+    # now we make a struct from interface residues of reflig 
+    ref_lig_if_struct = make_structure(ref_lig_if)
+    # but we need these residues with their coordinates as they are found in ligase active file
+    ligase_struct = ligase_obj.get_protein_struct()
+    if_residues = list(ref_lig_if_struct.get_residues())
+    
+    lig_if_residues = []
+    for res in ligase_struct.get_residues():
+        if res in if_residues:
+            lig_if_residues.append(res)
+
+    lig_if_struct = make_structure(lig_if_residues)
+
+    # now we can get the interface as position by the protein pose
+    ## by copying the interface at ligase active file
     pose_if_struct = deepcopy(lig_if_struct)
-    # and rotate it to match the pose_obj orientation
+    ## and rotating it to match the pose_obj orientation 
     atoms = Selection.unfold_entities(pose_if_struct, 'A')
     for atom in atoms:
         x,y,z, = atom.get_vector()

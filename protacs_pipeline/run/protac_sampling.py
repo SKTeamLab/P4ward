@@ -1,7 +1,6 @@
 from  threading import Thread
 from queue import Queue
 from ..tools.logger import logger
-from ..tools import classes
 from ..tools import decorators
 
 
@@ -20,7 +19,7 @@ def sample_protac_pose(inQ, outQ, p, receptor_obj, ligase_obj, global_parameters
         protac_pose = protac_obj.get_pose(pose_obj)
         
         if protac_pose.active == True and global_parameters['rxdock_score']:
-            if any(i.active for i in protac_pose.linker_confs): 
+            if any(i.active for i in protac_pose.linker_confs):
                 protac_scoring.rxdock_rescore(global_parameters, pose_obj, receptor_obj, ligase_obj, protac_obj)
                 protac_scoring.capture_rxdock_scores(pose_obj, protac_obj)
             
@@ -41,6 +40,7 @@ def protac_sampling(
                         neighbour_number,
                         min_linker_length,
                         rdkit_number_of_confs,
+                        write_protac_conf,
                         protac_poses_folder,
                         rmsd_tolerance,
                         time_tolerance,
@@ -64,7 +64,8 @@ def protac_sampling(
         'time_tolerance'        : time_tolerance,
         'rxdock_score'          : rxdock_score,
         'linker_scoring_folder' : linker_scoring_folder,
-        'minimize_protac'       : minimize_protac
+        'minimize_protac'       : minimize_protac,
+        'write_protac_conf'     : write_protac_conf
     }
 
     # make folder where the linkers for all pose objs will be stored
@@ -132,7 +133,8 @@ def protac_sampling(
 
             protac_pose = protac_obj.get_pose(pose_obj)
             # sort linker conformations based on score
-            protac_pose.linker_confs = sorted(protac_pose.active_confs(), key=lambda x: getattr(x, 'rx_score'))
+            if rxdock_score:
+                protac_pose.linker_confs = sorted(protac_pose.active_confs(), key=lambda x: getattr(x, 'rx_score'))
 
             success = True
             if extend_top_poses_sampled:

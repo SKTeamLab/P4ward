@@ -1,6 +1,5 @@
 from pathlib import Path
 from multiprocessing import Process, JoinableQueue
-from itertools import product
 from ..tools import decorators
 from ..tools.logger import logger
 from .structure_tools import load_biopython_structures, pymol_align
@@ -89,12 +88,14 @@ def crl_filters(
                         clash_threshold,
                         clash_count_tol,
                         accessible_lysines,
+                        lysine_count,
                         lys_sasa_cutoff,
                         overlap_dist_cutoff,
                         vhl_ubq_dist_cutoff,
                         crbn_ubq_dist_cutoff,
                         e3,
-                        num_procs
+                        num_procs,
+                        pose_objs=None
 ):
     
     from copy import deepcopy
@@ -179,10 +180,10 @@ def crl_filters(
                     lys = np.array([x,y,z])
                     break
             
-            # make atoms list for the protein that does not include the lysine itself
+            # make atoms list for the protein that does not include the lysine itself or hydrogens
             atoms = []
             for atom in rec_struct_align.get_atoms():
-                if not atom.get_parent()._id[1] == lysine._id[1]:
+                if not atom.get_parent()._id[1] == lysine._id[1] and not atom.element == 'H':
                     x,y,z = atom.get_vector()
                     atoms.append([x,y,z])
                 else:
@@ -269,7 +270,7 @@ def crl_filters(
                 aligned_ligase_struct = aligned_ligase_structs[model_number]
 
                 # now that the ligase in CRL model conformation is identical to the ligase that was docked
-                # (thanks to prep_alignment()), they can be aligned by biopython
+                # they can be aligned by biopython
                 superimposer = Superimposer()
                 superimposer.set_atoms(
                     list(aligned_ligase_struct.get_atoms()),
@@ -278,6 +279,14 @@ def crl_filters(
                 ## apply the rotation to the receptor
                 rec_struct_align = deepcopy(receptor_struct)
                 superimposer.apply(rec_struct_align)
+
+                # TODO REMOVE
+                if pose_obj.pose_number == 503:
+                    from Bio.PDB.PDBIO import Select, PDBIO
+                    pdbio = PDBIO()
+                    pdbio.set_structure(rec_struct_align)
+                    pdbio.save(str('test503_recalign.pdb'))
+
 
                 if crl_model_clash:
 
@@ -305,10 +314,14 @@ def crl_filters(
                             )
                             crl = lys_count
 
-                            if accessible_lys:
+                            if lys_count >= lysine_count:
                                 accepted_models.append(True)
                             else:
                                 accepted_models.append(False)
+                            # if accessible_lys:
+                            #     accepted_models.append(True)
+                            # else:
+                            #     accepted_models.append(False)
                         
                         else:
                             accepted_models.append(True)
@@ -321,7 +334,8 @@ def crl_filters(
 
     ######################
 
-    pose_objs = ligase_obj.active_confs()
+    if pose_objs == None:
+        pose_objs = ligase_obj.active_confs()
 
     inQ = JoinableQueue()
     outQ = JoinableQueue()

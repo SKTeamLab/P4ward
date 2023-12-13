@@ -127,6 +127,7 @@ if __name__ == '__main__':
         clash_threshold=conf.getfloat('protein_filter','clash_threshold'),
         clash_count_tol=conf.getint('protein_filter','clash_count_tol'),
         accessible_lysines=conf.getboolean('protein_filter','accessible_lysines'),
+        lysine_count=conf.getint('protein_filter','lysine_count'),
         lys_sasa_cutoff=conf.getfloat('protein_filter', 'lys_sasa_cutoff'),
         overlap_dist_cutoff=conf.getfloat('protein_filter','overlap_dist_cutoff'),
         vhl_ubq_dist_cutoff=conf.getfloat('protein_filter','vhl_ubq_dist_cutoff'),
@@ -149,8 +150,8 @@ if __name__ == '__main__':
 
     megadock.cluster(
         pose_objects=ligase.active_confs(), # structures are now the saved confs attr
-        clustering_cutoff=conf.getfloat('megadock','clustering_cutoff'),
-        choice=conf.getboolean('megadock', 'cluster_poses')
+        clustering_cutoff=conf.getfloat('protein_ranking','clustering_cutoff'),
+        choice=conf.getboolean('protein_ranking', 'cluster_poses')
     )
 
 
@@ -160,8 +161,6 @@ if __name__ == '__main__':
     rank.protein_poses(
         ligase_obj=ligase,
         top_poses=conf.getint('protein_ranking', 'top_poses'),
-        final_ranking_megadock_score=conf.getboolean('protein_ranking', 'final_ranking_megadock_score'),
-        final_ranking_z_score=conf.getboolean('protein_ranking', 'final_ranking_z_score'),
         cluster_proteins_choice=conf.getboolean('megadock', 'cluster_poses'),
         cluster_rep=conf.get('protein_ranking', 'cluster_rep'),
         rank_cluster_reps_only=conf.getboolean('protein_ranking', 'rank_cluster_reps_only'),
@@ -196,6 +195,7 @@ if __name__ == '__main__':
         protac_objs=protacs,
         extend_flexible_small_linker=conf.getboolean('linker_sampling', 'extend_flexible_small_linker'),
         neighbour_number=conf.getint('linker_sampling', 'extend_neighbour_number'),
+        write_protac_conf=conf.getboolean('linker_sampling','write_protac_conf'),
         min_linker_length=conf.getint('linker_sampling', 'min_linker_length'),
         rdkit_number_of_confs=conf.getint('linker_sampling', 'rdkit_number_of_confs'),
         unbound_protac_num_confs=conf.getint('protac_sampling','unbound_protac_num_confs'),
