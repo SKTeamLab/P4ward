@@ -40,6 +40,7 @@ def protac_sampling(
                         neighbour_number,
                         min_linker_length,
                         rdkit_number_of_confs,
+                        rdkit_ligands_cleanup,
                         write_protac_conf,
                         protac_poses_folder,
                         rmsd_tolerance,
@@ -87,7 +88,8 @@ def protac_sampling(
             receptor_obj, ligase_obj, protac_obj,
             extend_flexible_small_linker,
             min_linker_length,
-            neighbour_number
+            neighbour_number,
+            rdkit_ligands_cleanup
         )
 
     # ~~~~~~~~~~~~~~

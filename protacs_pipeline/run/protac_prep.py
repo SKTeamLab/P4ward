@@ -99,14 +99,15 @@ def protac_prep(
                     protac_obj,
                     extend_flexible_small_linker,
                     min_linker_length,
-                    neighbour_number
+                    neighbour_number,
+                    rdkit_ligands_cleanup
 ):
 
     # open receptor ligand - will not change, get its rotation info
-    reclig = Chem.MolFromMol2File(str(receptor_obj.lig_file), sanitize=False, cleanupSubstructures=False)
+    reclig = Chem.MolFromMol2File(str(receptor_obj.lig_file), sanitize=rdkit_ligands_cleanup, cleanupSubstructures=rdkit_ligands_cleanup)
     ref_rotation  = ligase_obj.rotate
     # open ligase ligand - raw initial position
-    liglig = Chem.MolFromMol2File(str(ligase_obj.lig_file), sanitize=False, cleanupSubstructures=False)
+    liglig = Chem.MolFromMol2File(str(ligase_obj.lig_file), sanitize=rdkit_ligands_cleanup, cleanupSubstructures=rdkit_ligands_cleanup)
     # combine reclig and liglig into a single molecule
     reference_ligs = Chem.CombineMols(liglig, reclig)
     # open protac and addHs

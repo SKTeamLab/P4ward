@@ -198,6 +198,7 @@ if __name__ == '__main__':
         write_protac_conf=conf.getboolean('linker_sampling','write_protac_conf'),
         min_linker_length=conf.getint('linker_sampling', 'min_linker_length'),
         rdkit_number_of_confs=conf.getint('linker_sampling', 'rdkit_number_of_confs'),
+        rdkit_ligands_cleanup=conf.getboolean('general','rdkit_ligands_cleanup'),
         unbound_protac_num_confs=conf.getint('protac_sampling','unbound_protac_num_confs'),
         protac_poses_folder=Path(conf.get('linker_sampling', 'protac_poses_folder')),
         rmsd_tolerance=conf.getfloat('linker_sampling', 'rdkit_pose_rmsd_tolerance'),
