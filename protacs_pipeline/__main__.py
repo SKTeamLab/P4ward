@@ -161,7 +161,7 @@ if __name__ == '__main__':
     rank.protein_poses(
         ligase_obj=ligase,
         top_poses=conf.getint('protein_ranking', 'top_poses'),
-        cluster_proteins_choice=conf.getboolean('megadock', 'cluster_poses'),
+        cluster_proteins_choice=conf.getboolean('protein_ranking', 'cluster_poses'),
         cluster_rep=conf.get('protein_ranking', 'cluster_rep'),
         rank_cluster_reps_only=conf.getboolean('protein_ranking', 'rank_cluster_reps_only'),
     )
