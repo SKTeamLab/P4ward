@@ -304,6 +304,7 @@ def crl_filters(
                         continue
 
                     else:
+                        crl = None
                         if accessible_lysines:
                             accessible_lys, lys_count = check_access_lys(
                                 rec_struct_align,
