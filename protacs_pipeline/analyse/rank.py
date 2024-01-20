@@ -24,8 +24,8 @@ def protein_poses(
     # pose_objs = [i for i in ligase_obj.conformations if i.active]
     sorted_confs = [i for i in sorted_confs if i.active]
     
-    # if the protein poses were clustered, we use the information in the ranking:
-    if cluster_proteins_choice:
+    # if the protein poses were clustered and cluster info was recorded, we use the information in the ranking:
+    if cluster_proteins_choice and any([i.cluster is not None for i in sorted_confs]):
         # assign cluster representatives:
         if cluster_rep == 'centroid':
             for i in sorted_confs:

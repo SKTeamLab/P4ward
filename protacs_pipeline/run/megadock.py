@@ -176,48 +176,56 @@ def cluster(pose_objects, clustering_cutoff):
     from .structure_tools import get_rmsd
     import numpy as np
 
-    logger.info(f'Clustering protein poses using cutoff of {clustering_cutoff}')
-    
-    # get first pose as reference:
-    reference_obj = pose_objects[0]
-    reference_obj_struct = reference_obj.get_rotated_struct(struct_type='protein')
+    if len(pose_objects) <= 1:
+        logger.info("Cannot cluster protein poses because only 1 pose was sent to the clustering step. Skipping.")
+        for pose_obj in pose_objects:
+            pose_obj.cluster  = None
+            pose_obj.centroid = None
 
-    # load receptor object
-    for pose_obj in pose_objects:
-        pose_obj_struct = pose_obj.get_rotated_struct(struct_type='protein')
+    else:
 
-        rmsd = get_rmsd(reference_obj_struct, pose_obj_struct, ca=True)
-        pose_obj.rmsd = rmsd
-        pose_obj.rmsd_reference = reference_obj
-    
-    # get the array of rmsds to compute
-    rmsd_list = [i.rmsd for i in pose_objects]
-    rmsd_points = np.asarray(rmsd_list).reshape(-1, 1)
+        logger.info(f'Clustering protein poses using cutoff of {clustering_cutoff}')
+        
+        # get first pose as reference:
+        reference_obj = pose_objects[0]
+        reference_obj_struct = reference_obj.get_rotated_struct(struct_type='protein')
 
-    # run clustering
-    clustering = AgglomerativeClustering(
-        n_clusters=None,
-        linkage='average',
-        distance_threshold=clustering_cutoff
-    ).fit(rmsd_points)
+        # load receptor object
+        for pose_obj in pose_objects:
+            pose_obj_struct = pose_obj.get_rotated_struct(struct_type='protein')
 
-    # add the information to the objects as attributes
-    for i in range(len(pose_objects)):
-        pose_objects[i].cluster = clustering.labels_[i]
+            rmsd = get_rmsd(reference_obj_struct, pose_obj_struct, ca=True)
+            pose_obj.rmsd = rmsd
+            pose_obj.rmsd_reference = reference_obj
+        
+        # get the array of rmsds to compute
+        rmsd_list = [i.rmsd for i in pose_objects]
+        rmsd_points = np.asarray(rmsd_list).reshape(-1, 1)
 
-    # get the theoretical centroid of each cluster
-    nc = NearestCentroid()
-    nc.fit(rmsd_points, clustering.labels_)
-    # get which rmsd value is the centroid
-    # the centroid will be the one closest the theoretical centroid
-    knn = NearestNeighbors(n_neighbors=1)
-    knn.fit(rmsd_points)
-    _, indices = knn.kneighbors(nc.centroids_)
-    centroids = np.hstack(rmsd_points)[np.hstack(indices)]
+        # run clustering
+        clustering = AgglomerativeClustering(
+            n_clusters=None,
+            linkage='average',
+            distance_threshold=clustering_cutoff
+        ).fit(rmsd_points)
 
-    # add to the attributes whether the pose is a centroid or not
-    for pose_obj in pose_objects:
-        if pose_obj.rmsd.round(decimals=3) in centroids.round(decimals=3):
-            pose_obj.centroid = True
-        else:
-            pose_obj.centroid = False
+        # add the information to the objects as attributes
+        for i in range(len(pose_objects)):
+            pose_objects[i].cluster = clustering.labels_[i]
+
+        # get the theoretical centroid of each cluster
+        nc = NearestCentroid()
+        nc.fit(rmsd_points, clustering.labels_)
+        # get which rmsd value is the centroid
+        # the centroid will be the one closest the theoretical centroid
+        knn = NearestNeighbors(n_neighbors=1)
+        knn.fit(rmsd_points)
+        _, indices = knn.kneighbors(nc.centroids_)
+        centroids = np.hstack(rmsd_points)[np.hstack(indices)]
+
+        # add to the attributes whether the pose is a centroid or not
+        for pose_obj in pose_objects:
+            if pose_obj.rmsd.round(decimals=3) in centroids.round(decimals=3):
+                pose_obj.centroid = True
+            else:
+                pose_obj.centroid = False
