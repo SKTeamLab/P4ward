@@ -15,7 +15,7 @@ def set_logging():
         logfile.write(
             f"""
 -----------------------------------
-PROTACS PIPELINE
+{PIPELINE_NAME}
 Log created at {now.strftime("%Y-%m-%d, %H:%M:%S")}
 -----------------------------------
 \n"""
