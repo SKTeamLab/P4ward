@@ -16,7 +16,7 @@ def ligand_distances(receptor_obj, ligase_obj, protac_objs, num_procs):
     """
 
     import numpy as np
-    from .structure_tools import structure_proximity
+    from .megadock import rotate_atoms
 
     dist_cutoff = np.max([i.dist_cutoff for i in protac_objs])
     logger.info(f'Filtering megadock poses with cuttoff {dist_cutoff}')
@@ -26,18 +26,26 @@ def ligand_distances(receptor_obj, ligase_obj, protac_objs, num_procs):
     inQ = JoinableQueue()
     outQ = JoinableQueue()
 
-    receptor_lig_obj = receptor_obj.get_ligand_struct()
-
-    def worker(inQ, outQ, receptor_lig_obj):
+    receptor_lig_com = receptor_obj.get_ligand_struct().center_of_mass()
+    ligase_lig_com = ligase_obj.get_ligand_struct().center_of_mass()
+    ref_rotate = ligase_obj.rotate
+    
+    def worker(inQ, outQ, receptor_lig_com, ligase_lig_com, ref_rotate):
 
         while True:
             pose_obj = inQ.get()
-            ligand_lig_obj = pose_obj.get_rotated_struct(struct_type='ligand')
-            distance, proximity = structure_proximity(
-                receptor_lig_obj,
-                ligand_lig_obj,
-                dist_cutoff=dist_cutoff
+            pose_rotate = pose_obj.rotate
+
+            pose_lig_com = rotate_atoms(
+                tuple(ligase_lig_com),
+                ref_rotation=ref_rotate,
+                pose_rotation=pose_rotate
             )
+            pose_lig_com = np.asarray(pose_lig_com)
+
+            distance = np.linalg.norm(receptor_lig_com - pose_lig_com)
+            proximity = distance <= dist_cutoff
+            
             inQ.task_done()
             outQ.put((pose_obj.pose_number, proximity, distance))
             
@@ -47,7 +55,7 @@ def ligand_distances(receptor_obj, ligase_obj, protac_objs, num_procs):
 
     procs = []
     for i in range(num_procs):
-        p = Process(name=i, target=worker, args=(inQ, outQ, receptor_lig_obj))
+        p = Process(name=i, target=worker, args=(inQ, outQ, receptor_lig_com, ligase_lig_com, ref_rotate))
         p.daemon = True
         p.start()
         procs.append(p)
