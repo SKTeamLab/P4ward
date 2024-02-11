@@ -99,6 +99,7 @@ def capture_scores(run_docking_output_file, ligase_obj):
             pose_obj.megadock_score = score
             pose_obj.rotate = rotate
             pose_obj.active = True
+            pose_obj.filter_info = {}
     output.close()
 
 

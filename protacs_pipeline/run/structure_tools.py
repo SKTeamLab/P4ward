@@ -106,7 +106,7 @@ def get_protac_dist_cuttoff(
 def structure_proximity(struct1, struct2, dist_cutoff=None):
     """
     Calculate the distance between the center of mass of two biopython struct objects
-    and check if it is <= than a distance cutoff, returns Bool.
+    and check if it is <= than a distance cutoff.
     """
 
     import numpy as np

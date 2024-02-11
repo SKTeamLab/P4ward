@@ -33,13 +33,13 @@ def ligand_distances(receptor_obj, ligase_obj, protac_objs, num_procs):
         while True:
             pose_obj = inQ.get()
             ligand_lig_obj = pose_obj.get_rotated_struct(struct_type='ligand')
-            _, proximity = structure_proximity(
+            distance, proximity = structure_proximity(
                 receptor_lig_obj,
                 ligand_lig_obj,
                 dist_cutoff=dist_cutoff
             )
             inQ.task_done()
-            outQ.put((pose_obj.pose_number, proximity))
+            outQ.put((pose_obj.pose_number, proximity, distance))
             
 
     for i in pose_objs:
@@ -56,12 +56,15 @@ def ligand_distances(receptor_obj, ligase_obj, protac_objs, num_procs):
     done_count = 0
     while True:
 
-        pose_number, proximity = outQ.get()
+        pose_number, proximity, distance = outQ.get()
         done_count += 1
 
         pose_obj = [i for i in pose_objs if i.pose_number == pose_number][0]
         pose_obj.active = proximity
         pose_obj.filtered = proximity
+        #        ^ need this attr for management even though the info is going to filter_info dict
+        pose_obj.filter_info['dist_filter'] = proximity
+        pose_obj.filter_info['distance'] = distance
 
         outQ.task_done()
         logger.debug(f"filter pose {pose_obj.pose_number}: {pose_obj.active}")
@@ -147,8 +150,8 @@ def crl_filters(
                 # then this receptor atom is clashing with at least one atom for the model
                 clash_count+=1
             if clash_count >= clash_count_tol:
-                
                 return(True)
+            
         return(False)
 
     def check_access_lys(
@@ -158,7 +161,6 @@ def crl_filters(
             dist_cutoff,
             overlap_dist_cutoff
     ):
-        
         # calculate the solvent exposed surface area for the residues in the rec
         from Bio.PDB.SASA import ShrakeRupley
         sr = ShrakeRupley()
@@ -172,6 +174,7 @@ def crl_filters(
 
         lysines_accepted = []
         for lysine in lysines:
+
 
             ## the lysine point will be its nitrogen:
             for atom in lysine.get_atoms():
@@ -192,8 +195,9 @@ def crl_filters(
 
             ubq2lys = lys - ubq
             ubq2atoms = atoms - ubq
+            distance = np.linalg.norm(ubq2lys)
 
-            if np.linalg.norm(ubq2lys) > dist_cutoff:
+            if distance > dist_cutoff:
                 final_verdict = True
 
             else:
@@ -211,11 +215,13 @@ def crl_filters(
                 final_verdict = np.any(final_check)
 
             #the final verdict is True if there is an atom in the way, False if not
-            lysines_accepted.append(not final_verdict)
+            if not final_verdict:
+                lys = {'resname':lysine._id[1], 'distance':distance, 'sasa':lysine.sasa, 'accessible':True}
+                lysines_accepted.append(lys)
+            # lysines_accepted.append(not final_verdict)
 
-        accessible_lys = np.any(lysines_accepted)
-        lys_count = np.array(lysines_accepted).sum()
-        return(accessible_lys, lys_count)
+        lys_count = len(lysines_accepted)
+        return(lys_count, lysines_accepted)
 
 
     receptor_struct = receptor_obj.get_protein_struct()
@@ -262,6 +268,7 @@ def crl_filters(
             ##              ##  
             accepted_models = []
             crls = []
+            lys_info = []
 
             for model_number in model_info[e3]['model_numbers']:
 
@@ -279,13 +286,6 @@ def crl_filters(
                 ## apply the rotation to the receptor
                 rec_struct_align = deepcopy(receptor_struct)
                 superimposer.apply(rec_struct_align)
-
-                # TODO REMOVE
-                if pose_obj.pose_number == 503:
-                    from Bio.PDB.PDBIO import Select, PDBIO
-                    pdbio = PDBIO()
-                    pdbio.set_structure(rec_struct_align)
-                    pdbio.save(str('test503_recalign.pdb'))
 
 
                 if crl_model_clash:
@@ -306,7 +306,7 @@ def crl_filters(
                     else:
                         crl = None
                         if accessible_lysines:
-                            accessible_lys, lys_count = check_access_lys(
+                            lys_count, lysines_accepted = check_access_lys(
                                 rec_struct_align,
                                 ubq=model_info[e3]['ubq_point'],
                                 lys_sasa_cutoff=lys_sasa_cutoff,
@@ -319,18 +319,15 @@ def crl_filters(
                                 accepted_models.append(True)
                             else:
                                 accepted_models.append(False)
-                            # if accessible_lys:
-                            #     accepted_models.append(True)
-                            # else:
-                            #     accepted_models.append(False)
                         
                         else:
                             accepted_models.append(True)
                     
                     crls.append(crl)
+                    lys_info.append(lysines_accepted)
 
             accepted_pose = np.any(accepted_models)
-            outQ.put((pose_obj.pose_number, accepted_pose, crls))
+            outQ.put((pose_obj.pose_number, accepted_pose, crls, lys_info))
 
 
     ######################
@@ -354,11 +351,14 @@ def crl_filters(
     done_count = 0
     while True:
 
-        pose_number, accepted_pose, crl = outQ.get()
+        pose_number, accepted_pose, crls, lys_info = outQ.get()
         done_count += 1
 
         pose_obj = [i for i in pose_objs if i.pose_number == pose_number][0]
-        pose_obj.crl = crl
+        pose_obj.filter_info['crl_filter'] = accepted_pose
+        pose_obj.filter_info['crls'] = crls
+        pose_obj.filter_info['lys_info'] = lys_info
+        # pose_obj.crl = crl
         if accepted_pose:
             pose_obj.filtered = True
             pose_obj.active = True

@@ -234,7 +234,7 @@ if __name__ == '__main__':
 
     #~~~~~~~~~~~~~~~~~~ make outputs ~~~~~~~~~~~~~~~~~~~
 
-    from .analyse import summaries
+    from .analyse import summaries, plot
 
     run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_objs=protacs)
     summaries.summary_csv(protacs, ligase, benchmark=args.benchmark)
@@ -247,3 +247,4 @@ if __name__ == '__main__':
         benchmark=args.benchmark,
         ref_ligase=args.ref_ligase
     )
+    plot.plot_ptn_poses(ligase)
