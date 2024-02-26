@@ -39,7 +39,7 @@ def ligand_distances(receptor_obj, ligase_obj, protac_objs):
 
         distance = np.linalg.norm(receptor_lig_com - pose_lig_com)
         proximity = distance <= dist_cutoff
-        print(distance, proximity)
+        logger.debug(f'Pose {pose_obj.pose_number}: distance {distance}, filtered: {proximity}')
 
         pose_obj.active = proximity
         pose_obj.filtered = proximity
@@ -167,35 +167,37 @@ def crl_filters(
                     continue
             atoms = np.asarray(atoms)
 
-            ubq2lys = lys - ubq
-            ubq2atoms = atoms - ubq
-            distance = np.linalg.norm(ubq2lys)
+            lys_dist = lys - ubq
+            lys_dist_scalar = np.linalg.norm(lys_dist)
 
-            if distance > dist_cutoff:
-                final_verdict = True
+            if lys_dist_scalar > dist_cutoff:
+                lys_is_accessible = False
 
             else:
+
+                atoms_dist = lys - atoms
+                lys_dist_unit = lys_dist / lys_dist_scalar
                 ## project the receptor atoms to the line between ubq and lys
-                proj = (np.sum(ubq2atoms * ubq2lys, axis=1) / np.dot(ubq2lys, ubq2lys))[:, np.newaxis] * ubq2lys
+                atoms_proj_scalars = np.dot(atoms_dist, lys_dist_unit).reshape(-1,1)
+                atoms_proj = lys_dist_unit * atoms_proj_scalars
+                ## check distance of atoms to the line
+                lys_occlusions = atoms_proj - atoms_dist
+                occlusion_scalars = np.linalg.norm(lys_occlusions, axis=1).reshape(-1,1)
+                ## find which atoms (if any) are in segment and too close to segment therefore occluding the lys
+                atoms_in_segment = (atoms_proj_scalars < lys_dist_scalar) & (atoms_proj_scalars > 0)
+                atoms_occluding = atoms_in_segment & (occlusion_scalars < overlap_dist_cutoff)
 
-                proj_dist = np.linalg.norm(ubq2atoms - proj, axis=1)
+                if atoms_occluding.any():
+                    lys_is_accessible = False
+                else:
+                    lys_is_accessible = True
 
-                is_positive = np.dot((atoms - ubq), ubq2lys) > 0
-                is_less_sqr = np.dot((atoms - ubq), ubq2lys) < np.linalg.norm(ubq2lys)**2
-                in_segment = np.logical_and(is_positive, is_less_sqr)
-
-                final_check = np.logical_and((proj_dist < overlap_dist_cutoff), in_segment)
-                final_verdict = np.any(final_check)
-
-            #the final verdict is True if there is an atom in the way, False if not
-            if not final_verdict:
-                lys = {'resname':lysine._id[1], 'distance':distance, 'sasa':lysine.sasa, 'accessible':True}
+            if lys_is_accessible:
+                lys = {'resname':lysine._id[1], 'distance':lys_dist_scalar, 'sasa':lysine.sasa, 'accessible':True}
                 lysines_accepted.append(lys)
-            # lysines_accepted.append(not final_verdict)
 
         lys_count = len(lysines_accepted)
         return(lys_count, lysines_accepted)
-
 
     receptor_struct = receptor_obj.get_protein_struct()
 
