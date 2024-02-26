@@ -33,15 +33,14 @@ def summary_csv(protac_objs, ligase_obj, benchmark):
         for pose_obj in pose_objs:
             for attr in data_dict.keys():
                 try:
-                    attr_value = getattr(pose_obj, attr)
+                    if attr == 'crl':
+                        attr_value = pose_obj.filter_info['crls']
+                    else:
+                        attr_value = getattr(pose_obj, attr)
                 except:
                     attr_value = None
                 data_dict[attr].append(attr_value)
-            # try:
-            #     data_dict['crl'].append(pose_obj.filter_info['crls'])
-            # except:
-            #     data_dict['crl'].append(None)
-        
+
         # get protac pose and linkers attributes
         data_dict['protac_pose'] = []
         data_dict['active_linkers'] = []
