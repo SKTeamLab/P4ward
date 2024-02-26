@@ -8,7 +8,7 @@ from ..definitions import ROOT_DIR
 
 @decorators.user_choice
 @decorators.track_run
-def ligand_distances(receptor_obj, ligase_obj, protac_objs, num_procs):
+def ligand_distances(receptor_obj, ligase_obj, protac_objs):
     """
     Use Biopython to filter the megadock poses which satisfy a
     distance cutoff for both binding sites. Takes the a Protein object
@@ -21,67 +21,33 @@ def ligand_distances(receptor_obj, ligase_obj, protac_objs, num_procs):
     dist_cutoff = np.max([i.dist_cutoff for i in protac_objs])
     logger.info(f'Filtering megadock poses with cuttoff {dist_cutoff}')
 
+    ref_rotate = ligase_obj.rotate
+    # ligase_com = ligase_obj.get_protein_struct().center_of_mass()
+    ligase_lig_com = ligase_obj.get_ligand_struct().center_of_mass()
+    receptor_lig_com = receptor_obj.get_ligand_struct().center_of_mass()
+
     pose_objs = ligase_obj.active_confs()
 
-    inQ = JoinableQueue()
-    outQ = JoinableQueue()
+    for pose_obj in pose_objs:
 
-    receptor_lig_com = receptor_obj.get_ligand_struct().center_of_mass()
-    ligase_lig_com = ligase_obj.get_ligand_struct().center_of_mass()
-    ref_rotate = ligase_obj.rotate
-    
-    def worker(inQ, outQ, receptor_lig_com, ligase_lig_com, ref_rotate):
+        pose_rotate = pose_obj.rotate
+        pose_lig_com = rotate_atoms(
+            tuple(ligase_lig_com),
+            ref_rotation=ref_rotate,
+            pose_rotation=pose_rotate
+        )
 
-        while True:
-            pose_obj = inQ.get()
-            pose_rotate = pose_obj.rotate
+        distance = np.linalg.norm(receptor_lig_com - pose_lig_com)
+        proximity = distance <= dist_cutoff
+        print(distance, proximity)
 
-            pose_lig_com = rotate_atoms(
-                tuple(ligase_lig_com),
-                ref_rotation=ref_rotate,
-                pose_rotation=pose_rotate
-            )
-            pose_lig_com = np.asarray(pose_lig_com)
-
-            distance = np.linalg.norm(receptor_lig_com - pose_lig_com)
-            proximity = distance <= dist_cutoff
-            
-            inQ.task_done()
-            outQ.put((pose_obj.pose_number, proximity, distance))
-            
-
-    for i in pose_objs:
-        inQ.put(i)
-
-    procs = []
-    for i in range(num_procs):
-        p = Process(name=i, target=worker, args=(inQ, outQ, receptor_lig_com, ligase_lig_com, ref_rotate))
-        p.daemon = True
-        p.start()
-        procs.append(p)
-
-
-    done_count = 0
-    while True:
-
-        pose_number, proximity, distance = outQ.get()
-        done_count += 1
-
-        pose_obj = [i for i in pose_objs if i.pose_number == pose_number][0]
         pose_obj.active = proximity
         pose_obj.filtered = proximity
         #        ^ need this attr for management even though the info is going to filter_info dict
         pose_obj.filter_info['dist_filter'] = proximity
         pose_obj.filter_info['distance'] = distance
 
-        outQ.task_done()
-        logger.debug(f"filter pose {pose_obj.pose_number}: {pose_obj.active}")
-
-        if done_count == len(pose_objs):
-            break
-
-
-    results = [i.filtered for i in pose_objs]
+    results = [i for i in pose_objs if i.filtered]
     if any(results):
         logger.info(f'Finished filtering {len(results)} protein poses according to ligand distance criteria.')
     else:
@@ -211,7 +177,6 @@ def crl_filters(
             else:
                 ## project the receptor atoms to the line between ubq and lys
                 proj = (np.sum(ubq2atoms * ubq2lys, axis=1) / np.dot(ubq2lys, ubq2lys))[:, np.newaxis] * ubq2lys
-                proj_vector = ubq + proj
 
                 proj_dist = np.linalg.norm(ubq2atoms - proj, axis=1)
 
