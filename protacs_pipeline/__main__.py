@@ -116,7 +116,6 @@ if __name__ == '__main__':
         receptor_obj=receptor,
         ligase_obj=ligase,
         protac_objs=protacs,
-        num_procs=conf.getint('general', 'num_processors'),
         choice=conf.getboolean('protein_filter', 'ligand_distances')
     )
 

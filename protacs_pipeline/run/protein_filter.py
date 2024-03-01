@@ -227,82 +227,161 @@ def crl_filters(
     ## we check each model number for each pose_obj
     ##
 
-    def worker(inQ, outQ):
+    def worker(pose_obj):
         """
         The worker function in this case takes a pose_obj and does its filtering for each
         crl model number
         """
 
-        while True:
+        pose_struct = pose_obj.get_rotated_struct('protein')
 
-            pose_obj = inQ.get()
-            pose_struct = pose_obj.get_rotated_struct('protein')
+        ##              ##
+        ## begin checks ##
+        ##              ##  
+        accepted_models = []
+        crls = []
+        lys_info = []
 
-            ##              ##
-            ## begin checks ##
-            ##              ##  
-            accepted_models = []
-            crls = []
-            lys_info = []
+        for model_number in model_info[e3]['model_numbers']:
 
-            for model_number in model_info[e3]['model_numbers']:
+            model_file = get_e3_modelfile(e3, model_number, subrec_only=True)
+            full_model_file = get_e3_modelfile(e3, model_number)
+            aligned_ligase_struct = aligned_ligase_structs[model_number]
 
-                model_file = get_e3_modelfile(e3, model_number, subrec_only=True)
-                full_model_file = get_e3_modelfile(e3, model_number)
-                aligned_ligase_struct = aligned_ligase_structs[model_number]
-
-                # now that the ligase in CRL model conformation is identical to the ligase that was docked
-                # they can be aligned by biopython
-                superimposer = Superimposer()
-                superimposer.set_atoms(
-                    list(aligned_ligase_struct.get_atoms()),
-                    list(pose_struct.get_atoms())
-                )    
-                ## apply the rotation to the receptor
-                rec_struct_align = deepcopy(receptor_struct)
-                superimposer.apply(rec_struct_align)
+            # now that the ligase in CRL model conformation is identical to the ligase that was docked
+            # they can be aligned by biopython
+            superimposer = Superimposer()
+            superimposer.set_atoms(
+                list(aligned_ligase_struct.get_atoms()),
+                list(pose_struct.get_atoms())
+            )    
+            ## apply the rotation to the receptor
+            rec_struct_align = deepcopy(receptor_struct)
+            superimposer.apply(rec_struct_align)
 
 
-                if crl_model_clash:
+            if crl_model_clash:
 
-                    full_model_struct = load_biopython_structures(full_model_file)
-                    clash = check_model_clash(
-                        full_model_struct,
-                        rec_struct_align,
-                        clash_threshold,
-                        clash_count_tol
-                    )
+                full_model_struct = load_biopython_structures(full_model_file)
+                clash = check_model_clash(
+                    full_model_struct,
+                    rec_struct_align,
+                    clash_threshold,
+                    clash_count_tol
+                )
 
-                    if clash:
-                        accepted_models.append(False)
-                        crl = -1
-                        continue
+                if clash:
+                    accepted_models.append(False)
+                    crl = -1
+                    continue
 
-                    else:
-                        crl = None
-                        if accessible_lysines:
-                            lys_count, lysines_accepted = check_access_lys(
-                                rec_struct_align,
-                                ubq=model_info[e3]['ubq_point'],
-                                lys_sasa_cutoff=lys_sasa_cutoff,
-                                dist_cutoff=model_info[e3]['dist_cutoff'],
-                                overlap_dist_cutoff=overlap_dist_cutoff
-                            )
-                            crl = lys_count
+                else:
+                    crl = None
+                    if accessible_lysines:
+                        lys_count, lysines_accepted = check_access_lys(
+                            rec_struct_align,
+                            ubq=model_info[e3]['ubq_point'],
+                            lys_sasa_cutoff=lys_sasa_cutoff,
+                            dist_cutoff=model_info[e3]['dist_cutoff'],
+                            overlap_dist_cutoff=overlap_dist_cutoff
+                        )
+                        crl = lys_count
 
-                            if lys_count >= lysine_count:
-                                accepted_models.append(True)
-                            else:
-                                accepted_models.append(False)
-                        
-                        else:
+                        if lys_count >= lysine_count:
                             accepted_models.append(True)
+                        else:
+                            accepted_models.append(False)
                     
-                    crls.append(crl)
-                    lys_info.append(lysines_accepted)
+                    else:
+                        accepted_models.append(True)
+                
+                crls.append(crl)
+                lys_info.append(lysines_accepted)
 
-            accepted_pose = np.any(accepted_models)
-            outQ.put((pose_obj.pose_number, accepted_pose, crls, lys_info))
+        accepted_pose = np.any(accepted_models)
+        pose_obj.filter_info['crl_filter'] = accepted_pose
+        pose_obj.filter_info['crls'] = crls
+        pose_obj.filter_info['lys_info'] = lys_info
+
+        if accepted_pose:
+            pose_obj.filtered = True
+            pose_obj.active = True
+        else:
+            pose_obj.filtered = False
+            pose_obj.active = False
+
+
+
+        # while True:
+
+        #     pose_obj = inQ.get()
+        #     pose_struct = pose_obj.get_rotated_struct('protein')
+
+        #     ##              ##
+        #     ## begin checks ##
+        #     ##              ##  
+        #     accepted_models = []
+        #     crls = []
+        #     lys_info = []
+
+        #     for model_number in model_info[e3]['model_numbers']:
+
+        #         model_file = get_e3_modelfile(e3, model_number, subrec_only=True)
+        #         full_model_file = get_e3_modelfile(e3, model_number)
+        #         aligned_ligase_struct = aligned_ligase_structs[model_number]
+
+        #         # now that the ligase in CRL model conformation is identical to the ligase that was docked
+        #         # they can be aligned by biopython
+        #         superimposer = Superimposer()
+        #         superimposer.set_atoms(
+        #             list(aligned_ligase_struct.get_atoms()),
+        #             list(pose_struct.get_atoms())
+        #         )    
+        #         ## apply the rotation to the receptor
+        #         rec_struct_align = deepcopy(receptor_struct)
+        #         superimposer.apply(rec_struct_align)
+
+
+        #         if crl_model_clash:
+
+        #             full_model_struct = load_biopython_structures(full_model_file)
+        #             clash = check_model_clash(
+        #                 full_model_struct,
+        #                 rec_struct_align,
+        #                 clash_threshold,
+        #                 clash_count_tol
+        #             )
+
+        #             if clash:
+        #                 accepted_models.append(False)
+        #                 crl = -1
+        #                 continue
+
+        #             else:
+        #                 crl = None
+        #                 if accessible_lysines:
+        #                     lys_count, lysines_accepted = check_access_lys(
+        #                         rec_struct_align,
+        #                         ubq=model_info[e3]['ubq_point'],
+        #                         lys_sasa_cutoff=lys_sasa_cutoff,
+        #                         dist_cutoff=model_info[e3]['dist_cutoff'],
+        #                         overlap_dist_cutoff=overlap_dist_cutoff
+        #                     )
+        #                     crl = lys_count
+
+        #                     if lys_count >= lysine_count:
+        #                         accepted_models.append(True)
+        #                     else:
+        #                         accepted_models.append(False)
+                        
+        #                 else:
+        #                     accepted_models.append(True)
+                    
+        #             crls.append(crl)
+        #             lys_info.append(lysines_accepted)
+
+        #     accepted_pose = np.any(accepted_models)
+        #     outQ.put((pose_obj.pose_number, accepted_pose, crls, lys_info))
 
 
     ######################
@@ -310,38 +389,12 @@ def crl_filters(
     if pose_objs == None:
         pose_objs = ligase_obj.active_confs()
 
-    inQ = JoinableQueue()
-    outQ = JoinableQueue()
-
-    for i in pose_objs:
-        inQ.put(i)
-
-    procs = []
-    for i in range(num_procs):
-        p = Process(name=i, target=worker, args=(inQ, outQ))
-        p.daemon = True
-        p.start()
-        procs.append(p)
-
     done_count = 0
-    while True:
+    for pose_obj in pose_objs:
 
-        pose_number, accepted_pose, crls, lys_info = outQ.get()
+        worker(pose_obj)
         done_count += 1
-
-        pose_obj = [i for i in pose_objs if i.pose_number == pose_number][0]
-        pose_obj.filter_info['crl_filter'] = accepted_pose
-        pose_obj.filter_info['crls'] = crls
-        pose_obj.filter_info['lys_info'] = lys_info
-        # pose_obj.crl = crl
-        if accepted_pose:
-            pose_obj.filtered = True
-            pose_obj.active = True
-        else:
-            pose_obj.filtered = False
-            pose_obj.active = False
         
-        outQ.task_done()
         logger.debug(f'Pose number {pose_obj.pose_number} filtered: {pose_obj.filtered}')
 
         if done_count == len(pose_objs):
@@ -353,3 +406,48 @@ def crl_filters(
     else:
         logger.info('There are no poses which satisfy the CRL model filtering criteria. Exiting now.')
         exit(0)
+
+
+    # inQ = JoinableQueue()
+    # outQ = JoinableQueue()
+
+    # for i in pose_objs:
+    #     inQ.put(i)
+
+    # procs = []
+    # for i in range(num_procs):
+    #     p = Process(name=i, target=worker, args=(inQ, outQ))
+    #     p.daemon = True
+    #     p.start()
+    #     procs.append(p)
+
+    # done_count = 0
+    # while True:
+
+    #     pose_number, accepted_pose, crls, lys_info = outQ.get()
+    #     done_count += 1
+
+    #     pose_obj = [i for i in pose_objs if i.pose_number == pose_number][0]
+    #     pose_obj.filter_info['crl_filter'] = accepted_pose
+    #     pose_obj.filter_info['crls'] = crls
+    #     pose_obj.filter_info['lys_info'] = lys_info
+    #     # pose_obj.crl = crl
+    #     if accepted_pose:
+    #         pose_obj.filtered = True
+    #         pose_obj.active = True
+    #     else:
+    #         pose_obj.filtered = False
+    #         pose_obj.active = False
+        
+    #     outQ.task_done()
+    #     logger.debug(f'Pose number {pose_obj.pose_number} filtered: {pose_obj.filtered}')
+
+    #     if done_count == len(pose_objs):
+    #         break
+    
+    # results = [i.filtered for i in pose_objs]
+    # if any(results):
+    #     logger.info(f'Finished filtering {len(results)} protein poses according to CRL models.')
+    # else:
+    #     logger.info('There are no poses which satisfy the CRL model filtering criteria. Exiting now.')
+    #     exit(0)
