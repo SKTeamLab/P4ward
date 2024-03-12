@@ -119,6 +119,16 @@ if __name__ == '__main__':
         choice=conf.getboolean('protein_filter', 'ligand_distances')
     )
 
+    # megadock.cluster.version = 0
+    megadock.cluster(
+        ligase_obj=ligase,
+        protac_objs=protacs,
+        clustering_type='redundancy',
+        clustering_cutoff_redund=conf.getfloat('protein_ranking','clustering_cutoff_redund'),
+        clustering_cutoff_trend=conf.getfloat('protein_ranking','clustering_cutoff_trend'),
+        choice=conf.getboolean('protein_ranking', 'cluster_poses_redundancy')
+    )
+
     protein_filter.crl_filters(
         receptor_obj=receptor,
         ligase_obj=ligase,
@@ -139,6 +149,7 @@ if __name__ == '__main__':
         )
     )
 
+
     # CHECKPOINT!
     run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_objs=protacs)
 
@@ -147,11 +158,6 @@ if __name__ == '__main__':
     #~~~~~~~~~~~ protein ranking ~~~~~~~~~~~#
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
-    megadock.cluster(
-        pose_objects=ligase.active_confs(), # structures are now the saved confs attr
-        clustering_cutoff=conf.getfloat('protein_ranking','clustering_cutoff'),
-        choice=conf.getboolean('protein_ranking', 'cluster_poses')
-    )
 
 
     #rank final protein poses
@@ -160,9 +166,6 @@ if __name__ == '__main__':
     rank.protein_poses(
         ligase_obj=ligase,
         top_poses=conf.getint('protein_ranking', 'top_poses'),
-        cluster_proteins_choice=conf.getboolean('protein_ranking', 'cluster_poses'),
-        cluster_rep=conf.get('protein_ranking', 'cluster_rep'),
-        rank_cluster_reps_only=conf.getboolean('protein_ranking', 'rank_cluster_reps_only'),
     )
 
     # CHECKPOINT!
@@ -212,6 +215,17 @@ if __name__ == '__main__':
         choice=conf.getboolean('linker_sampling', 'rdkit_sampling')
     )
 
+    megadock.cluster(
+        ligase_obj=ligase,
+        protac_objs=protacs,
+        clustering_type='trend',
+        clustering_cutoff_redund=conf.getfloat('protein_ranking','clustering_cutoff_redund'),
+        clustering_cutoff_trend=conf.getfloat('protein_ranking','clustering_cutoff_trend'),
+        choice=conf.getboolean('protein_ranking', 'cluster_poses_trend'),
+        track=False
+    )
+
+
     # CHECKPOINT!
     run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_objs=protacs)
 
@@ -236,7 +250,11 @@ if __name__ == '__main__':
     from .analyse import summaries, plot
 
     run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_objs=protacs)
-    summaries.summary_csv(protacs, ligase, benchmark=args.benchmark)
+    summaries.summary_csv(
+        protacs, ligase,
+        benchmark=args.benchmark,
+        cluster_trend=conf.getboolean('protein_ranking', 'cluster_poses_trend')
+    )
     summaries.chimerax_view(
         receptor_obj=receptor,
         pose_objs=[i for i in ligase.conformations if i.top],

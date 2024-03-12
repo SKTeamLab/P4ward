@@ -26,7 +26,7 @@ def load_tracker(overwrite):
 
 def load_run_objects(pickle_file, conf, overwrite=False):
     """
-    load receptor and ligase objects either from previously saved pickle or
+    load all objects either from previously saved pickle or
     from scratch when first time running or overwrite chosen by user
     """
 
@@ -73,7 +73,7 @@ def load_run_objects(pickle_file, conf, overwrite=False):
 
 def save_protein_objects(receptor_obj, ligase_obj, protac_objs):
     """
-    Save receptor and ligase objects into pickle file
+    Save all objects into pickle file
     """
 
     with open(CPT_FILE, 'wb+') as pic:

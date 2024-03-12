@@ -1,7 +1,7 @@
 import pandas as pd
 from pathlib import Path
 
-def summary_csv(protac_objs, ligase_obj, benchmark):
+def summary_csv(protac_objs, ligase_obj, benchmark, cluster_trend):
 
     results_folder = Path("./results_summaries")
     results_folder.mkdir(exist_ok=True)
@@ -13,12 +13,11 @@ def summary_csv(protac_objs, ligase_obj, benchmark):
         # otherwise if I had done `pose_objs = protac_obj.protein_poses`, the list would not be
         # ranked according to the docking score of choice
 
-        # get protein pose attributes
+
+        ## get general protein pose attributes
         data_dict = {
             'pose_number':[],
             'megadock_score':[],
-            'cluster':[],
-            'clrep':[],
             'crl':[]
         }
 
@@ -31,15 +30,51 @@ def summary_csv(protac_objs, ligase_obj, benchmark):
             }}
 
         for pose_obj in pose_objs:
+            
             for attr in data_dict.keys():
                 try:
                     if attr == 'crl':
                         attr_value = pose_obj.filter_info['crls']
+                    # elif attr == 'cl_size':
+                    #     cln = pose_obj.cluster_redund.get_cl_from_pose(pose_obj)
+                    #     attr_value = pose_obj.cluster_redund.get_cl_size(cln)
+                    # elif attr == 'cluster_centr':
+                    #     if pose_obj in protac_obj.cluster.repr_centr:
+                    #         attr_value = True
+                    #     else:
+                    #         attr_value = False
                     else:
                         attr_value = getattr(pose_obj, attr)
                 except:
                     attr_value = None
                 data_dict[attr].append(attr_value)
+
+
+        ## get cluster trend attributes
+        if cluster_trend:
+
+            data_dict['cluster_number'] = []
+            data_dict['cluster_centr'] = []
+            data_dict['cluster_best'] = []
+            data_dict['cluster_size'] = []
+
+            for pose_obj in pose_objs:
+
+                repr_centr = pose_obj in protac_obj.cluster.repr_centr
+                data_dict['cluster_centr'].append(repr_centr)
+
+                repr_best = pose_obj in protac_obj.cluster.repr_best
+                data_dict['cluster_best'].append(repr_best)
+
+                cln = protac_obj.cluster.get_cl_from_pose(pose_obj)
+                data_dict['cluster_number'].append(cln)
+
+                if repr_centr or repr_best:
+                    cl_size = protac_obj.cluster.get_cl_size(cln)
+                    data_dict['cluster_size'].append(cl_size)
+                else:
+                    data_dict['cluster_size'].append(None)
+
 
         # get protac pose and linkers attributes
         data_dict['protac_pose'] = []

@@ -1,6 +1,6 @@
 import subprocess
 import os
-from ..tools import decorators
+from ..tools import decorators, classes
 from ..tools.logger import logger
 from ..definitions import CWD
 
@@ -164,69 +164,97 @@ def rotate_atoms(atom_coords, ref_rotation, pose_rotation):
 
 @decorators.user_choice
 @decorators.track_run
-def cluster(pose_objects, clustering_cutoff):
+def cluster(ligase_obj, protac_objs, clustering_type, clustering_cutoff_redund, clustering_cutoff_trend):
     """
-    cluster megadock docked poses using a user-specified RMSD cutoff
-    RMSD is calculated using the alpha carbons.
+    cluster protein_poses' triad points for redundancy or trend using hieragglo with ward linkage
     """
-    # NOTE list is the active ligase.conformations
 
+    import numpy as np
     from sklearn.cluster import AgglomerativeClustering
     from sklearn.neighbors import NearestCentroid
     from sklearn.neighbors import NearestNeighbors
-    from .structure_tools import get_rmsd
-    import numpy as np
 
-    if len(pose_objects) <= 1:
-        logger.info("Cannot cluster protein poses because only 1 pose was sent to the clustering step. Skipping.")
-        for pose_obj in pose_objects:
-            pose_obj.cluster  = None
-            pose_obj.centroid = None
 
-    else:
+    def make_clusterer(pose_objs, cutoff):
 
-        logger.info(f'Clustering protein poses using cutoff of {clustering_cutoff}')
-        
-        # get first pose as reference:
-        reference_obj = pose_objects[0]
-        reference_obj_struct = reference_obj.get_rotated_struct(struct_type='protein')
+        logger.info(f'Clustering protein poses for {clustering_type} using cutoff of {cutoff}')
 
-        # load receptor object
-        for pose_obj in pose_objects:
-            pose_obj_struct = pose_obj.get_rotated_struct(struct_type='protein')
+        a,c,d = ligase_obj.get_triad_points()
+        coords = []
 
-            rmsd = get_rmsd(reference_obj_struct, pose_obj_struct, ca=True)
-            pose_obj.rmsd = rmsd
-            pose_obj.rmsd_reference = reference_obj
-        
-        # get the array of rmsds to compute
-        rmsd_list = [i.rmsd for i in pose_objects]
-        rmsd_points = np.asarray(rmsd_list).reshape(-1, 1)
+        for pose_obj in pose_objs:
 
-        # run clustering
-        clustering = AgglomerativeClustering(
+            a_rot = rotate_atoms(tuple(a), ref_rotation=ligase_obj.rotate, pose_rotation=pose_obj.rotate)
+            c_rot = rotate_atoms(tuple(c), ref_rotation=ligase_obj.rotate, pose_rotation=pose_obj.rotate)
+            d_rot = rotate_atoms(tuple(d), ref_rotation=ligase_obj.rotate, pose_rotation=pose_obj.rotate)
+
+            coords.append([*a_rot, *c_rot, *d_rot])
+
+        coords = np.asarray(coords)
+
+        ## start clustering
+        clusterer = AgglomerativeClustering(
             n_clusters=None,
-            linkage='average',
-            distance_threshold=clustering_cutoff
-        ).fit(rmsd_points)
+            distance_threshold=cutoff,
+            metric='euclidean',
+            linkage='ward'
+        ).fit(coords)
 
-        # add the information to the objects as attributes
-        for i in range(len(pose_objects)):
-            pose_objects[i].cluster = clustering.labels_[i]
-
-        # get the theoretical centroid of each cluster
+        ## get the centroids
         nc = NearestCentroid()
-        nc.fit(rmsd_points, clustering.labels_)
-        # get which rmsd value is the centroid
-        # the centroid will be the one closest the theoretical centroid
+        nc.fit(coords, clusterer.labels_)
         knn = NearestNeighbors(n_neighbors=1)
-        knn.fit(rmsd_points)
+        knn.fit(coords)
         _, indices = knn.kneighbors(nc.centroids_)
-        centroids = np.hstack(rmsd_points)[np.hstack(indices)]
 
-        # add to the attributes whether the pose is a centroid or not
-        for pose_obj in pose_objects:
-            if pose_obj.rmsd.round(decimals=3) in centroids.round(decimals=3):
-                pose_obj.centroid = True
+        repr_centr = list(np.asarray(pose_objs)[indices].ravel())
+        repr_best = []
+        ## make cluster information and get best scores for each cluster
+        cluster = classes.Cluster(clusterer=clusterer, type=clustering_type)
+        
+        for cln in range(clusterer.n_clusters_):
+            cl_components = list(np.asarray(pose_objs)[clusterer.labels_ == cln])
+            cluster.clusters[cln] = cl_components
+            best = cl_components[np.argmax([i.megadock_score for i in cl_components])]
+            repr_best.append(best)
+
+        cluster.repr_centr = repr_centr
+        cluster.repr_best = repr_best
+        ## get best scored repr
+
+        return(cluster)
+
+    def enough_poses(pose_objs):
+        check = len(pose_objs) > 1
+        if not check:
+            logger.info("Cannot cluster protein poses because only 1 pose was sent to the clustering step. Skipping.")
+        return(check)
+
+
+    if clustering_type == 'redundancy':
+        
+        pose_objs = ligase_obj.active_confs()
+        if enough_poses(pose_objs):
+
+            cluster_obj = make_clusterer(pose_objs=pose_objs, cutoff=clustering_cutoff_redund)
+            ligase_obj.cluster = cluster_obj
+
+            for pose_obj in pose_objs:
+                if pose_obj in cluster_obj.repr_centr:
+                    pose_obj.active = True
+                else:
+                    pose_obj.active = False
+        
+        else:
+            ligase_obj.cluster = None
+
+    elif clustering_type == 'trend':
+
+        for protac_obj in protac_objs:
+
+            pose_objs = protac_obj.protein_poses
+            if enough_poses(pose_objs):
+                cluster_obj = make_clusterer(pose_objs=pose_objs, cutoff=clustering_cutoff_trend)
+                protac_obj.cluster = cluster_obj
             else:
-                pose_obj.centroid = False
+                protac_obj.cluster = None

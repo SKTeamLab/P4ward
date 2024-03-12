@@ -5,9 +5,6 @@ from ..tools import decorators
 def protein_poses(
                     ligase_obj,
                     top_poses,
-                    cluster_proteins_choice,
-                    cluster_rep,
-                    rank_cluster_reps_only
 ):
     """
     organize protein pose object in a ranking as specified by the user.
@@ -24,36 +21,6 @@ def protein_poses(
     # pose_objs = [i for i in ligase_obj.conformations if i.active]
     sorted_confs = [i for i in sorted_confs if i.active]
     
-    # if the protein poses were clustered and cluster info was recorded, we use the information in the ranking:
-    if cluster_proteins_choice and any([i.cluster is not None for i in sorted_confs]):
-        # assign cluster representatives:
-        if cluster_rep == 'centroid':
-            for i in sorted_confs:
-                if i.centroid:
-                    i.clrep = True
-                else: i.clrep = False
-        elif cluster_rep == 'best':
-            # the best scoring cluster member will appear first
-            clusters_ = []
-            for i in sorted_confs:
-                if i.cluster not in clusters_:
-                    i.clrep = True
-                    clusters_.append(i.cluster)
-                else:
-                    i.clrep = False
-
-
-        if rank_cluster_reps_only:
-            # previously the actives came from previous function.
-            # now if we must consider only the cluster reps for next stage,
-            # then only those should be active
-            sorted_confs = [i for i in sorted_confs if i.clrep]
-            for pose_obj in ligase_obj.conformations:
-                if pose_obj in sorted_confs:
-                    pose_obj.active = True
-                else:
-                    pose_obj.active = False
-
     # grab top poses
     sorted_confs = sorted_confs[:top_poses]
 
@@ -63,18 +30,9 @@ def protein_poses(
         else:
             pose_obj.top = True
 
-    # by the end of the ranking process we have:
-    #   - ligase.conformations sorted by megadock score
-    #   - then filtered by only the active confs that came from previous function (probably filtering)
-    #   - assigned protein cluster representatives based on user choice 'best' or 'centroid'
-    #   - if user wants to consider clustering for ranking, deactivated not cluster reps
-    #   - from this last version of the rank, grabbed top poses
-    #   - assigned the `top` attribute to the top poses. Note that non-top poses should not be deactivated.
 
     """log user choices"""
     logger.info('generated a final protein-protein ranking by megadock score')
-    if rank_cluster_reps_only:
-        logger.info(f'grabbing top {top_poses} poses which are also cluster representatives')
     """"""
     
 

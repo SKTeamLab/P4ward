@@ -69,6 +69,30 @@ class Protein:
         """
         active_confs = [pose for pose in self.conformations if pose.active]
         return(active_confs)
+    
+
+    def get_triad_points(self):
+        """
+        Get the three points to represent the protein for clustering
+        """
+        import numpy as np
+
+        a = self.get_ligand_struct().center_of_mass()
+        b = self.get_protein_struct().center_of_mass()
+
+        ab = b - a
+        ab_normalized = ab / np.linalg.norm(ab)
+        c = a + ab_normalized * 5  # 1 angstrom away from a
+
+        dummy_vector = np.array([1, 0, 0])
+        if (ab_normalized == dummy_vector).all():
+            dummy_vector = np.array([0, 1, 0])  # Change dummy vector if it's parallel to ab
+
+        perpendicular_vector = np.cross(ab_normalized, dummy_vector)
+        perpendicular_vector_normalized = perpendicular_vector / np.linalg.norm(perpendicular_vector)
+        d = c + perpendicular_vector_normalized * 5
+
+        return(a, c, d)
 
 
 
@@ -118,6 +142,8 @@ class ProteinPose():
         self.lig_file = parent.lig_file
         self.active = None
         self.file = None
+        self.cluster_trend = None
+        self.cluster_redund = None
 
         # add itself to the parent's conformations list
         if self not in parent.conformations:
@@ -157,6 +183,46 @@ class ProteinPose():
 
     def top_protac(self, protac_obj):
         protac_obj.protein_poses.append(self)
+
+
+
+
+class Cluster():
+
+    def __init__(self, clusterer, type) -> None:
+
+        self.clusterer = clusterer
+        # self.repr_centr = repr_centr
+        # self.repr_best = repr_best
+        self.type = type # 'redundancy', 'trend'
+        self.clusters = {}
+        # self.cutoff = self.clusterer.distance_threshold
+
+    def get_all_confs(self):
+
+        all_confs = []
+        for i in self.cluster_numbers:
+            all_confs.extend(i.conformations)
+
+        return(all_confs)
+
+    def get_centroid(self, cln):
+
+        for pose_obj in self.clusters[cln]:
+            if pose_obj in self.centroids:
+                return(pose_obj)
+    
+    def get_cl_from_pose(self, pose_obj):
+
+        for cln in self.clusters.keys():
+            if pose_obj in self.clusters[cln]:
+                return(cln)
+        
+    def get_cl_size(self, cln):
+
+        return(len(self.clusters[cln]))
+    
+
 
 
 class Protac():

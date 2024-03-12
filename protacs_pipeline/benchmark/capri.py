@@ -24,7 +24,6 @@ def get_atom_pairs(interface_struct, search_struct, cutoff=5.0):
     ns = NeighborSearch(list(search_struct.get_atoms()))
     residue_pairs = []
 
-    neighbours = []
     for residue in interface_struct.get_residues():
         neighbours = []
         for atom in residue.get_atoms():
@@ -65,16 +64,10 @@ def make_structure(*lists_of_residues, structure_name="structure"):
 def calc_fnat(receptor_struct, ref_ligase_struct, pose_struct):
 
     ligase_if = get_atom_pairs(ref_ligase_struct, receptor_struct)
-    rec_ligase_if = get_atom_pairs(receptor_struct, ref_ligase_struct)
-
     pose_if = get_atom_pairs(pose_struct, receptor_struct)
-    rec_pose_if = get_atom_pairs(receptor_struct, pose_struct)
+    correct_pairs = [i for i in pose_if if i in ligase_if]
 
-    ref_pairs = [*ligase_if, *rec_ligase_if]
-    pose_pairs = [*pose_if, *rec_pose_if]
-    correct_pairs = [i for i in pose_pairs if i in ref_pairs]
-
-    fnat = len(correct_pairs) / len(ref_pairs)
+    fnat = len(correct_pairs) / len(ligase_if)
 
     return(fnat)
 
@@ -177,7 +170,7 @@ def calc_rank(fnat, lrms, irms):
     elif (
         ( fnat >= 0.1 and fnat < 0.3 ) and
         ( lrms <= 10.0 or irms <= 4.0 ) or
-        ( fnat >= 0.3 and lrms > 0.5 and irms > 2.0 )
+        ( fnat >= 0.3 and lrms > 5.0 and irms > 2.0 )
     ):
         rank = 'acceptable'
 
