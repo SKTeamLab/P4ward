@@ -158,8 +158,9 @@ def get_rmsd(obj1, obj2, fit=False, ca=False, backbone=True):
     return(rmsd)
 
 
-def pymol_combine(*args, out_filename='combined.pdb'):
+def pymol_combine(*args, out_filename='combined.pdb', assign_chains=True):
 
+    import string
     import pymol2
 
     with pymol2.PyMOL() as pm:
@@ -168,6 +169,15 @@ def pymol_combine(*args, out_filename='combined.pdb'):
         for filename in args:
             pm.cmd.load(filename)
         
+        # loop through models and assign a separate chain to each
+        if assign_chains:
+            chain_letters = list(string.ascii_lowercase)
+            for i in range(len(basenames)):
+                model = basenames[i]
+                chain = chain_letters[i]
+                pm.cmd.alter(model, f'chain="{chain}"')
+
+        ## combine all and save
         pm.cmd.create('combined', ' '.join(basenames))
         pm.cmd.save(out_filename, 'combined')
 

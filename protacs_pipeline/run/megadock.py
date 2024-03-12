@@ -23,8 +23,8 @@ def prep_structures(receptor_obj, ligase_obj):
     prep_receptor_file = receptor_file.parent/('mg-'+receptor_file.name)
     prep_ligase_file = ligase_file.parent/('mg-'+ligase_file.name)
 
-    pymol_combine(receptor_file, receptor_ligand_file, out_filename=prep_receptor_file)
-    pymol_combine(ligase_file,   ligase_ligand_file,   out_filename=prep_ligase_file)
+    pymol_combine(receptor_file, receptor_ligand_file, out_filename=prep_receptor_file, assign_chains=False)
+    pymol_combine(ligase_file,   ligase_ligand_file,   out_filename=prep_ligase_file,   assign_chains=False)
  
     logger.info(f'Saved protein files for megadock: {prep_receptor_file}, {prep_ligase_file}')
 
