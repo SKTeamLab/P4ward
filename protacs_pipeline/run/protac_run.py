@@ -51,6 +51,7 @@ def conf_sampling(params, pose_obj, protac_obj, logger):
     kwargs = {
         'mol':protac_embed, 'coordMap':coordmap,
         'numConfs':params['rdkit_number_of_confs'],
+        'randomSeed':params['rdkit_random_seed'],
         'enforceChirality':False
     }
     try:

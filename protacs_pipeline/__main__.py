@@ -205,6 +205,7 @@ if __name__ == '__main__':
         protac_poses_folder=Path(conf.get('linker_sampling', 'protac_poses_folder')),
         rmsd_tolerance=conf.getfloat('linker_sampling', 'rdkit_pose_rmsd_tolerance'),
         time_tolerance=conf.getint('linker_sampling', 'rdkit_time_tolerance'),
+        rdkit_random_seed=conf.getint('linker_sampling', 'rdkit_random_seed'),
         extend_top_poses_sampled=conf.getboolean('linker_sampling', 'extend_top_poses_sampled'),
         extend_top_poses_score=conf.getboolean('linker_sampling', 'extend_top_poses_score'),
         extend_top_poses_energy=conf.getboolean('linker_sampling', 'extend_top_poses_energy'),
@@ -255,6 +256,7 @@ if __name__ == '__main__':
         benchmark=args.benchmark,
         cluster_trend=conf.getboolean('protein_ranking', 'cluster_poses_trend')
     )
+    summaries.protac_summaries(protac_objs=protacs)
     summaries.chimerax_view(
         receptor_obj=receptor,
         pose_objs=[i for i in ligase.conformations if i.top],

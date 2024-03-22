@@ -189,6 +189,10 @@ class ProteinPose():
 
 class Cluster():
 
+    """
+    attributes added/modified by the functions:
+    """
+
     def __init__(self, clusterer, type) -> None:
 
         self.clusterer = clusterer
@@ -201,8 +205,8 @@ class Cluster():
     def get_all_confs(self):
 
         all_confs = []
-        for i in self.cluster_numbers:
-            all_confs.extend(i.conformations)
+        for i in self.clusters.values():
+            all_confs.extend(i)
 
         return(all_confs)
 

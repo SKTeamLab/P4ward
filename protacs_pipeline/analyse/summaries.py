@@ -1,5 +1,6 @@
 import pandas as pd
 from pathlib import Path
+from ..tools.logger import logger
 
 def summary_csv(protac_objs, ligase_obj, benchmark, cluster_trend):
 
@@ -148,3 +149,29 @@ def chimerax_view(receptor_obj, protac_objs, pose_objs, generated_poses_folder, 
 
         with open(results_folder / f'summary-{protac_obj.name}.cxc', 'w+') as cmx:
             cmx.write(script)
+
+
+def protac_summaries(protac_objs):
+    """
+    Write protac cluster information
+    """
+
+    import numpy as np
+
+    for protac_obj in protac_objs:
+
+        cl_count = protac_obj.cluster.clusterer.n_clusters_
+        cl_sizes = []
+        scores = [i.megadock_score for i in protac_obj.cluster.get_all_confs()]
+        for cln in protac_obj.cluster.clusters:
+            cl_sizes.append(protac_obj.cluster.get_cl_size(cln))
+        
+        ratio = np.mean(cl_sizes)/cl_count
+        mean_score = np.mean(scores)
+
+        logger.info(f'-> Protac {protac_obj.name}:')
+        logger.info(f'Number of clusters = {cl_count}')
+        logger.info(f'Avg cluster size = {np.mean(cl_sizes)}')
+        logger.info(f'Ratio = {ratio}')
+        logger.info(f'Mean ptn score = {mean_score}')
+        

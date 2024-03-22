@@ -220,6 +220,7 @@ def cluster(ligase_obj, protac_objs, clustering_type, clustering_cutoff_redund, 
 
         cluster.repr_centr = repr_centr
         cluster.repr_best = repr_best
+        cluster.coords = coords
         ## get best scored repr
 
         return(cluster)
