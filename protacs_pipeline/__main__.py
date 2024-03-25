@@ -53,6 +53,7 @@ if __name__ == '__main__':
         ligase,
         minimized_suffix='_minim',
         maxiterations=conf.getint('protein_prep', 'minimize_maxiter'),
+        hydrogens_only=conf.getboolean('protein_prep', 'minimize_h_only'),
         choice=conf.getboolean('protein_prep', 'minimize')
     )
 

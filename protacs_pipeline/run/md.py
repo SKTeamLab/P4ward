@@ -11,6 +11,7 @@ def fix_proteins(*protein_objs, fixed_suffix='_fixed', ignore_extremities=True, 
     creates attribute with fixed filepath and makes it active
     """
     from pdbfixer.pdbfixer import PDBFixer
+    import pymol2
 
     for protein_obj in protein_objs:
 
@@ -55,12 +56,13 @@ def fix_proteins(*protein_objs, fixed_suffix='_fixed', ignore_extremities=True, 
 def minimize_proteins(
                             *protein_objs,
                             maxiterations=0,
+                            hydrogens_only,
                             minimized_suffix='_minim'
 ):
     
     import openmm.app as omm
     import openmm.unit as omu
-    from openmm import NoseHooverIntegrator
+    from openmm import NoseHooverIntegrator, CustomExternalForce
 
     ff = omm.ForceField('amber14/protein.ff14SB.xml', 'implicit/gbn2.xml')
     
@@ -73,14 +75,30 @@ def minimize_proteins(
         pdb = PDBFile(str(filepath))
         system = ff.createSystem(
             pdb.topology,
-            nonbondedMethod=omm.NoCutoff,
-            constraints=omm.HBonds
+            nonbondedMethod=omm.NoCutoff
         )
+
+        if hydrogens_only:
+
+            force = 100000.0 * omu.kilocalories_per_mole/omu.angstroms**2
+            restraint = CustomExternalForce('k*periodicdistance(x, y, z, x0, y0, z0)^2')
+            restraint.addGlobalParameter('k', force)
+            restraint.addPerParticleParameter('x0')
+            restraint.addPerParticleParameter('y0')
+            restraint.addPerParticleParameter('z0')
+
+            for atom_idx, atom in enumerate(pdb.topology.atoms()):
+                if atom.element.symbol != 'H':
+                    x0, y0, z0 = pdb.positions[atom_idx]
+                    restraint.addParticle(atom_idx, [x0, y0, z0])
+            
+            system.addForce(restraint)
+
+        # minimize
         integrator = NoseHooverIntegrator(300*omu.kelvin, 1/omu.picosecond, 0.002*omu.picoseconds)
         simulation = omm.Simulation(pdb.topology, system, integrator)
         simulation.context.setPositions(pdb.positions)
 
-        # minimize
         logger.info(f'Minimizing energy for {filepath.name} ...')
         simulation.minimizeEnergy(maxIterations=maxiterations)
 

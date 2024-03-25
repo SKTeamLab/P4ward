@@ -89,3 +89,4 @@ def capture_rxdock_scores(pose_obj, protac_obj):
 
         linker_conf = [i for i in protac_pose.linker_confs if i.conf_number == int(conf_number)][0]
         linker_conf.rx_score = score
+        linker_conf.data = dict(conf.data)
