@@ -21,7 +21,7 @@ def sample_protac_pose(inQ, outQ, p, receptor_obj, ligase_obj, global_parameters
         if protac_pose.active == True and global_parameters['rxdock_score']:
             if any(i.active for i in protac_pose.linker_confs):
                 protac_scoring.rxdock_rescore(global_parameters, pose_obj, receptor_obj, ligase_obj, protac_obj)
-                protac_scoring.capture_rxdock_scores(pose_obj, protac_obj)
+                protac_scoring.capture_rxdock_scores(global_parameters, pose_obj, protac_obj)
             
         logger.debug(f"(proc. {p+1}) Sampled protac {protac_obj.name} for protein pose {pose_obj.pose_number}")
         
@@ -43,6 +43,7 @@ def protac_sampling(
                         rdkit_random_seed,
                         rdkit_ligands_cleanup,
                         write_protac_conf,
+                        rxdock_target_score,
                         protac_poses_folder,
                         rmsd_tolerance,
                         time_tolerance,
@@ -68,7 +69,8 @@ def protac_sampling(
         'rxdock_score'          : rxdock_score,
         'linker_scoring_folder' : linker_scoring_folder,
         'minimize_protac'       : minimize_protac,
-        'write_protac_conf'     : write_protac_conf
+        'write_protac_conf'     : write_protac_conf,
+        'rxdock_target_score'   : rxdock_target_score
     }
 
     # make folder where the linkers for all pose objs will be stored
@@ -152,8 +154,10 @@ def protac_sampling(
                         for i in protac_pose.active_confs():
                             if i.rx_score > 0:
                                 pos_scores.append(True)
+                                i.active = False
                             else:
                                 pos_scores.append(False)
+                                i.active = True
                         if all(pos_scores) or len(pos_scores) == 0:
                             success = False
                     else:
@@ -163,8 +167,10 @@ def protac_sampling(
                         for i in protac_pose.active_confs():
                             if i.energy > protac_obj.unbound_energy:
                                 higher_energies.append(True)
+                                i.active = False
                             else:
                                 higher_energies.append(False)
+                                i.active = True
                         if all(higher_energies) or len(higher_energies) == 0:
                             success = False
                     else:
@@ -175,6 +181,7 @@ def protac_sampling(
                 protac_obj.protein_poses.append(pose_obj)
             else:
                 failed_poses.append(pose_obj)
+                protac_pose.active = False
 
             logger.debug(f"pose {pose_obj.pose_number}, protac {protac_obj.name} - {('success' if success else 'failed')}")
             

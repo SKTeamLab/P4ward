@@ -39,6 +39,7 @@ def get_protac_dist_cuttoff(
         reclig_file,
         liglig_file,
         dist_cutoff,
+        sampling_type,
         unbound_protac_num_confs
 ):
 
@@ -51,7 +52,7 @@ def get_protac_dist_cuttoff(
 
             import numpy as np
             from rdkit import Chem
-            from rdkit.Chem import rdFMCS
+            from rdkit.Chem import rdFMCS, AllChem
             
             def center_of_mass(atom_indices, conf):
 
@@ -67,9 +68,17 @@ def get_protac_dist_cuttoff(
                     zs.append(mass*z)
                 center = np.array([np.sum(xs)/total_mass, np.sum(ys)/total_mass, np.sum(zs)/total_mass])
                 return(center)
+            
+            if sampling_type == '2D':
 
-            protac_obj.sample_unbound_confs(num_unbound_confs=unbound_protac_num_confs)
-            protac = protac_obj.unbound_confs
+                unbound_protac_num_confs = 1
+                protac = Chem.MolFromSmiles(protac_obj.smiles)
+                AllChem.Compute2DCoords(protac)
+            
+            elif sampling_type == '3D':
+
+                protac_obj.sample_unbound_confs(num_unbound_confs=unbound_protac_num_confs)
+                protac = protac_obj.unbound_confs
 
             reclig = Chem.MolFromMol2File(str(reclig_file), sanitize=False, cleanupSubstructures=False)
             liglig = Chem.MolFromMol2File(str(liglig_file), sanitize=False, cleanupSubstructures=False)

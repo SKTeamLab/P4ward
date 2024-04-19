@@ -3,6 +3,7 @@ import argparse
 from shutil import copy
 from pathlib import Path
 from ..definitions import CWD, ROOT_DIR
+from ..tools.logger import logger
 
 
 def arg_parser(arguments):
@@ -48,6 +49,16 @@ def make_config(config_file, ROOT_DIR):
     conf = configparser.ConfigParser()
     conf.read(ROOT_DIR/'config'/'default.ini')
     conf.read(config_file)
+
+    # log the configuration used for this run
+    conf_str = "Configuration used:\n\n"
+    for section in conf.sections():
+        conf_str += f'[{section}]\n'
+        for key in conf[section]:
+            conf_str += f'{key} = {conf[section][key]}\n'
+        conf_str += '\n'
+
+    logger.debug(conf_str)
 
     return(conf)
 

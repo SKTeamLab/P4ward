@@ -77,15 +77,17 @@ def rxdock_rescore(params, pose_obj, receptor_obj, ligase_obj, protac_obj):
     protac_pose.scored_file = scored_protacs_file
 
 
-def capture_rxdock_scores(pose_obj, protac_obj):
+def capture_rxdock_scores(params, pose_obj, protac_obj):
 
     from openbabel import pybel
+
+    score_type = params['rxdock_target_score']
 
     protac_pose = protac_obj.get_pose(pose_obj)
     confs = pybel.readfile('sdf', str(protac_pose.scored_file))
     for conf in confs:
         conf_number = int(conf.data['Name'].split('_')[-1]) # name in sdf file is format "conf_X"
-        score = float(conf.data['SCORE'])
+        score = float(conf.data[score_type])
 
         linker_conf = [i for i in protac_pose.linker_confs if i.conf_number == int(conf_number)][0]
         linker_conf.rx_score = score

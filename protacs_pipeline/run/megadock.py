@@ -164,7 +164,7 @@ def rotate_atoms(atom_coords, ref_rotation, pose_rotation):
 
 @decorators.user_choice
 @decorators.track_run
-def cluster(ligase_obj, protac_objs, clustering_type, clustering_cutoff_redund, clustering_cutoff_trend):
+def cluster(ligase_obj, protac_objs, clustering_type, clustering_cutoff_redund, clustering_cutoff_trend, cluster_redund_repr):
     """
     cluster protein_poses' triad points for redundancy or trend using hieragglo with ward linkage
     """
@@ -228,7 +228,7 @@ def cluster(ligase_obj, protac_objs, clustering_type, clustering_cutoff_redund, 
     def enough_poses(pose_objs):
         check = len(pose_objs) > 1
         if not check:
-            logger.info("Cannot cluster protein poses because only 1 pose was sent to the clustering step. Skipping.")
+            logger.info("Cannot cluster protein poses because fewer than 2 poses were sent to the clustering step. Skipping.")
         return(check)
 
 
@@ -240,8 +240,13 @@ def cluster(ligase_obj, protac_objs, clustering_type, clustering_cutoff_redund, 
             cluster_obj = make_clusterer(pose_objs=pose_objs, cutoff=clustering_cutoff_redund)
             ligase_obj.cluster = cluster_obj
 
+            if cluster_redund_repr == 'centroid':
+                attribute = 'repr_centr'
+            elif cluster_redund_repr == 'best':
+                attribute = 'repr_best'
+
             for pose_obj in pose_objs:
-                if pose_obj in cluster_obj.repr_centr:
+                if pose_obj in getattr(cluster_obj, attribute):
                     pose_obj.active = True
                 else:
                     pose_obj.active = False

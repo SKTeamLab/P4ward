@@ -101,8 +101,12 @@ def conf_sampling(params, pose_obj, protac_obj, logger):
             linker_conf = classes.LinkerConf(parent=protac_pose_obj, conf_number=lconf['conf_number'])
             linker_conf.active = lconf['active']
             linker_conf.energy = lconf['energy']
-        protac_pose_obj.active = True
         protac_pose_obj.file = protac_file
+        # if no linker_conf is active, protac_pose_obj shouldn't be either
+        if any([lconf['active'] for lconf in linker_confs]):
+            protac_pose_obj.active = True
+        else:
+            protac_pose_obj.active = False
     except:
         logger.debug(f'No conformation possible for protac {protac_obj.name} on pose {pose_obj.pose_number}')
         protac_pose_obj.active = False

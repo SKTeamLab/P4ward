@@ -161,17 +161,17 @@ def protac_summaries(protac_objs):
     for protac_obj in protac_objs:
 
         cl_count = protac_obj.cluster.clusterer.n_clusters_
-        cl_sizes = []
         scores = [i.megadock_score for i in protac_obj.cluster.get_all_confs()]
-        for cln in protac_obj.cluster.clusters:
-            cl_sizes.append(protac_obj.cluster.get_cl_size(cln))
         
-        ratio = np.mean(cl_sizes)/cl_count
+        # ratio = np.mean(cl_sizes)/cl_count
+        n_ptn_poses = len(protac_obj.protein_poses)
+        avg_cl_size = n_ptn_poses/cl_count
         mean_score = np.mean(scores)
 
         logger.info(f'-> Protac {protac_obj.name}:')
         logger.info(f'Number of clusters = {cl_count}')
-        logger.info(f'Avg cluster size = {np.mean(cl_sizes)}')
-        logger.info(f'Ratio = {ratio}')
+        logger.info(f'Number of protein poses = {n_ptn_poses}')
+        logger.info(f'Avg cluster size = {avg_cl_size}')
+        logger.info(f'Avg cluster size / NClusters = {avg_cl_size/cl_count}')
         logger.info(f'Mean ptn score = {mean_score}')
         

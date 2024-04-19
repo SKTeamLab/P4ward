@@ -11,7 +11,6 @@ def fix_proteins(*protein_objs, fixed_suffix='_fixed', ignore_extremities=True, 
     creates attribute with fixed filepath and makes it active
     """
     from pdbfixer.pdbfixer import PDBFixer
-    import pymol2
 
     for protein_obj in protein_objs:
 

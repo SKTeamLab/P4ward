@@ -108,6 +108,7 @@ if __name__ == '__main__':
         liglig_file=ligase.lig_file,
         unbound_protac_num_confs=conf.getint('protac_sampling','unbound_protac_num_confs'),
         dist_cutoff=conf.get('protein_filter', 'filter_dist_cutoff'),
+        sampling_type=conf.get('protein_filter', 'filter_dist_sampling_type'),
         choice=conf.getboolean('protein_filter', 'ligand_distances')
     )
 
@@ -127,6 +128,7 @@ if __name__ == '__main__':
         clustering_type='redundancy',
         clustering_cutoff_redund=conf.getfloat('protein_ranking','clustering_cutoff_redund'),
         clustering_cutoff_trend=conf.getfloat('protein_ranking','clustering_cutoff_trend'),
+        cluster_redund_repr=conf.get('protein_ranking','cluster_redund_repr'),
         choice=conf.getboolean('protein_ranking', 'cluster_poses_redundancy')
     )
 
@@ -213,6 +215,7 @@ if __name__ == '__main__':
         rxdock_score=conf.getboolean('linker_ranking', 'rxdock_score'),
         linker_scoring_folder=Path(conf.get('linker_ranking','linker_scoring_folder')),
         minimize_protac=conf.getboolean('linker_ranking','rxdock_minimize'),
+        rxdock_target_score=conf.get('linker_ranking','rxdock_target_score'),
         num_parallel_procs=conf.getint('general', 'num_processors'),
         choice=conf.getboolean('linker_sampling', 'rdkit_sampling')
     )
@@ -223,6 +226,7 @@ if __name__ == '__main__':
         clustering_type='trend',
         clustering_cutoff_redund=conf.getfloat('protein_ranking','clustering_cutoff_redund'),
         clustering_cutoff_trend=conf.getfloat('protein_ranking','clustering_cutoff_trend'),
+        cluster_redund_repr=conf.get('protein_ranking','cluster_redund_repr'),
         choice=conf.getboolean('protein_ranking', 'cluster_poses_trend'),
         track=False
     )
