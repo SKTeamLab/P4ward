@@ -220,6 +220,11 @@ if __name__ == '__main__':
         choice=conf.getboolean('linker_sampling', 'rdkit_sampling')
     )
 
+    rank.rescore(
+        protac_objs=protacs,
+        choice=conf.getboolean('protein_ranking','rescore_poses')
+    )
+
     megadock.cluster(
         ligase_obj=ligase,
         protac_objs=protacs,

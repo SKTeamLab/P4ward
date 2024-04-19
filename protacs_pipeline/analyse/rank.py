@@ -34,7 +34,72 @@ def protein_poses(
     """log user choices"""
     logger.info('generated a final protein-protein ranking by megadock score')
     """"""
-    
+
+
+@decorators.user_choice
+@decorators.track_run
+def rescore(protac_objs):
+    """
+    For each protac, rescore its protein poses to combine ppi score
+    with protac-protein interaction score
+    """
+
+    import numpy as np
+    from sklearn.preprocessing import normalize
+
+    for protac_obj in protac_objs:
+
+        protac_pose_objs = protac_obj.active_poses()
+        ppis = []
+        interactions = []
+
+        for protac_pose_obj in protac_pose_objs:
+
+            interaction = np.mean([i.rx_score for i in protac_pose_obj.active_confs()])
+            ppi = protac_pose_obj.protein_parent.megadock_score
+            interactions.append(interaction)
+            ppis.append(ppi)
+
+        ppis = (np.array(ppis) * -1).reshape(-1,1) 
+        # ^ make values negative so that the lower the better to match with interactions
+        interactions = np.array(interactions).reshape(-1,1)
+        # ^ they are reshaped since they are features so they must be columns
+
+        data = np.concatenate((ppis, interactions), axis=1)
+        data_norm = normalize(data, norm='l2', axis=1)
+        scores = np.mean(data_norm, axis=1)
+
+        # record the new scores on the protac pose objs
+        for i in range(len(protac_pose_objs)):
+            protac_pose_obj = protac_pose_objs[i]
+            score = scores[i]
+            protac_pose_obj.rescore = score
+        
+        # sort the protein_poses list for the protac_obj based on the rescores
+        def get_rescore(pose_obj):
+            return(protac_obj.get_pose(pose_obj).rescore)
+        sorted_confs = sorted(protac_obj.protein_poses, key=lambda x: get_rescore(x), reverse=False)
+        protac_obj.protein_poses = sorted_confs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @decorators.track_run
 def generate_protein_poses(poses, pose_objs, generated_poses_folder, altlocA):

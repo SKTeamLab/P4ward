@@ -123,11 +123,7 @@ class ProteinPose():
             - self.active = Bool
             - self.top = Bool
         linker_sampling.rdkit_sampling()
-            - self.protac_pose
-        linker_sampling.capture_dock6_scores()
-            - self.linker_scores
-            - self.active_linkers
-            - self.active
+            - self.protac_pos
         
     """
 
@@ -306,6 +302,8 @@ class ProtacPose():
             - self.file
         linker_scoring.rxdock_rescore()
             - self.scored_file
+        rank.rescore()
+            - self.rescore
     """
 
     def __init__(self, parent, protein_parent) -> None:

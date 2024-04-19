@@ -9,11 +9,10 @@ def summary_csv(protac_objs, ligase_obj, benchmark, cluster_trend):
 
     for protac_obj in protac_objs:
 
-        pose_objs = [i for i in ligase_obj.active_confs() if i in protac_obj.protein_poses]
-        # ^ this ensures that the pose_objs list is still ranked as done by .rank.protein_poses()
-        # otherwise if I had done `pose_objs = protac_obj.protein_poses`, the list would not be
-        # ranked according to the docking score of choice
-
+        # pose_objs = [i for i in ligase_obj.active_confs() if i in protac_obj.protein_poses]
+        # # ^ this ensures that the pose_objs list is still ranked as done by rank.protein_poses()
+        pose_objs = protac_obj.protein_poses
+        # ^ this ensures that the pose_objs list is ranked by rank.rescore() if it was used
 
         ## get general protein pose attributes
         data_dict = {
@@ -81,10 +80,12 @@ def summary_csv(protac_objs, ligase_obj, benchmark, cluster_trend):
         data_dict['protac_pose'] = []
         data_dict['active_linkers'] = []
         data_dict['top_protac_score'] = []
+        data_dict['final_score'] = []
 
         for pose_obj in pose_objs:
             protac_pose = protac_obj.get_pose(pose_obj)
             data_dict['protac_pose'].append(protac_pose.active)
+            data_dict['final_score'].append(protac_pose.rescore)
             if protac_pose.active:
                 active_linkers = [i for i in protac_pose.linker_confs if i.active]
                 if len(active_linkers) == 0:
