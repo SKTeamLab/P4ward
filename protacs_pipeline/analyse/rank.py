@@ -82,25 +82,6 @@ def rescore(protac_objs):
         protac_obj.protein_poses = sorted_confs
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @decorators.track_run
 def generate_protein_poses(poses, pose_objs, generated_poses_folder, altlocA):
     """

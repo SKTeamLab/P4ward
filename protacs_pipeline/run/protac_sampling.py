@@ -160,8 +160,7 @@ def protac_sampling(
                                 i.active = True
                         if all(pos_scores) or len(pos_scores) == 0:
                             success = False
-                    else:
-                        success=True
+
                     if extend_top_poses_energy:
                         higher_energies = []
                         for i in protac_pose.active_confs():
@@ -173,8 +172,6 @@ def protac_sampling(
                                 i.active = True
                         if all(higher_energies) or len(higher_energies) == 0:
                             success = False
-                    else:
-                        success=True
 
             if success:
                 successful_poses.append(pose_obj)

@@ -220,6 +220,9 @@ if __name__ == '__main__':
         choice=conf.getboolean('linker_sampling', 'rdkit_sampling')
     )
 
+    # CHECKPOINT!
+    run_tracker.save_protein_objects(receptor_obj=receptor, ligase_obj=ligase, protac_objs=protacs)
+
     rank.rescore(
         protac_objs=protacs,
         choice=conf.getboolean('protein_ranking','rescore_poses')
