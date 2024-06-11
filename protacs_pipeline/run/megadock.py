@@ -164,7 +164,7 @@ def rotate_atoms(atom_coords, ref_rotation, pose_rotation):
 
 @decorators.user_choice
 @decorators.track_run
-def cluster(ligase_obj, protac_objs, clustering_type, clustering_cutoff_redund, clustering_cutoff_trend, cluster_redund_repr):
+def cluster(ligase_obj, protac_objs, clustering_type, clustering_cutoff_redund, clustering_cutoff_trend, cluster_redund_repr, rescore_poses):
     """
     cluster protein_poses' triad points for redundancy or trend using hieragglo with ward linkage
     """
@@ -175,7 +175,7 @@ def cluster(ligase_obj, protac_objs, clustering_type, clustering_cutoff_redund, 
     from sklearn.neighbors import NearestNeighbors
 
 
-    def make_clusterer(pose_objs, cutoff):
+    def make_clusterer(pose_objs, rescore_poses, cutoff):
 
         logger.info(f'Clustering protein poses for {clustering_type} using cutoff of {cutoff}')
 
@@ -209,13 +209,18 @@ def cluster(ligase_obj, protac_objs, clustering_type, clustering_cutoff_redund, 
 
         repr_centr = list(np.asarray(pose_objs)[indices].ravel())
         repr_best = []
+
         ## make cluster information and get best scores for each cluster
         cluster = classes.Cluster(clusterer=clusterer, type=clustering_type)
         
         for cln in range(clusterer.n_clusters_):
             cl_components = list(np.asarray(pose_objs)[clusterer.labels_ == cln])
             cluster.clusters[cln] = cl_components
-            best = cl_components[np.argmax([i.megadock_score for i in cl_components])]
+            if rescore_poses:
+                protac_components = [protac_obj.get_pose(i) for i in cl_components]
+                best = protac_components[np.argmin(i.rescore for i in protac_components)]
+            else:
+                best = cl_components[np.argmax([i.megadock_score for i in cl_components])]
             repr_best.append(best)
 
         cluster.repr_centr = repr_centr
@@ -237,7 +242,7 @@ def cluster(ligase_obj, protac_objs, clustering_type, clustering_cutoff_redund, 
         pose_objs = ligase_obj.active_confs()
         if enough_poses(pose_objs):
 
-            cluster_obj = make_clusterer(pose_objs=pose_objs, cutoff=clustering_cutoff_redund)
+            cluster_obj = make_clusterer(pose_objs=pose_objs, rescore_poses=rescore_poses, cutoff=clustering_cutoff_redund)
             ligase_obj.cluster = cluster_obj
 
             if cluster_redund_repr == 'centroid':
@@ -260,7 +265,7 @@ def cluster(ligase_obj, protac_objs, clustering_type, clustering_cutoff_redund, 
 
             pose_objs = protac_obj.protein_poses
             if enough_poses(pose_objs):
-                cluster_obj = make_clusterer(pose_objs=pose_objs, cutoff=clustering_cutoff_trend)
+                cluster_obj = make_clusterer(pose_objs=pose_objs, rescore_poses=rescore_poses, cutoff=clustering_cutoff_trend)
                 protac_obj.cluster = cluster_obj
             else:
                 protac_obj.cluster = None

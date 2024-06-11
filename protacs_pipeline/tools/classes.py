@@ -316,7 +316,6 @@ class ProtacPose():
         if self not in parent.poses:
             parent.poses.append(self)
     
-
     def active_confs(self):
         active_confs = [pose for pose in self.linker_confs if pose.active]
         return(active_confs)

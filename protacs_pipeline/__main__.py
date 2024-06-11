@@ -129,6 +129,7 @@ if __name__ == '__main__':
         clustering_cutoff_redund=conf.getfloat('protein_ranking','clustering_cutoff_redund'),
         clustering_cutoff_trend=conf.getfloat('protein_ranking','clustering_cutoff_trend'),
         cluster_redund_repr=conf.get('protein_ranking','cluster_redund_repr'),
+        rescore_poses=False,
         choice=conf.getboolean('protein_ranking', 'cluster_poses_redundancy')
     )
 
@@ -235,6 +236,7 @@ if __name__ == '__main__':
         clustering_cutoff_redund=conf.getfloat('protein_ranking','clustering_cutoff_redund'),
         clustering_cutoff_trend=conf.getfloat('protein_ranking','clustering_cutoff_trend'),
         cluster_redund_repr=conf.get('protein_ranking','cluster_redund_repr'),
+        rescore_poses=conf.get('protein_ranking','rescore_poses'),
         choice=conf.getboolean('protein_ranking', 'cluster_poses_trend'),
         track=False
     )
@@ -269,7 +271,7 @@ if __name__ == '__main__':
         benchmark=args.benchmark,
         cluster_trend=conf.getboolean('protein_ranking', 'cluster_poses_trend')
     )
-    summaries.protac_summaries(protac_objs=protacs)
+    summaries.protac_summaries(protac_objs=protacs, cluster_trend=conf.getboolean('protein_ranking', 'cluster_poses_trend'))
     summaries.chimerax_view(
         receptor_obj=receptor,
         pose_objs=[i for i in ligase.conformations if i.top],

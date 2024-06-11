@@ -63,7 +63,7 @@ def summary_csv(protac_objs, ligase_obj, benchmark, cluster_trend):
                 repr_centr = pose_obj in protac_obj.cluster.repr_centr
                 data_dict['cluster_centr'].append(repr_centr)
 
-                repr_best = pose_obj in protac_obj.cluster.repr_best
+                repr_best = pose_obj in [i.protein_parent for i in protac_obj.cluster.repr_best]
                 data_dict['cluster_best'].append(repr_best)
 
                 cln = protac_obj.cluster.get_cl_from_pose(pose_obj)
@@ -152,7 +152,7 @@ def chimerax_view(receptor_obj, protac_objs, pose_objs, generated_poses_folder, 
             cmx.write(script)
 
 
-def protac_summaries(protac_objs):
+def protac_summaries(protac_objs, cluster_trend):
     """
     Write protac cluster information
     """
@@ -161,18 +161,26 @@ def protac_summaries(protac_objs):
 
     for protac_obj in protac_objs:
 
-        cl_count = protac_obj.cluster.clusterer.n_clusters_
-        scores = [i.megadock_score for i in protac_obj.cluster.get_all_confs()]
-        
         # ratio = np.mean(cl_sizes)/cl_count
         n_ptn_poses = len(protac_obj.protein_poses)
-        avg_cl_size = n_ptn_poses/cl_count
-        mean_score = np.mean(scores)
-
-        logger.info(f'-> Protac {protac_obj.name}:')
-        logger.info(f'Number of clusters = {cl_count}')
-        logger.info(f'Number of protein poses = {n_ptn_poses}')
-        logger.info(f'Avg cluster size = {avg_cl_size}')
-        logger.info(f'Avg cluster size / NClusters = {avg_cl_size/cl_count}')
-        logger.info(f'Mean ptn score = {mean_score}')
         
+        logger.info(f'-> Protac {protac_obj.name}:')
+        logger.info(f'Number of protein poses = {n_ptn_poses}')
+        
+        
+        if cluster_trend:
+
+            cl_count = protac_obj.cluster.clusterer.n_clusters_
+            scores = [i.megadock_score for i in protac_obj.cluster.get_all_confs()]
+            avg_cl_size = n_ptn_poses/cl_count
+        
+            logger.info(f'Avg cluster size = {avg_cl_size}')
+            logger.info(f'Number of clusters = {cl_count}')
+            logger.info(f'Avg cluster size / NClusters = {avg_cl_size/cl_count}')
+        
+        else:
+
+            scores = [i.megadock_score for i in protac_obj.protein_poses]
+        
+        mean_score = np.mean(scores)
+        logger.info(f'Mean ptn score = {mean_score}')
