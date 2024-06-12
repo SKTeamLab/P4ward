@@ -224,3 +224,24 @@ def write_charges(*charge_lists, filepath):
     
     with open(filepath, 'w') as newfile:
         newfile.write('\n'.join(rawfile))
+
+
+def get_coords_array(pose_objs, ligase_obj):
+
+    import numpy as np
+    from ..run.megadock import rotate_atoms
+
+    a,c,d = ligase_obj.get_triad_points()
+
+    coords = []
+
+    for pose_obj in pose_objs:
+
+        a_rot = rotate_atoms(tuple(a), ref_rotation=ligase_obj.rotate, pose_rotation=pose_obj.rotate)
+        c_rot = rotate_atoms(tuple(c), ref_rotation=ligase_obj.rotate, pose_rotation=pose_obj.rotate)
+        d_rot = rotate_atoms(tuple(d), ref_rotation=ligase_obj.rotate, pose_rotation=pose_obj.rotate)
+
+        coords.append([*a_rot, *c_rot, *d_rot])
+
+    coords = np.asarray(coords)
+    return(coords)

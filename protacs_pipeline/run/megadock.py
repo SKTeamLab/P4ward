@@ -177,22 +177,13 @@ def cluster(ligase_obj, protac_objs, clustering_type, clustering_cutoff_redund, 
 
     def make_clusterer(pose_objs, rescore_poses, cutoff):
 
+        from .structure_tools import get_coords_array
+
         logger.info(f'Clustering protein poses for {clustering_type} using cutoff of {cutoff}')
 
-        a,c,d = ligase_obj.get_triad_points()
-        coords = []
-
-        for pose_obj in pose_objs:
-
-            a_rot = rotate_atoms(tuple(a), ref_rotation=ligase_obj.rotate, pose_rotation=pose_obj.rotate)
-            c_rot = rotate_atoms(tuple(c), ref_rotation=ligase_obj.rotate, pose_rotation=pose_obj.rotate)
-            d_rot = rotate_atoms(tuple(d), ref_rotation=ligase_obj.rotate, pose_rotation=pose_obj.rotate)
-
-            coords.append([*a_rot, *c_rot, *d_rot])
-
-        coords = np.asarray(coords)
-
         ## start clustering
+        coords = get_coords_array(pose_objs, ligase_obj)
+        
         clusterer = AgglomerativeClustering(
             n_clusters=None,
             distance_threshold=cutoff,

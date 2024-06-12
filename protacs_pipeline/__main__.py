@@ -281,4 +281,9 @@ if __name__ == '__main__':
         benchmark=args.benchmark,
         ref_ligase=args.ref_ligase
     )
-    plot.plot_ptn_poses(ligase)
+    plot.interactive_plots(
+        protacs=protacs,
+        ligase_obj=ligase,
+        receptor_obj=receptor,
+        conf=conf
+    )
