@@ -6,8 +6,8 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'Protacs Pipeline'
-copyright = '2023, Paula Jofily'
+project = 'P4ward'
+copyright = '2024, Paula Jofily'
 author = 'Paula Jofily'
 
 # -- General configuration ---------------------------------------------------
@@ -17,8 +17,6 @@ extensions = []
 
 templates_path = ['_templates']
 exclude_patterns = []
-
-
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

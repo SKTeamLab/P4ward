@@ -79,7 +79,7 @@ if __name__ == '__main__':
         program_path=conf.get('program_paths', 'megadock'),
         receptor_file=receptor.mg_file,
         ligase_file=ligase.mg_file,
-        num_threads=conf.get('megadock', 'num_threads'),
+        num_threads=conf.get('general', 'num_processors'),
         run_docking_output_file=conf.get('megadock', 'run_docking_output_file'),
         num_predictions=conf.get('megadock', 'num_predictions'),
         num_predictions_per_rotation=conf.get('megadock', 'num_predictions_per_rotation'),

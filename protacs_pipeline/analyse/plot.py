@@ -12,6 +12,7 @@ def make_step_check(conf):
 
     steps = {
         'all'         : conf.getboolean('megadock', 'run_docking'),
+        'cl_red'      : conf.getboolean('protein_ranking', 'cluster_poses_trend'),
         'dist_filter' : conf.getboolean('protein_filter', 'ligand_distances'),
         'crl_noclash' : conf.getboolean('protein_filter', 'crl_model_clash'),
         'crl_lys'     : conf.getboolean('protein_filter', 'accessible_lysines'),
@@ -28,12 +29,13 @@ def make_step_check(conf):
 
 def plot_funnel(ligase_obj, protac_obj, steps):
 
-    plot_labels = ['all','dist_filter','crl_noclash','crl_lys','protac','cl_trend']
+    plot_labels = ['all','dist_filter','cl_red','crl_noclash','crl_lys','protac','cl_trend']
     labels = [i for i in plot_labels if steps[i]]
     crl_filtered = [i for i in ligase_obj.conformations if i.filter_info.get('crls') is not None]
     all_counts = {
         'all'         : len(ligase_obj.conformations),
         'dist_filter' : len([i for i in ligase_obj.conformations if i.filter_info['dist_filter']]),
+        'cl_red'      : ligase_obj.cluster.clusterer.n_clusters_,
         'crl_noclash' : len([i for i in crl_filtered if any(j >= 0 for j in i.filter_info['crls'])]),
         'crl_lys'     : len([i for i in crl_filtered if any(j >= 1 for j in i.filter_info['crls'])]),
         'protac'      : len(protac_obj.protein_poses),

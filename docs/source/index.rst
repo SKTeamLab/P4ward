@@ -3,8 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Protacs Pipeline's documentation!
+Welcome to P4ward's documentation!
 ============================================
+
+P4ward stands for Predictive Protacs Python Pipeline: Workflow Automation for Research and Design
 
 .. toctree::
    :maxdepth: 2
@@ -13,10 +15,9 @@ Welcome to Protacs Pipeline's documentation!
    config_reference
 
 
+.. Indices and tables
+.. ==================
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. * :ref:`genindex`
+.. * :ref:`modindex`
+.. * :ref:`search`

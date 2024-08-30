@@ -107,10 +107,6 @@ def generate_protein_poses(poses, pose_objs, generated_poses_folder, altlocA):
         final_poses = [i for i in pose_objs if i.filtered]
     elif poses == 'top':
         final_poses = [i for i in pose_objs if i.top]
-    elif poses == 'filtered_clreps':
-        final_poses = [i for i in pose_objs if i.filtered and i.clrep]
-    elif poses == 'top_clreps':
-        final_poses = [i for i in pose_objs if i.top and i.clrep]
     else:
         raise Exception("Invalid choice for generate_poses")
     
