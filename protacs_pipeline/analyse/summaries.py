@@ -50,8 +50,8 @@ def summary_csv(protac_objs, ligase_obj, benchmark, cluster_trend):
                 data_dict[attr].append(attr_value)
 
 
-        ## get cluster trend attributes
-        if cluster_trend:
+        ## get cluster trend attributes if clustering ran successfully
+        if cluster_trend and hasattr(protac_obj.cluster, 'repr_centr'):
 
             data_dict['cluster_number'] = []
             data_dict['cluster_centr'] = []
