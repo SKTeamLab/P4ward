@@ -82,6 +82,12 @@ def get_protac_dist_cuttoff(
                 protac = protac_obj.unbound_confs
                 num_sampled_confs = protac_obj.num_confs
 
+                if num_sampled_confs == 0 or num_sampled_confs <= 0.1 * unbound_protac_num_confs:
+                    logger.warning(
+                        f"RDKit sampled {num_sampled_confs} but {unbound_protac_num_confs} were requested. "+
+                        f"This could be a challenging molecule, consider increasing {unbound_protac_num_confs}."
+                    )
+
             reclig = Chem.MolFromMol2File(str(reclig_file), sanitize=False, cleanupSubstructures=False)
             liglig = Chem.MolFromMol2File(str(liglig_file), sanitize=False, cleanupSubstructures=False)
 
