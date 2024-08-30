@@ -74,11 +74,13 @@ def get_protac_dist_cuttoff(
                 unbound_protac_num_confs = 1
                 protac = Chem.MolFromSmiles(protac_obj.smiles)
                 AllChem.Compute2DCoords(protac)
+                num_sampled_confs = 1
             
             elif sampling_type == '3D':
 
                 protac_obj.sample_unbound_confs(num_unbound_confs=unbound_protac_num_confs)
                 protac = protac_obj.unbound_confs
+                num_sampled_confs = protac_obj.num_confs
 
             reclig = Chem.MolFromMol2File(str(reclig_file), sanitize=False, cleanupSubstructures=False)
             liglig = Chem.MolFromMol2File(str(liglig_file), sanitize=False, cleanupSubstructures=False)
@@ -92,7 +94,8 @@ def get_protac_dist_cuttoff(
         
             distances = []
 
-            for i in range(unbound_protac_num_confs):
+            # iterate through how many conformations were actually sampled for the protac
+            for i in range(num_sampled_confs):
 
                 conf = Chem.Mol(protac, confId=i)
                 center_reclig = center_of_mass(receptor_lig_indices, conf)

@@ -277,6 +277,7 @@ class Protac():
             energies.append(ff.CalcEnergy())
 
         self.unbound_confs = protac
+        self.num_confs = protac.GetNumConformers()
         self.unbound_energy = np.max(energies)
 
     
@@ -285,7 +286,7 @@ class Protac():
         from rdkit import Chem
 
         with open(filename, 'a+') as protac_file:
-            for i in range(num_unbound_confs):
+            for i in range(self.num_confs):
                 molblock = Chem.MolToMolBlock(self.unbound_confs, confId=i, kekulize=False)
                 protac_file.write(f'conf_{i}')
                 protac_file.write(molblock)
