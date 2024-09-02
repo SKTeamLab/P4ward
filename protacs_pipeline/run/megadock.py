@@ -192,11 +192,17 @@ def cluster(ligase_obj, protac_objs, clustering_type, clustering_cutoff_redund, 
         ).fit(coords)
 
         ## get the centroids
-        nc = NearestCentroid()
-        nc.fit(coords, clusterer.labels_)
+        if clusterer.n_clusters_ == 1:
+            # cannot use NearestCentroid if there is only 1 cluster
+            centroids = coords.mean(axis=0).reshape(1,-1)
+        else:
+            nc = NearestCentroid()
+            nc.fit(coords, clusterer.labels_)
+            centroids = nc.centroids_
+
         knn = NearestNeighbors(n_neighbors=1)
         knn.fit(coords)
-        _, indices = knn.kneighbors(nc.centroids_)
+        _, indices = knn.kneighbors(centroids)
 
         repr_centr = list(np.asarray(pose_objs)[indices].ravel())
         repr_best = []
