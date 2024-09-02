@@ -24,9 +24,9 @@ brunsli=0.1=h2531618_0
 bzip2=1.0.8=h7b6447c_0
 c-ares=1.19.1=h5eee18b_0
 c-blosc2=2.8.0=h6a678d5_0
-ca-certificates=2023.08.22=h06a4308_0
+ca-certificates=2024.2.2=hbcca054_0
 cairo=1.16.0=hb05425b_5
-certifi=2023.7.22=py311h06a4308_0
+certifi=2024.2.2=pyhd8ed1ab_0
 cffi=1.15.1=py311h5eee18b_3
 cfitsio=4.2.0=hd9d235c_0
 charls=2.4.1=hcb278e6_0
@@ -135,7 +135,7 @@ libsndfile=1.2.0=hb75c966_0
 libsodium=1.0.18=h7b6447c_0
 libsqlite=3.42.0=h2797004_0
 libssh2=1.10.0=hdbd6064_2
-libstdcxx-ng=12.2.0=h46fd767_19
+libstdcxx-ng=13.2.0=h7e041cc_5
 libsystemd0=253=h8c4010b_1
 libtiff=4.5.0=ha587672_6
 libuuid=2.38.1=h0b41bf4_0
@@ -178,7 +178,7 @@ oddt=0.7=pyh500f238_0
 openbabel=3.1.1=py311ha3c2874_7
 openjpeg=2.5.0=hfec8fc6_2
 openmm=8.0.0=py311h59c6c42_1
-openssl=3.1.2=hd590300_0
+openssl=3.1.5=hd590300_0
 packaging=23.1=py311h06a4308_0
 pandas=2.0.3=py311ha02d727_0
 parso=0.8.3=pyhd3eb1b0_0
@@ -192,6 +192,7 @@ pillow=9.5.0=py311h0b84326_1
 pip=23.2.1=py311h06a4308_0
 pixman=0.40.0=h7f8727e_1
 platformdirs=3.10.0=py311h06a4308_0
+plotly=5.18.0=pyhd8ed1ab_0
 ply=3.11=py311h06a4308_0
 pmw=2.0.1=py311h38be061_1007
 prompt-toolkit=3.0.36=py311h06a4308_0
@@ -203,6 +204,7 @@ pycairo=1.23.0=py311hd1222b9_0
 pycparser=2.21=pyhd3eb1b0_0
 pygments=2.15.1=py311h06a4308_1
 pymol-open-source=2.5.0=py311hf3bc80d_6
+pympler=1.0.1=pyhd8ed1ab_0
 pyopenssl=23.2.0=py311h06a4308_0
 pyparsing=3.0.9=py311h06a4308_0
 pyqt=5.15.7=py311ha74522f_3
@@ -249,6 +251,7 @@ stack_data=0.2.0=pyhd3eb1b0_0
 statsmodels=0.14.0=py311hf4808d0_0
 tabulate=0.9.0=pyhd8ed1ab_1
 tbb=2021.8.0=hdb19cb5_0
+tenacity=8.2.3=pyhd8ed1ab_0
 threadpoolctl=2.2.0=pyh0d69192_0
 tifffile=2023.4.12=py311h06a4308_0
 tk=8.6.12=h1ccaba5_0

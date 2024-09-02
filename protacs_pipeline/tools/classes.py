@@ -279,6 +279,7 @@ class Protac():
         self.unbound_confs = protac
         self.num_confs = protac.GetNumConformers()
         self.unbound_energy = np.max(energies)
+            
 
     
     def write_unbound_confs(self, num_unbound_confs=100, filename='unbound_protac.sdf'):
