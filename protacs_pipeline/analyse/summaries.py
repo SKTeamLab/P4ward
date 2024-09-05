@@ -83,9 +83,15 @@ def summary_csv(protac_objs, ligase_obj, benchmark, cluster_trend):
         data_dict['final_score'] = []
 
         for pose_obj in pose_objs:
+
             protac_pose = protac_obj.get_pose(pose_obj)
             data_dict['protac_pose'].append(protac_pose.active)
-            data_dict['final_score'].append(protac_pose.rescore)
+
+            if hasattr(protac_pose, 'rescore'):
+                data_dict['final_score'].append(protac_pose.rescore)
+            else:
+                data_dict['final_score'].append(None)
+                
             if protac_pose.active:
                 active_linkers = [i for i in protac_pose.linker_confs if i.active]
                 if len(active_linkers) == 0:

@@ -67,7 +67,7 @@ def rescore(protac_objs):
 
         data = np.concatenate((ppis, interactions), axis=1)
         if len(data) <= 1:
-            logger.info('Cannot rescore complexes because only complex was sent to scoring function.')
+            logger.info('Cannot rescore complexes because less than 2 complexes were sent to scoring function.')
             return(None)
         data_norm = normalize(data, norm='l2', axis=1)
         scores = np.mean(data_norm, axis=1)
