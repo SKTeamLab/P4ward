@@ -85,7 +85,7 @@ def get_protac_dist_cuttoff(
                 if num_sampled_confs == 0 or num_sampled_confs <= 0.1 * unbound_protac_num_confs:
                     logger.warning(
                         f"RDKit sampled {num_sampled_confs} but {unbound_protac_num_confs} were requested. "+
-                        f"This could be a challenging molecule, consider increasing {unbound_protac_num_confs}."
+                        f"This could be a challenging molecule, consider increasing unbound_protac_num_confs and rdkit_number_of_confs."
                     )
 
             reclig = Chem.MolFromMol2File(str(reclig_file), sanitize=False, cleanupSubstructures=False)

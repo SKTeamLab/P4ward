@@ -162,8 +162,6 @@ if __name__ == '__main__':
     #~~~~~~~~~~~ protein ranking ~~~~~~~~~~~#
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
-
-
     #rank final protein poses
     from .analyse import rank
 
