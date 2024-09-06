@@ -21,7 +21,7 @@ if __name__ == '__main__':
     if args.write_default:
         config.write_default_conf()
         exit(0)
-
+    
     conf = config.make_config(args.config_file, ROOT_DIR)
     # load run tracker from previous run
     tracker = run_tracker.load_tracker(overwrite=conf.getboolean('general', 'overwrite'))
@@ -32,6 +32,11 @@ if __name__ == '__main__':
         conf=conf,
         overwrite=conf.getboolean('general', 'overwrite')
     )
+
+    if args.check_lig_matches:
+        from .run.protac_prep import check_ligand_matches
+        check_ligand_matches(protacs, receptor, ligase, conf.getboolean('general','rdkit_ligands_cleanup'))
+        exit(0)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     #~~~~~~~~~~~~ prep proteins ~~~~~~~~~~~~#

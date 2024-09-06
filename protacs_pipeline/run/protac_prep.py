@@ -34,17 +34,18 @@ def get_matches(protac, reclig, liglig, reference_ligs):
     return(matches)
 
 
-def check_linker_size(protac, indices_ligs, min_linker_length, neighbour_number, matches):
+def make_indices_link(protac, indices_ligs):
+    indices_link = []
+    for atom in Chem.RemoveHs(protac).GetAtoms():
+        ix = atom.GetIdx()
+        if ix not in indices_ligs:
+            indices_link.append(ix)
+    return(indices_link)
 
-    def make_indices_link():
-        indices_link = []
-        for atom in Chem.RemoveHs(protac).GetAtoms():
-            ix = atom.GetIdx()
-            if ix not in indices_ligs:
-                indices_link.append(ix)
-        return(indices_link)
-    
-    indices_link = make_indices_link()
+
+def check_linker_size(protac, indices_ligs, min_linker_length, neighbour_number, matches):
+   
+    indices_link = make_indices_link(protac, indices_ligs)
     
     if len(indices_link) <= min_linker_length:
         logger.warning(f"Linker length is {len(indices_link)}, extending flexibility to neighbouring atoms.")
@@ -89,6 +90,47 @@ def check_linker_size(protac, indices_ligs, min_linker_length, neighbour_number,
         logger.info(f"Linker length is {len(indices_link)}, not extending flexibility.")
     
     return(matches)
+
+
+def check_ligand_matches(protac_objs, receptor_obj, ligase_obj, rdkit_ligands_cleanup):
+
+    from rdkit.Chem.Draw import rdMolDraw2D
+    from ..definitions import CWD
+
+    reclig = Chem.MolFromMol2File(str(receptor_obj.lig_file), sanitize=rdkit_ligands_cleanup, cleanupSubstructures=rdkit_ligands_cleanup)
+    liglig = Chem.MolFromMol2File(str(ligase_obj.lig_file), sanitize=rdkit_ligands_cleanup, cleanupSubstructures=rdkit_ligands_cleanup)
+    reference_ligs = Chem.CombineMols(liglig, reclig)
+
+    logger.info(
+        f"Testing ligand match between the protac smiles codes " +
+        f"and the ligand structures at {receptor_obj.lig_file.name} and {ligase_obj.lig_file.name}"
+    )
+
+    for protac_obj in protac_objs:
+        
+        protac = Chem.MolFromSmiles(protac_obj.smiles)
+        matches_ = get_matches(protac, reclig, liglig, reference_ligs)
+        matches = [*matches_['receptor_lig_indices'], *matches_['pose_lig_indices']]
+
+        indices_ligs = list(matches_['receptor_lig_indices'])
+        indices_ligs.extend(list(matches_['pose_lig_indices']))
+
+        # draw the protac with the highlighted matches
+        drawer = rdMolDraw2D.MolDraw2DCairo(1366, 1366)
+        drawer.drawOptions().addAtomIndices = True
+        highlight_atoms = [atom for atom in matches]
+        drawer.DrawMolecule(protac, highlightAtoms=highlight_atoms)
+        drawer.FinishDrawing()
+
+        with open(CWD / f'ligand_matches-{protac_obj.name}.png', 'wb') as img:
+            img.write(drawer.GetDrawingText())
+        
+        indices_link = make_indices_link(protac, indices_ligs)
+
+        logger.info(
+            f"Wrote image for {protac_obj.name} matches at ligand_matches-{protac_obj.name}.png" +
+            f"Number of linker atoms found: {len(indices_link)}, at indices: {indices_link}"
+        )
 
 
 #~~~~~~~~~~~~~~~~~~~

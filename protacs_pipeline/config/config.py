@@ -24,6 +24,11 @@ def arg_parser(arguments):
         help='Copy full configuration file and quit the program.'
     )
     parser.add_argument(
+        "--check_lig_matches",
+        action='store_true',
+        help='Check that P4ward can accurately identify the ligands and linker in the protac structure.'
+    )    
+    parser.add_argument(
         "--benchmark",
         action='store_true',
         help='Benchmark a modelling run.'
