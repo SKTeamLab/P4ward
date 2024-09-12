@@ -282,11 +282,22 @@ if __name__ == '__main__':
         generated_poses_folder=conf.get('protein_ranking', 'generated_poses_folder'),
         protac_poses_folder=conf.get('linker_sampling', 'protac_poses_folder'),
         benchmark=args.benchmark,
-        ref_ligase=args.ref_ligase
+        ref_ligase=args.ref_ligase,
+        choice=conf.getboolean('outputs','chimerax_view')
+    )
+    summaries.write_crl_complex(
+        receptor_obj=receptor,
+        protac_objs=protacs,
+        e3=conf.get('protein_filter','e3'),
+        protac_poses_folder=Path(conf.get('linker_sampling', 'protac_poses_folder')),
+        linker_scoring_folder=Path(conf.get('linker_ranking','linker_scoring_folder')),
+        cluster_rep_only=conf.getboolean('outputs','crl_cluster_rep_only'),
+        choice=conf.getboolean('outputs','write_crl_complex')
     )
     plot.interactive_plots(
         protacs=protacs,
         ligase_obj=ligase,
         receptor_obj=receptor,
-        conf=conf
+        conf=conf,
+        choice=conf.getboolean('outputs','plots')
     )

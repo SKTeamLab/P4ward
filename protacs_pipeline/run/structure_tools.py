@@ -1,5 +1,6 @@
 from ..tools.logger import logger
 from ..tools import decorators
+from ..definitions import ROOT_DIR
 from pathlib import Path
 import subprocess
 
@@ -254,3 +255,19 @@ def get_coords_array(pose_objs, ligase_obj):
 
     coords = np.asarray(coords)
     return(coords)
+
+
+def get_e3_modelfile(e3, model_number=1, subrec_only=False):
+    """
+    return the a model file corresponding to the e3 (vhl or crbn) and the model number
+    if subrec_only == True, we get the pdb that contains only the vhl or crbn proteins
+    if False, we get the pdb which contains the full crl model
+    """
+    if subrec_only:
+        filename = f'model{model_number}_{e3}.pdb'
+    else:
+        filename = f'model{model_number}.pdb' 
+    
+    modelfile =  ROOT_DIR / 'structures' / 'crl_models' / e3 / filename
+    return(modelfile)
+    

@@ -1,6 +1,8 @@
 import pandas as pd
 from pathlib import Path
+from ..tools import decorators
 from ..tools.logger import logger
+from ..definitions import CWD
 
 def summary_csv(protac_objs, ligase_obj, benchmark, cluster_trend):
 
@@ -110,6 +112,7 @@ def summary_csv(protac_objs, ligase_obj, benchmark, cluster_trend):
         data.to_csv(results_folder / f'summary-{protac_obj.name}.csv')
 
 
+@decorators.user_choice
 def chimerax_view(receptor_obj, protac_objs, pose_objs, generated_poses_folder, protac_poses_folder, benchmark=False, ref_ligase=None):
     """
     Make a chimerax visualization script to see the final successful poses
@@ -190,3 +193,50 @@ def protac_summaries(protac_objs, cluster_trend):
         
         mean_score = np.mean(scores)
         logger.info(f'Mean ptn score = {mean_score}')
+
+
+@decorators.user_choice
+def write_crl_complex(receptor_obj, protac_objs, e3, protac_poses_folder, linker_scoring_folder, cluster_rep_only=True):
+
+    import pymol2
+    from ..structures.model_info import model_info
+    from ..run.structure_tools import get_e3_modelfile
+
+    crl_folder = CWD / 'crl_models'
+
+    for protac_obj in protac_objs:
+
+        if cluster_rep_only and hasattr(protac_obj.cluster, 'repr_centr'):
+            pose_objs = protac_obj.cluster.repr_centr
+        else:
+            pose_objs = protac_obj.protein_poses
+        
+        for pose_obj in pose_objs:
+
+            output_folder = crl_folder / f'protac_{protac_obj.name}' / f'protein_pose{pose_obj.pose_number}'
+            output_folder.mkdir(parents=True, exist_ok=True)
+
+            for model_num in model_info[e3]['model_numbers']:
+
+                crl_file = get_e3_modelfile(e3, model_number=model_num, subrec_only=False)
+                receptor_file = receptor_obj.active_file
+                pose_file = pose_obj.file
+
+                protac_file = linker_scoring_folder / f'protac_{protac_obj.name}' / f'protein_pose_{pose_obj.pose_number}' / 'protac_scored_confs.sdf'
+                if not protac_file.is_file():
+                    protac_file = protac_poses_folder / f'protac_{protac_obj.name}' / f'protein_pose_{pose_obj.pose_number}' / 'protac_embedded_confs.sdf'
+                
+                output_file = output_folder / f'model{model_num}.pdb'
+
+                with pymol2.PyMOL() as pm:
+
+                    pm.cmd.load(crl_file, 'target')
+                    pm.cmd.load(pose_file, 'moving')
+                    pm.cmd.load(receptor_file, 'bring_receptor')
+                    pm.cmd.load(protac_file, 'bring_protac')
+
+                    pm.cmd.align('moving', 'target')
+                    pm.cmd.matrix_copy('moving','bring_receptor')
+                    pm.cmd.matrix_copy('moving', 'bring_protac', target_state=0)
+
+                    pm.cmd.save(output_file, state=0)

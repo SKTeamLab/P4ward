@@ -78,35 +78,12 @@ def crl_filters(
     from copy import deepcopy
     import numpy as np
     from Bio.PDB import Superimposer
+    from .structure_tools import get_e3_modelfile
+    from ..structures.model_info import model_info
 
+    model_info['vhl']['dist_cutoff'] = vhl_ubq_dist_cutoff
+    model_info['crbn']['dist_cutoff'] = crbn_ubq_dist_cutoff
 
-    model_info = {
-        'vhl':{
-            'model_numbers' : [1],
-            'ubq_point'     : np.array([-1.400, 47.989, 16.144]),
-            'dist_cutoff'   : vhl_ubq_dist_cutoff
-        },
-        'crbn':{
-            'model_numbers' : [1,2,3,4,5,9,10,11,12],
-            'ubq_point'     : np.array([-33.329, -5.636, 15.041]),
-            'dist_cutoff'   : crbn_ubq_dist_cutoff
-        }
-    }
-
-    def get_e3_modelfile(e3, model_number=1, subrec_only=False):
-        """
-        return the a model file corresponding to the e3 (vhl or crbn) and the model number
-        if subrec_only == True, we get the pdb that contains only the vhl or crbn proteins
-        if False, we get the pdb which contains the full crl model
-        """
-        if subrec_only:
-            filename = f'model{model_number}_{e3}.pdb'
-        else:
-            filename = f'model{model_number}.pdb' 
-        
-        modelfile =  ROOT_DIR / 'structures' / 'crl_models' / e3 / filename
-        return(modelfile)
-        
     def check_model_clash(
             full_model_struct, rec_struct_align,
             clash_threshold, clash_count_tol

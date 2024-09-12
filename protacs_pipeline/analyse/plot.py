@@ -3,6 +3,7 @@ import numpy as np
 import plotly.express as px
 import plotly.io as pio
 from ..tools.logger import logger
+from ..tools import decorators
 
 
 plot_colors = ['#34345e', '#548687', '#FCAA67', '#eee220']
@@ -184,7 +185,7 @@ def plot_scatter(protac_obj):
     fig_html = pio.to_html(fig)
     return(fig_html)
 
-
+@decorators.user_choice
 def interactive_plots(
         protacs,
         ligase_obj,
