@@ -9,16 +9,16 @@ from ..tools import decorators
 plot_colors = ['#34345e', '#548687', '#FCAA67', '#eee220']
 
 
-def make_step_check(conf):
+def make_step_check(conf, protac_obj):
 
     steps = {
         'all'         : conf.getboolean('megadock', 'run_docking'),
-        'cl_red'      : conf.getboolean('protein_ranking', 'cluster_poses_trend'),
+        'cl_red'      : conf.getboolean('protein_ranking', 'cluster_poses_redundancy'),
         'dist_filter' : conf.getboolean('protein_filter', 'ligand_distances'),
         'crl_noclash' : conf.getboolean('protein_filter', 'crl_model_clash'),
         'crl_lys'     : conf.getboolean('protein_filter', 'accessible_lysines'),
         'protac'      : conf.getboolean('linker_sampling', 'rdkit_sampling'),
-        'cl_trend'    : conf.getboolean('protein_ranking', 'cluster_poses_trend'),
+        'cl_trend'    : conf.getboolean('protein_ranking', 'cluster_poses_trend') and hasattr(protac_obj.cluster, 'repr_centr'),
         'filter'      : (
             conf.getboolean('protein_filter', 'ligand_distances') or 
             conf.getboolean('protein_filter', 'crl_model_clash') or
