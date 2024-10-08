@@ -288,3 +288,26 @@ Default: ``False``
 * ``rxdock_target_score``
 
 Which score value to capture from RXdock. Values can be ``SCORE`` or ``SCORE.INTER``. Please refer to RXdock documentation for detailed description of these values. Default: ``SCORE.INTER``
+
+Outputs
+-------
+
+* ``plots``
+
+Whether to generate analysis plots.
+Default: ``True``
+
+* ``chimerax_view``
+
+Whether to generate ChimeraX script for visualization of the results.
+Default: ``True``
+
+* ``write_crl_complex``
+
+Whether to write the full CRL complex models for the final predictions.
+Default: ``True``
+
+* ``crl_cluster_rep_only``
+
+If writing CRL models, write only for the cluster representative structures.
+Default: ``True``

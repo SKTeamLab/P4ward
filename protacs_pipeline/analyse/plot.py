@@ -36,11 +36,11 @@ def plot_funnel(ligase_obj, protac_obj, steps):
     all_counts = {
         'all'         : len(ligase_obj.conformations),
         'dist_filter' : len([i for i in ligase_obj.conformations if i.filter_info['dist_filter']]),
-        'cl_red'      : ligase_obj.cluster.clusterer.n_clusters_,
+        'cl_red'      : (ligase_obj.cluster.clusterer.n_clusters_ if hasattr(ligase_obj,'cluster') else None),
         'crl_noclash' : len([i for i in crl_filtered if any(j >= 0 for j in i.filter_info['crls'])]),
         'crl_lys'     : len([i for i in crl_filtered if any(j >= 1 for j in i.filter_info['crls'])]),
         'protac'      : len(protac_obj.protein_poses),
-        'cl_trend'    : protac_obj.cluster.clusterer.n_clusters_
+        'cl_trend'    : (protac_obj.cluster.clusterer.n_clusters_ if hasattr(protac_obj, 'cluster') else None)
     }
     counts = {i:all_counts[i] for i in plot_labels if steps[i]}
 
@@ -215,7 +215,7 @@ def interactive_plots(
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Combined Plotly Plots</title>
+    <title>P4ward Result Plots</title>
     <!-- <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> -->
 </head>
 <body>
