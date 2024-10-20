@@ -97,9 +97,22 @@ def check_ligand_matches(protac_objs, receptor_obj, ligase_obj, rdkit_ligands_cl
     from rdkit.Chem.Draw import rdMolDraw2D
     from ..definitions import CWD
 
-    reclig = Chem.MolFromMol2File(str(receptor_obj.lig_file), sanitize=rdkit_ligands_cleanup, cleanupSubstructures=rdkit_ligands_cleanup)
-    liglig = Chem.MolFromMol2File(str(ligase_obj.lig_file), sanitize=rdkit_ligands_cleanup, cleanupSubstructures=rdkit_ligands_cleanup)
-    reference_ligs = Chem.CombineMols(liglig, reclig)
+    try:
+
+        reclig = Chem.MolFromMol2File(str(receptor_obj.lig_file), sanitize=rdkit_ligands_cleanup, cleanupSubstructures=rdkit_ligands_cleanup)
+        liglig = Chem.MolFromMol2File(str(ligase_obj.lig_file), sanitize=rdkit_ligands_cleanup, cleanupSubstructures=rdkit_ligands_cleanup)
+        reference_ligs = Chem.CombineMols(liglig, reclig)
+
+    except Exception as e:
+
+        logger.error(
+            "Ligand matching failed." +
+            "Please check your structures and consider turning off RDKit ligand sanitization.\n" +
+            "RDKit error:\n" +
+            str(e)
+        )
+        exit(0)
+
 
     logger.info(
         f"Testing ligand match between the protac smiles codes " +
@@ -128,9 +141,10 @@ def check_ligand_matches(protac_objs, receptor_obj, ligase_obj, rdkit_ligands_cl
         indices_link = make_indices_link(protac, indices_ligs)
 
         logger.info(
-            f"Wrote image for {protac_obj.name} matches at ligand_matches-{protac_obj.name}.png" +
+            f"Wrote image for {protac_obj.name} matches at ligand_matches-{protac_obj.name}.png\n" +
             f"Number of linker atoms found: {len(indices_link)}, at indices: {indices_link}"
         )
+        
 
 
 #~~~~~~~~~~~~~~~~~~~
