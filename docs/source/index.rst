@@ -3,21 +3,32 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to P4ward's documentation!
-============================================
+P4ward: Predictive Protacs Python Pipeline - Workflow Automation for Research and Design.
+===================================
 
-P4ward stands for Predictive Protacs Python Pipeline: Workflow Automation for Research and Design
+P4ward is a fully automated, customizable and open-source program for Protacs ternary complex modelling. From two known binary complexes and a list of Protac 2D conformations, it can predict ternary complexes for each protac listed.
+
+P4ward is written in Python3 and integrates permissively licensed structural biology tools, such as Megadock, RxDock, and libraries such as RDkit and BioPython to build a workflow with no accessibility barriers. As such, we acknowledge the countless contributors to open-source code which enables research by all and for all.
+
+----------------
+Getting Started
+----------------
+
+P4ward can be easily obtained with docker and conda. Please read :doc:`obtain` for more information.
+For a tutorial on how to run P4ward, go to :doc:`tutorial`
+
+-----
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
    
    config_reference
+   test_docstrings
 
+Indices and tables
+==================
 
-.. Indices and tables
-.. ==================
-
-.. * :ref:`genindex`
-.. * :ref:`modindex`
-.. * :ref:`search`
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

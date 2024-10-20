@@ -1,5 +1,16 @@
-Welcome to Protacs Pipeline's documentation!
-============================================
+P4ward Configuration
+====================
+
+All the settings for a P4ward run can be found at the ``config.ini`` file. All settings have default values which are populated automatically if the configuration option cannot be found in ``config.ini``. This page describes all settings. In order to view an ``.ini`` file with all the default values, run p4ward with:
+
+.. code-block:: bash
+
+   p4ward --write_default
+
+This will result in a file called ``default.ini`` to be written to the working directory.
+This is a test of refering to :func:`protacs_pipeline.run.megadock.cluster`
+
+-------
 
 Program Paths
 -------------

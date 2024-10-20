@@ -65,7 +65,10 @@ def run_docking(program_path, receptor_file, ligase_file, num_threads, run_docki
 def capture_scores(run_docking_output_file, ligase_obj):
     """
     Grab all original megadock scores from run_docking_output_file and
-    generate the ProteinPose objs from the docking run
+    generate the ProteinPose objs from the docking run.
+
+    :param run_docking_output_file: file generated my megadock output
+    :param ligase_obj: object representing the ligase
     """
     from ..tools.classes import ProteinPose
     logger.info(f'Capturing megadock scores from {run_docking_output_file}')
