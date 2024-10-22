@@ -106,7 +106,7 @@ def check_ligand_matches(protac_objs, receptor_obj, ligase_obj, rdkit_ligands_cl
     except Exception as e:
 
         logger.error(
-            "Ligand matching failed." +
+            "Ligand matching failed. " +
             "Please check your structures and consider turning off RDKit ligand sanitization.\n" +
             "RDKit error:\n" +
             str(e)

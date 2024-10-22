@@ -113,7 +113,7 @@ def summary_csv(protac_objs, ligase_obj, benchmark, cluster_trend):
 
 
 @decorators.user_choice
-def chimerax_view(receptor_obj, protac_objs, pose_objs, generated_poses_folder, protac_poses_folder, benchmark=False, ref_ligase=None):
+def chimerax_view(receptor_obj, protac_objs, generated_poses_folder, protac_poses_folder, benchmark=False, ref_ligase=None):
     """
     Make a chimerax visualization script to see the final successful poses
     """
@@ -125,11 +125,16 @@ def chimerax_view(receptor_obj, protac_objs, pose_objs, generated_poses_folder, 
 
     for protac_obj in protac_objs:
 
+        if hasattr(protac_obj.cluster, 'repr_centr'):
+            pose_objs = protac_obj.cluster.repr_centr
+        else:
+            pose_objs = protac_obj.protein_poses
+
         script = f'open ../{receptor_obj.file} name receptor;\ncolor ##name="receptor" #afafaf target asr;\n'
         palette = sns.color_palette('viridis', len(pose_objs)).as_hex()
 
-        for i in range(len(protac_obj.protein_poses)):
-            pose_obj = protac_obj.protein_poses[i]
+        for i in range(len(pose_objs)):
+            pose_obj = pose_objs[i]
             script += (
                 f'open ../{generated_poses_folder}/pose{pose_obj.pose_number}.pdb name pose{pose_obj.pose_number};\n'
                 +f'open ../{protac_poses_folder}/protac_{protac_obj.name}/protein_pose_{pose_obj.pose_number}/protac_embedded_confs.sdf name pose{pose_obj.pose_number}_protac;\n'
