@@ -193,15 +193,15 @@ def interactive_plots(
         conf
 ):
     
-    # get run steps
-    steps = make_step_check(conf)
-    if not steps['all']:
-        logger.info('Cannot generate plots because no docking was run.')
-        return(None)
-    
     results_folder = Path("./results_summaries")
 
     for protac_obj in protacs:
+
+        # get run steps
+        steps = make_step_check(conf, protac_obj)
+        if not steps['all']:
+            logger.info(f'Cannot generate plots for protac {protac_obj.name} because no docking was run.')
+            return(None)
 
         # make plots
         fig_funnel_html  = plot_funnel(ligase_obj, protac_obj, steps)
