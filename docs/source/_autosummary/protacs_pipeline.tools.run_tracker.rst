@@ -1,31 +1,7 @@
-protacs\_pipeline.tools.run\_tracker
-====================================
+﻿protacs_pipeline.tools.run_tracker
+==================================
 
 .. automodule:: protacs_pipeline.tools.run_tracker
-
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      load_run_objects
-      load_tracker
-      save_protein_objects
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-
+   :members:
+   :undoc-members:  # Optional, include undocumented members
+   :show-inheritance:  # Optional, show class inheritance if relevant

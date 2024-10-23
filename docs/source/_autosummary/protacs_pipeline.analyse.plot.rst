@@ -1,34 +1,7 @@
-protacs\_pipeline.analyse.plot
-==============================
+﻿protacs_pipeline.analyse.plot
+=============================
 
 .. automodule:: protacs_pipeline.analyse.plot
-
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      interactive_plots
-      make_step_check
-      plot_funnel
-      plot_pca
-      plot_ppi
-      plot_scatter
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-
+   :members:
+   :undoc-members:  # Optional, include undocumented members
+   :show-inheritance:  # Optional, show class inheritance if relevant

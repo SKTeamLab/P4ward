@@ -1,29 +1,7 @@
-protacs\_pipeline.tools.logger
-==============================
+﻿protacs_pipeline.tools.logger
+=============================
 
 .. automodule:: protacs_pipeline.tools.logger
-
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      set_logging
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-
+   :members:
+   :undoc-members:  # Optional, include undocumented members
+   :show-inheritance:  # Optional, show class inheritance if relevant

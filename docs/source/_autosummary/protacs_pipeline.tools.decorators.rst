@@ -1,30 +1,7 @@
-protacs\_pipeline.tools.decorators
-==================================
+﻿protacs_pipeline.tools.decorators
+=================================
 
 .. automodule:: protacs_pipeline.tools.decorators
-
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      track_run
-      user_choice
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-
+   :members:
+   :undoc-members:  # Optional, include undocumented members
+   :show-inheritance:  # Optional, show class inheritance if relevant

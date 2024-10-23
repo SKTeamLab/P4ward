@@ -1,30 +1,7 @@
-protacs\_pipeline.run.protein\_filter
-=====================================
+﻿protacs_pipeline.run.protein_filter
+===================================
 
 .. automodule:: protacs_pipeline.run.protein_filter
-
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      crl_filters
-      ligand_distances
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-
+   :members:
+   :undoc-members:  # Optional, include undocumented members
+   :show-inheritance:  # Optional, show class inheritance if relevant

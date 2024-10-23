@@ -1,31 +1,7 @@
-protacs\_pipeline.analyse.rank
-==============================
+﻿protacs_pipeline.analyse.rank
+=============================
 
 .. automodule:: protacs_pipeline.analyse.rank
-
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      generate_protein_poses
-      protein_poses
-      rescore
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-
+   :members:
+   :undoc-members:  # Optional, include undocumented members
+   :show-inheritance:  # Optional, show class inheritance if relevant

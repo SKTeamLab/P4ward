@@ -1,30 +1,7 @@
-protacs\_pipeline.run.protac\_sampling
-======================================
+﻿protacs_pipeline.run.protac_sampling
+====================================
 
 .. automodule:: protacs_pipeline.run.protac_sampling
-
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      protac_sampling
-      sample_protac_pose
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-
+   :members:
+   :undoc-members:  # Optional, include undocumented members
+   :show-inheritance:  # Optional, show class inheritance if relevant

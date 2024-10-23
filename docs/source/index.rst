@@ -15,20 +15,22 @@ Getting Started
 ----------------
 
 P4ward can be easily obtained with docker and conda. Please read :doc:`obtain` for more information.
-For a tutorial on how to run P4ward, go to :doc:`tutorial`
+For a gentle introduction to running P4ward, check the :doc:`tutorial`.
 
 -----
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
+   :caption: Getting Started
    
+   obtain
+   tutorial
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Documentation
+   
+   configure
    config_reference
-   test_docstrings
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   command_args
+   modules_docs

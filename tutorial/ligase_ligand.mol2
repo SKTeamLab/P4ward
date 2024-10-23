@@ -1,0 +1,98 @@
+# Name: 3JF
+# Created by ModelServer 0.9.12
+
+# model_server_result.job_id: MWlXCQyRTzTcJIiL9ctp2w
+# model_server_result.datetime_utc: 2024-10-20 22:07:23
+# model_server_result.server_version: 0.9.12
+# model_server_result.query_name: ligand
+# model_server_result.source_id: pdb-bcif
+# model_server_result.entry_id: 4w9h
+
+# model_server_params.name: atom_site
+# model_server_params.value: {"label_asym_id":"M","auth_seq_id":301}
+
+# model_server_stats.io_time_ms: 145
+# model_server_stats.parse_time_ms: 25
+# model_server_stats.create_model_time_ms: 15
+# model_server_stats.query_time_ms: 265
+# model_server_stats.encode_time_ms: 0
+# model_server_stats.element_count: 33
+
+@<TRIPOS>MOLECULE
+3JF
+33 35 1
+****
+****
+
+@<TRIPOS>ATOM
+1 CAA 9.795 56.244 95.088 C.3 1 3JF 0.000
+2 CAV 11.105 55.649 94.539 C.2 1 3JF 0.000
+3 OAF 12.164 56.222 94.763 O.2 1 3JF 0.000
+4 NAT 10.983 54.468 93.902 N.am 1 3JF 0.000
+5 CBE 12.105 53.753 93.264 C.3 1 3JF 0.000
+6 CBG 12.246 52.307 93.815 C.3 1 3JF 0.000
+7 CAD 12.577 52.360 95.312 C.3 1 3JF 0.000
+8 CAE 13.396 51.584 93.092 C.3 1 3JF 0.000
+9 CAC 10.936 51.485 93.675 C.3 1 3JF 0.000
+10 CAX 11.794 53.809 91.740 C.2 1 3JF 0.000
+11 OAH 10.642 53.641 91.356 O.2 1 3JF 0.000
+12 N 12.788 54.082 90.866 N.am 1 3JF 0.000
+13 CD2 14.243 54.377 91.051 C.3 1 3JF 0.000
+14 CG 14.628 55.201 89.816 C.3 1 3JF 0.000
+15 OD1 14.296 56.590 89.968 O.3 1 3JF 0.000
+16 CB 13.783 54.625 88.725 C.3 1 3JF 0.000
+17 CA 12.460 54.203 89.380 C.3 1 3JF 0.000
+18 C 12.021 53.010 88.765 C.2 1 3JF 0.000
+19 O 12.449 51.930 89.156 O.2 1 3JF 0.000
+20 NAS 11.216 53.128 87.681 N.am 1 3JF 0.000
+21 CAO 10.775 51.946 86.936 C.3 1 3JF 0.000
+22 CAY 11.579 51.775 85.766 C.ar 1 3JF 0.000
+23 CAK 12.409 52.768 85.227 C.ar 1 3JF 0.000
+24 CAM 13.179 52.524 84.077 C.ar 1 3JF 0.000
+25 CAJ 11.553 50.539 85.117 C.ar 1 3JF 0.000
+26 CAL 12.315 50.298 83.974 C.ar 1 3JF 0.000
+27 CBA 13.145 51.290 83.427 C.ar 1 3JF 0.000
+28 CBB 13.876 51.067 82.311 C.ar 1 3JF 0.000
+29 SAU 15.502 51.465 82.054 S.3 1 3JF 0.000
+30 CAN 15.570 50.864 80.503 C.ar 1 3JF 0.000
+31 NAR 14.364 50.376 80.196 N.ar 1 3JF 0.000
+32 CAZ 13.444 50.486 81.170 C.ar 1 3JF 0.000
+33 CAB 12.032 49.944 80.921 C.3 1 3JF 0.000
+@<TRIPOS>BOND
+1 1 2 1
+2 2 4 1
+3 2 3 2
+4 4 5 1
+5 5 10 1
+6 5 6 1
+7 6 8 1
+8 6 9 1
+9 6 7 1
+10 10 12 1
+11 10 11 2
+12 12 17 1
+13 12 13 1
+14 13 14 1
+15 14 16 1
+16 14 15 1
+17 16 17 1
+18 17 18 1
+19 18 20 1
+20 18 19 2
+21 20 21 1
+22 21 22 1
+23 22 25 ar
+24 22 23 ar
+25 23 24 ar
+26 24 27 ar
+27 25 26 ar
+28 26 27 ar
+29 27 28 1
+30 28 32 ar
+31 28 29 ar
+32 29 30 ar
+33 30 31 ar
+34 31 32 ar
+35 32 33 1
+@<TRIPOS>SUBSTRUCTURE
+1 3JF 1

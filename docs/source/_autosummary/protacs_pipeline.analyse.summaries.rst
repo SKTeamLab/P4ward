@@ -1,32 +1,7 @@
-protacs\_pipeline.analyse.summaries
-===================================
+﻿protacs_pipeline.analyse.summaries
+==================================
 
 .. automodule:: protacs_pipeline.analyse.summaries
-
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      chimerax_view
-      protac_summaries
-      summary_csv
-      write_crl_complex
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-
+   :members:
+   :undoc-members:  # Optional, include undocumented members
+   :show-inheritance:  # Optional, show class inheritance if relevant

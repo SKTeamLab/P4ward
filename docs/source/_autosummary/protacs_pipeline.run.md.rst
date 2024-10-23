@@ -1,31 +1,7 @@
-protacs\_pipeline.run.md
-========================
+﻿protacs_pipeline.run.md
+=======================
 
 .. automodule:: protacs_pipeline.run.md
-
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      fix_proteins
-      get_protein_charges
-      minimize_proteins
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-
+   :members:
+   :undoc-members:  # Optional, include undocumented members
+   :show-inheritance:  # Optional, show class inheritance if relevant

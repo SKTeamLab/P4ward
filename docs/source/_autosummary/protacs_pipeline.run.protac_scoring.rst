@@ -1,30 +1,7 @@
-protacs\_pipeline.run.protac\_scoring
-=====================================
+﻿protacs_pipeline.run.protac_scoring
+===================================
 
 .. automodule:: protacs_pipeline.run.protac_scoring
-
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      capture_rxdock_scores
-      rxdock_rescore
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-
+   :members:
+   :undoc-members:  # Optional, include undocumented members
+   :show-inheritance:  # Optional, show class inheritance if relevant

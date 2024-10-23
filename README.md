@@ -25,5 +25,5 @@ Please refer to [P4ward's article](LINK) for:
 - This project, P4ward, includes [MEGADOCK](https://github.com/akiyamalab/MEGADOCK), which is licensed under the [Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)](https://github.com/akiyamalab/MEGADOCK?tab=License-1-ov-file). If you use P4ward, you must comply with its non-commercial restriction.
 - This project includes [Open-Source PyMOL](https://github.com/schrodinger/pymol-open-source), which is copyrighted by Schrödinger, LLC, and is made available under its open-source license. For details, see the [Open-Source PyMOL Copyright Notice](https://github.com/schrodinger/pymol-open-source?tab=License-1-ov-file).
 - This project includes packages licensed under [GPL](https://www.gnu.org/licenses/gpl-3.0.en.html#license-text). As such, this project's code is made completely available [here](LINK TO GITHUB).
-- See `requirements.txt` for complete package attributions.
+- See `dockerfiles/conda_requirements.txt` for complete package attributions.
 - No changes were made to the source code of any of P4ward's dependencies.

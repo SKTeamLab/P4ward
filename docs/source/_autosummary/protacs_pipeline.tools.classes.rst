@@ -1,34 +1,7 @@
-protacs\_pipeline.tools.classes
-===============================
+﻿protacs_pipeline.tools.classes
+==============================
 
 .. automodule:: protacs_pipeline.tools.classes
-
-   
-   
-   
-
-   
-   
-   
-
-   
-   
-   .. rubric:: Classes
-
-   .. autosummary::
-   
-      Cluster
-      LinkerConf
-      Protac
-      ProtacPose
-      Protein
-      ProteinPose
-   
-   
-
-   
-   
-   
-
-
-
+   :members:
+   :undoc-members:  # Optional, include undocumented members
+   :show-inheritance:  # Optional, show class inheritance if relevant

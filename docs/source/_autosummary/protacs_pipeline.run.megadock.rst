@@ -1,33 +1,7 @@
-protacs\_pipeline.run.megadock
-==============================
+﻿protacs_pipeline.run.megadock
+=============================
 
 .. automodule:: protacs_pipeline.run.megadock
-
-   
-   
-   
-
-   
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      capture_scores
-      cluster
-      prep_structures
-      rotate_atoms
-      run_docking
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-
+   :members:
+   :undoc-members:  # Optional, include undocumented members
+   :show-inheritance:  # Optional, show class inheritance if relevant
