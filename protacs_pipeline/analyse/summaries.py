@@ -118,6 +118,7 @@ def chimerax_view(receptor_obj, protac_objs, generated_poses_folder, protac_pose
     Make a chimerax visualization script to see the final successful poses
     """
 
+    import matplotlib
     import seaborn as sns
     
     results_folder = Path("./results_summaries")
@@ -130,8 +131,25 @@ def chimerax_view(receptor_obj, protac_objs, generated_poses_folder, protac_pose
         else:
             pose_objs = protac_obj.protein_poses
 
+        # see if we have performed rescoring
+        if hasattr(protac_obj.get_pose(pose_objs[0]), 'rescore'):
+            color_vals = [protac_obj.get_pose(i).rescore for i in pose_objs]
+            reverse_colors = False
+        else:
+            color_vals = [pose_obj.megadock_score for pose_obj in pose_objs]
+            reverse_colors = True
+
         script = f'open ../{receptor_obj.file} name receptor;\ncolor ##name="receptor" #afafaf target asr;\n'
-        palette = sns.color_palette('viridis', len(pose_objs)).as_hex()
+
+        norm = matplotlib.colors.Normalize(vmin=min(color_vals), vmax=max(color_vals), clip=True)
+        if reverse_colors:
+            cmap = matplotlib.cm.viridis_r
+        else:
+            cmap = matplotlib.cm.viridis
+        mapper = matplotlib.cm.ScalarMappable(norm=norm, cmap=cmap)
+        palette = [matplotlib.colors.to_hex(mapper.to_rgba(i)) for i in color_vals]
+
+        # palette = sns.color_palette('viridis', len(pose_objs)).as_hex()
 
         for i in range(len(pose_objs)):
             pose_obj = pose_objs[i]
@@ -149,7 +167,7 @@ def chimerax_view(receptor_obj, protac_objs, generated_poses_folder, protac_pose
                 +f'transparency ~(##name="receptor" | ##name="ref_ligase") 50 target asr\n'
             )
 
-            for pose_obj in protac_obj.protein_poses:
+            for pose_obj in pose_objs:
                 if pose_obj.capri_rank in ['acceptable', 'medium', 'high']:
                     script += (
                         f'transparency ##name="pose{pose_obj.pose_number}" 0 target asr\n'

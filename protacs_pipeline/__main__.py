@@ -277,7 +277,6 @@ if __name__ == '__main__':
     summaries.protac_summaries(protac_objs=protacs, cluster_trend=conf.getboolean('protein_ranking', 'cluster_poses_trend'))
     summaries.chimerax_view(
         receptor_obj=receptor,
-        pose_objs=[i for i in ligase.conformations if i.top],
         protac_objs=protacs,
         generated_poses_folder=conf.get('protein_ranking', 'generated_poses_folder'),
         protac_poses_folder=conf.get('linker_sampling', 'protac_poses_folder'),
