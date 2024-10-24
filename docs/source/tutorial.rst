@@ -188,16 +188,16 @@ For the purposes of this tutorial, we will modify slightly the options so that o
 
 Next, we will make the following modifications to the default file:
 
-- If you're running using Docker or a conda environment, there is no need to worry about changing anything in the ``[program_paths]`` section
-- Adjust the file names to reflect our input files.
-- Make sure we keep ``rdkit_ligands_cleanup`` as ``False``
-- Depending on your system, change ``number_of_processors`` to a value that suits it best
-- Change the megadock settings to generate fewer protein poses, this will reduce the runtime for this tutorial.
-   - Change ``num_rotational_angles`` to ``360``
-   - Change ``num_predictions_per_rotation`` to ``5``
-   - We want all the poses to be reported in the megadock output file, so we can change ``num_predictions`` to ``1800``
-   - We also want P4ward to consider all poses, so change ``top_poses`` to the same value of ``1800``
-- Save this configuration as ``config_run.ini``
+- If you're running using Docker or a conda environment, there is no need to worry about changing anything in the ``[program_paths]`` section;
+- Adjust the file names to reflect our input files;
+- Make sure we keep ``rdkit_ligands_cleanup`` as ``False``;
+- Depending on your system, change ``number_of_processors`` to a value that suits it best;
+- Change the megadock settings to generate fewer protein poses, this will reduce the runtime for this tutorial;
+   - Change ``num_rotational_angles`` to ``3600``;
+   - Change ``num_predictions_per_rotation`` to ``5``;
+   - We want all the poses to be reported in the megadock output file, so we can change ``num_predictions`` to ``18000``;
+   - We also want P4ward to consider all poses, so change ``top_poses`` to the same value of ``18000``;
+- Save this configuration as ``config_run.ini``.
 
 Thus, our configuration will have the following changes (Note that clicking the copy button copies the clean updated version of the file):
 
@@ -235,7 +235,7 @@ Thus, our configuration will have the following changes (Note that clicking the 
    [megadock]
    run_docking = True
    num_predictions = 162000
-   num_predictions = 1800
+   num_predictions = 18000
    num_predictions_per_rotation = 3
    num_predictions_per_rotation = 5
    num_rotational_angles = 54000
@@ -265,7 +265,7 @@ Thus, our configuration will have the following changes (Note that clicking the 
    clustering_cutoff_trend = 10.0
    cluster_redund_repr = centroid
    top_poses = 10
-   top_poses = 1800
+   top_poses = 18000
    generate_poses = filtered
    generate_poses_altlocA = True
    generated_poses_folder = protein_docking
