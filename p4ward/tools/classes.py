@@ -228,6 +228,9 @@ class Cluster():
 class Protac():
 
     """
+    Represents a PLV.
+    Each protac smiles code from the input file becomes a Protac obj.
+
     attributes added/modified by the functions:
         linker_sampling.rdkit_sampling()
             - self.indices_ligs

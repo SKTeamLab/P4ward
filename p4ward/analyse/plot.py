@@ -4,12 +4,16 @@ import plotly.express as px
 import plotly.io as pio
 from ..tools.logger import logger
 from ..tools import decorators
+from ..tools.classes import *
 
 
 plot_colors = ['#34345e', '#548687', '#FCAA67', '#eee220']
 
 
-def make_step_check(conf, protac_obj):
+def make_step_check(conf:object, protac_obj:Protac) -> dict:
+    """
+    Checks which modelling steps were run so that their results can be plotted (or not).
+    """
 
     steps = {
         'all'         : conf.getboolean('megadock', 'run_docking'),
@@ -28,7 +32,11 @@ def make_step_check(conf, protac_obj):
     return(steps)
 
 
-def plot_funnel(ligase_obj, protac_obj, steps):
+def plot_funnel(ligase_obj:Protein, protac_obj:Protac, steps:dict) -> str:
+    """
+    Make the funnel interactive plot.
+    This plot shows how many protein poses passed each filtering stage.
+    """
 
     plot_labels = ['all','dist_filter','cl_red','crl_noclash','crl_lys','protac','cl_trend']
     labels = [i for i in plot_labels if steps[i]]
@@ -61,7 +69,11 @@ def plot_funnel(ligase_obj, protac_obj, steps):
     return(fig_html)
 
 
-def plot_ppi(ligase_obj, protac_obj, steps):
+def plot_ppi(ligase_obj:Protein, protac_obj:Protac, steps:dict) -> str:
+    """
+    Make the ppi distribution interactive plot.
+    This shows, for each main filtering step, what is the distribution of the ppi scores.
+    """
 
     import plotly.figure_factory as ff
 
@@ -98,7 +110,11 @@ def plot_ppi(ligase_obj, protac_obj, steps):
     return(fig_html)
 
 
-def plot_pca(ligase_obj, receptor_obj, protac_obj, steps):
+def plot_pca(ligase_obj:Protein, receptor_obj:Protein, protac_obj:Protac, steps:dict) -> str:
+    """
+    Make PCA plot.
+    This runs PCA on the triad coordinates of the protein poses, then plots PC1xPC2.
+    """
 
     import pandas as pd
     from sklearn.decomposition import PCA
@@ -155,7 +171,12 @@ def plot_pca(ligase_obj, receptor_obj, protac_obj, steps):
     return(fig_html)
 
 
-def plot_scatter(protac_obj):
+def plot_scatter(protac_obj:Protac) -> str:
+    """
+    Make scatter plot that shows ppi score vs protein-protac score.
+    The datapoints are coloured according to rescore, if rescore was not calculated,
+    then they are colored according to ppi score.
+    """
 
     import pandas as pd
 
@@ -203,11 +224,17 @@ def plot_scatter(protac_obj):
 
 @decorators.user_choice
 def interactive_plots(
-        protacs,
-        ligase_obj,
-        receptor_obj,
-        conf
-):
+        protacs:list[Protac],
+        ligase_obj:Protein,
+        receptor_obj:Protein,
+        conf:object
+) -> None:
+    """
+    Runs the functions that generate the html for the interactive plots:
+    plot_funnel, plot_ppi, plot_pca, plot_scatter.
+    Then generates an overarching html file that combines these plots and writes
+    this html to disk.
+    """
     
     results_folder = Path("./results_summaries")
 
