@@ -18,7 +18,7 @@ def make_step_check(conf, protac_obj):
         'crl_noclash' : conf.getboolean('protein_filter', 'crl_model_clash'),
         'crl_lys'     : conf.getboolean('protein_filter', 'accessible_lysines'),
         'protac'      : conf.getboolean('linker_sampling', 'rdkit_sampling'),
-        'cl_trend'    : conf.getboolean('protein_ranking', 'cluster_poses_trend') and hasattr(protac_obj.cluster, 'repr_centr'),
+        'cl_trend'    : conf.getboolean('protein_ranking', 'cluster_poses_trend') and hasattr(protac_obj, 'cluster'),
         'filter'      : (
             conf.getboolean('protein_filter', 'ligand_distances') or 
             conf.getboolean('protein_filter', 'crl_model_clash') or
@@ -71,13 +71,20 @@ def plot_ppi(ligase_obj, protac_obj, steps):
     all_scores = {
         'all'         : [i.megadock_score for i in ligase_obj.conformations],
         'filter'      : [i.megadock_score for i in ligase_obj.active_confs()],
-        'protac'      : [i.megadock_score for i in protac_obj.protein_poses],
-        'cl_trend'    : [i.megadock_score for i in protac_obj.cluster.repr_centr]
+        'protac'      : [i.megadock_score for i in protac_obj.protein_poses]
     }
-    hist_data = [all_scores[i] for i in all_scores.keys() if i in labels]
+    if hasattr(protac_obj, 'cluster'):
+        all_scores['cl_trend'] = [i.megadock_score for i in protac_obj.cluster.repr_centr]
+
+    hist_data = []
+    labels_ = []
+    for i in all_scores.keys():
+        if i in labels and len(all_scores[i])>1:
+            hist_data.append(all_scores[i])
+            labels_.append(i)
 
     fig = ff.create_distplot(
-        hist_data, labels, show_rug=False, bin_size=100,
+        hist_data, labels_, show_rug=False, bin_size=100,
         colors=plot_colors[::-1]
     )
     fig.update_layout(
@@ -105,7 +112,7 @@ def plot_pca(ligase_obj, receptor_obj, protac_obj, steps):
    
     poses = []
     for i in range(len(is_protac_pose)):
-        if is_trend_repr[i] and steps['cl_trend']:
+        if hasattr(protac_obj,'cluster') and is_trend_repr[i]:
             poses.append('centroid')
         elif is_protac_pose[i]:
             poses.append('protac_pose')
@@ -152,27 +159,36 @@ def plot_scatter(protac_obj):
 
     import pandas as pd
 
+    rescore = len(protac_obj.active_poses()) > 0 and hasattr(protac_obj.active_poses()[0], 'rescore') 
+
     data_dict = {
         'pose_number':[],
         'ppi':[],
         'interaction':[],
-        'rescore':[]
     }
+    if rescore:
+        data_dict['rescore'] = []
     for protac_pose in protac_obj.active_poses():
         interactions = [i.rx_score for i in protac_pose.active_confs()]
 
         data_dict['pose_number'].append(protac_pose.protein_parent.pose_number)
         data_dict['ppi'].append(protac_pose.protein_parent.megadock_score)
         data_dict['interaction'].append(np.mean(interactions))
-        data_dict['rescore'].append(protac_pose.rescore)
+        if rescore:
+            data_dict['rescore'].append(protac_pose.rescore)
     
     data_scores = pd.DataFrame.from_dict(data_dict)
+
+    if rescore:
+        color = 'rescore'
+    else:
+        color = None
 
     fig = px.scatter(
         data_frame=data_scores,
         x='ppi',
         y='interaction',
-        color='rescore',
+        color=color,
         hover_data=data_scores.columns,
         color_continuous_scale='Cividis'
     )

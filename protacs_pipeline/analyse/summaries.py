@@ -53,7 +53,7 @@ def summary_csv(protac_objs, ligase_obj, benchmark, cluster_trend):
 
 
         ## get cluster trend attributes if clustering ran successfully
-        if cluster_trend and hasattr(protac_obj.cluster, 'repr_centr'):
+        if cluster_trend and hasattr(protac_obj, 'cluster'):
 
             data_dict['cluster_number'] = []
             data_dict['cluster_centr'] = []
@@ -126,12 +126,16 @@ def chimerax_view(receptor_obj, protac_objs, generated_poses_folder, protac_pose
 
     for protac_obj in protac_objs:
 
-        if hasattr(protac_obj.cluster, 'repr_centr'):
+        if hasattr(protac_obj, 'cluster'):
             pose_objs = protac_obj.cluster.repr_centr
         else:
             pose_objs = protac_obj.protein_poses
 
-        # see if we have performed rescoring
+        if len(pose_objs) < 1:
+            logger.info(f"Protac {protac_obj.name} has no protein poses, skipping ChimeraX summary")
+            continue
+
+        # see if we have performed rescoring successfully
         if hasattr(protac_obj.get_pose(pose_objs[0]), 'rescore'):
             color_vals = [protac_obj.get_pose(i).rescore for i in pose_objs]
             reverse_colors = False
@@ -200,7 +204,7 @@ def protac_summaries(protac_objs, cluster_trend):
         logger.info(f'Number of protein poses = {n_ptn_poses}')
         
         
-        if cluster_trend:
+        if hasattr(protac_obj, "cluster"):
 
             cl_count = protac_obj.cluster.clusterer.n_clusters_
             scores = [i.megadock_score for i in protac_obj.cluster.get_all_confs()]
@@ -229,7 +233,7 @@ def write_crl_complex(receptor_obj, protac_objs, e3, protac_poses_folder, linker
 
     for protac_obj in protac_objs:
 
-        if cluster_rep_only and hasattr(protac_obj.cluster, 'repr_centr'):
+        if cluster_rep_only and hasattr(protac_obj, 'cluster'):
             pose_objs = protac_obj.cluster.repr_centr
         else:
             pose_objs = protac_obj.protein_poses

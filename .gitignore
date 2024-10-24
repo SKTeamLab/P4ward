@@ -1,5 +1,6 @@
 .vscode/settings.json
 *.pyc
 protacs_pipeline.log
+p4ward.log
 docs/build
 __pycache__

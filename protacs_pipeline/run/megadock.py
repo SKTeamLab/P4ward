@@ -256,8 +256,6 @@ def cluster(ligase_obj, protac_objs, clustering_type, clustering_cutoff_redund, 
                 else:
                     pose_obj.active = False
         
-        else:
-            ligase_obj.cluster = None
 
     elif clustering_type == 'trend':
 
@@ -267,5 +265,3 @@ def cluster(ligase_obj, protac_objs, clustering_type, clustering_cutoff_redund, 
             if enough_poses(pose_objs):
                 cluster_obj = make_clusterer(pose_objs=pose_objs, rescore_poses=rescore_poses, cutoff=clustering_cutoff_trend)
                 protac_obj.cluster = cluster_obj
-            else:
-                protac_obj.cluster = None

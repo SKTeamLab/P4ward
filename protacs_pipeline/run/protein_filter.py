@@ -268,12 +268,12 @@ def crl_filters(
                             accepted_models.append(True)
                         else:
                             accepted_models.append(False)
+                        lys_info.append(lysines_accepted)
                     
                     else:
                         accepted_models.append(True)
                 
                 crls.append(crl)
-                lys_info.append(lysines_accepted)
 
         accepted_pose = np.any(accepted_models)
         pose_obj.filter_info['crl_filter'] = accepted_pose
