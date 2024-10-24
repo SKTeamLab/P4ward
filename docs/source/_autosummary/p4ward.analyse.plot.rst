@@ -1,7 +1,7 @@
-﻿protacs_pipeline.benchmark.capri
-================================
+﻿p4ward.analyse.plot
+===================
 
-.. automodule:: protacs_pipeline.benchmark.capri
+.. automodule:: p4ward.analyse.plot
    :members:
    :undoc-members:  # Optional, include undocumented members
    :show-inheritance:  # Optional, show class inheritance if relevant

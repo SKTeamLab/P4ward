@@ -1,7 +1,7 @@
-﻿protacs_pipeline.tools.logger
-=============================
+﻿p4ward.analyse.rank
+===================
 
-.. automodule:: protacs_pipeline.tools.logger
+.. automodule:: p4ward.analyse.rank
    :members:
    :undoc-members:  # Optional, include undocumented members
    :show-inheritance:  # Optional, show class inheritance if relevant

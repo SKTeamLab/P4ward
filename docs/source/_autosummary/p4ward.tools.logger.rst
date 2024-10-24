@@ -1,7 +1,7 @@
-﻿protacs_pipeline.run.protein_filter
-===================================
+﻿p4ward.tools.logger
+===================
 
-.. automodule:: protacs_pipeline.run.protein_filter
+.. automodule:: p4ward.tools.logger
    :members:
    :undoc-members:  # Optional, include undocumented members
    :show-inheritance:  # Optional, show class inheritance if relevant

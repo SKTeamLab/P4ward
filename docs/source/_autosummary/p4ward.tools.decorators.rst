@@ -1,7 +1,7 @@
-﻿protacs_pipeline.analyse.rank
-=============================
+﻿p4ward.tools.decorators
+=======================
 
-.. automodule:: protacs_pipeline.analyse.rank
+.. automodule:: p4ward.tools.decorators
    :members:
    :undoc-members:  # Optional, include undocumented members
    :show-inheritance:  # Optional, show class inheritance if relevant

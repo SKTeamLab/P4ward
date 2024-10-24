@@ -31,6 +31,18 @@ exclude_patterns = []
 # add the tutorial html files to be copied to the build folder as well
 html_extra_path = ['../../tutorial/plots-mz1.html']
 
+autodoc_mock_imports = [
+    "rdkit",
+    "numpy",
+    "plotly",
+    "pandas",
+    "openmm",
+    "openbabel",
+    "multiprocessing",
+    "func_timeout"
+]
+
+
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 

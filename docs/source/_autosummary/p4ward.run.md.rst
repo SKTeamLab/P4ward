@@ -1,7 +1,7 @@
-﻿protacs_pipeline.run.protac_prep
-================================
+﻿p4ward.run.md
+=============
 
-.. automodule:: protacs_pipeline.run.protac_prep
+.. automodule:: p4ward.run.md
    :members:
    :undoc-members:  # Optional, include undocumented members
    :show-inheritance:  # Optional, show class inheritance if relevant
