@@ -1435,7 +1435,7 @@ To benchmark, run:
             apptainer run -B /home /path/to/p4ward.sif --config_file config_run.ini --benchmark --ref_ligase ref_ligase.pdb
 
 
-This will trigger running the :doc:`_autosummary/protacs_pipeline.benchmark.capri` module, which performs the Capri assessment when comparing the ``ref_ligase`` with each TC protein pose.
+This will trigger running the :doc:`_autosummary/p4ward.benchmark.capri` module, which performs the Capri assessment when comparing the ``ref_ligase`` with each TC protein pose.
 
 Viewing the benchmarking results
 --------------------------------

@@ -64,7 +64,7 @@ Then build a conda environment to work P4ward:
 
     conda config --add channels conda-forge
     conda config --add channels bioconda
-    conda create -n protacs_pipeline python=3.11 --file ./p4ward/dockerfiles/conda_requirements.txt
+    conda create -n p4ward python=3.11 --file ./p4ward/dockerfiles/conda_requirements.txt
 
 Next, add P4ward to ``PYTHONPATH``:
 

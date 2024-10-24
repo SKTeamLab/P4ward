@@ -49,18 +49,18 @@ RUN ln -s ${MEGADOCK_WORK_DIR}/megadock /usr/local/bin/megadock && \
 COPY ./dockerfiles/conda_requirements.txt /home/conda_requirements.txt
 RUN conda config --add channels conda-forge
 RUN conda config --add channels bioconda
-RUN conda create -n protacs_pipeline python=3.11 --file /home/conda_requirements.txt
+RUN conda create -n p4ward python=3.11 --file /home/conda_requirements.txt
 
 ###################
 ##### protacs #####
 ###################
 
-COPY ./protacs_pipeline /home/python/protacs_pipeline
+COPY ./p4ward /home/python/p4ward
 ENV PYTHONPATH /home/python:$PYTHONPATH
 
-SHELL ["conda", "run", "-n", "protacs_pipeline", "/bin/bash", "-c"]
+SHELL ["conda", "run", "-n", "p4ward", "/bin/bash", "-c"]
 
 RUN mkdir /home/data
 WORKDIR /home/data
 
-ENTRYPOINT [ "conda", "run", "--no-capture-output", "-n","protacs_pipeline", "python", "-m", "protacs_pipeline" ]
+ENTRYPOINT [ "conda", "run", "--no-capture-output", "-n","p4ward", "python", "-m", "p4ward" ]

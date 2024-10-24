@@ -5,22 +5,22 @@ Module Documentation
    :toctree: _autosummary
    :recursive:
 
-   protacs_pipeline.analyse.plot
-   protacs_pipeline.analyse.rank
-   protacs_pipeline.analyse.summaries
-   protacs_pipeline.benchmark.capri
-   protacs_pipeline.config.config
-   protacs_pipeline.run.md
-   protacs_pipeline.run.megadock
-   protacs_pipeline.run.protac_prep
-   protacs_pipeline.run.protac_run
-   protacs_pipeline.run.protac_sampling
-   protacs_pipeline.run.protac_scoring
-   protacs_pipeline.run.protein_filter
-   protacs_pipeline.run.structure_tools
-   protacs_pipeline.tools.classes
-   protacs_pipeline.tools.decorators
-   protacs_pipeline.tools.logger
-   protacs_pipeline.tools.run_tracker
+   p4ward.analyse.plot
+   p4ward.analyse.rank
+   p4ward.analyse.summaries
+   p4ward.benchmark.capri
+   p4ward.config.config
+   p4ward.run.md
+   p4ward.run.megadock
+   p4ward.run.protac_prep
+   p4ward.run.protac_run
+   p4ward.run.protac_sampling
+   p4ward.run.protac_scoring
+   p4ward.run.protein_filter
+   p4ward.run.structure_tools
+   p4ward.tools.classes
+   p4ward.tools.decorators
+   p4ward.tools.logger
+   p4ward.tools.run_tracker
 
    
