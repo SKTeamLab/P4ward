@@ -1,0 +1,8 @@
+source leaprc.protein.ff19SB
+source leaprc.gaff2
+rec = loadpdb receptor_unbound_fixed.pdb
+lig = loadmol2 receptor_ligand_fixed_amber.mol2
+loadamberparams receptor_ligand.frcmod
+complex = combine { rec lig }
+saveamberparm complex receptor_unbound_bin.prmtop receptor_unbound_bin.rst7
+quit

@@ -1,0 +1,49 @@
+Remark line goes here
+MASS
+c5 12.010        0.878               same as c3 
+
+BOND
+c5-c5  300.90   1.538       same as c3-c3, penalty score=  0.0
+c5-hc  330.60   1.097       same as c3-hc, penalty score=  0.0
+c5-na  327.70   1.463       same as c3-na, penalty score=  0.0
+c5-h1  330.60   1.097       same as c3-h1, penalty score=  0.0
+
+ANGLE
+c5-c5-c5   62.900     111.510   same as c3-c3-c3, penalty score=  0.0
+c5-c5-hc   46.300     109.800   same as c3-c3-hc, penalty score=  0.0
+c5-c5-na   65.500     112.880   same as c3-c3-na, penalty score=  0.0
+c5-c5-h1   46.400     109.560   same as c3-c3-h1, penalty score=  0.0
+c5-na-ca   62.300     124.360   same as c3-na-ca, penalty score=  0.0
+c5-na-cd   61.900     126.460   same as c3-na-cd, penalty score=  0.0
+h1-c5-na   49.800     108.780   same as h1-c3-na, penalty score=  0.0
+hc-c5-hc   39.400     107.580   same as hc-c3-hc, penalty score=  0.0
+
+DIHE
+c5-c5-c5-c5   1    0.180         0.000          -3.000      same as c3-c3-c3-c3
+c5-c5-c5-c5   1    0.250       180.000          -2.000      same as c3-c3-c3-c3
+c5-c5-c5-c5   1    0.200       180.000           1.000      same as c3-c3-c3-c3, penalty score=  0.0
+c5-c5-c5-hc   1    0.160         0.000           3.000      same as hc-c3-c3-c3, penalty score=  0.0
+c5-c5-c5-na   9    1.400         0.000           3.000      same as X -c3-c3-X , penalty score=  0.0
+c5-c5-c5-h1   9    1.400         0.000           3.000      same as X -c3-c3-X , penalty score=  0.0
+c5-c5-na-ca   6    0.000         0.000           2.000      same as X -c3-na-X , penalty score=  0.0
+c5-c5-na-cd   6    0.000         0.000           2.000      same as X -c3-na-X , penalty score=  0.0
+hc-c5-c5-hc   1    0.150         0.000           3.000      same as hc-c3-c3-hc, penalty score=  0.0
+hc-c5-c5-na   9    1.400         0.000           3.000      same as X -c3-c3-X , penalty score=  0.0
+h1-c5-c5-hc   9    1.400         0.000           3.000      same as X -c3-c3-X , penalty score=  0.0
+h1-c5-na-ca   6    0.000         0.000           2.000      same as X -c3-na-X , penalty score=  0.0
+h1-c5-na-cd   6    0.000         0.000           2.000      same as X -c3-na-X , penalty score=  0.0
+
+IMPROPER
+ca-ca-ca-ha         1.1          180.0         2.0          Using general improper torsional angle  X- X-ca-ha, penalty score=  6.0)
+c5-ca-na-cd         1.1          180.0         2.0          Using the default value
+ca-ca-ca-na         1.1          180.0         2.0          Using the default value
+ca-nc-c -o         10.5          180.0         2.0          Using general improper torsional angle  X- X- c- o, penalty score=  6.0)
+na-na-cd-nc         1.1          180.0         2.0          Using the default value
+ca-ca-na-cd         1.1          180.0         2.0          Using the default value
+c -ca-ca-ca         1.1          180.0         2.0          Using the default value
+
+NONBON
+  c5          1.9080  0.1094             same as c3 
+
+
+
