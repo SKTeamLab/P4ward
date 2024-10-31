@@ -27,5 +27,4 @@ Copyright (C) 2024 Paula Jofily de Lima Rangel. This project is licensed under t
 - This project, P4ward, depends on [MEGADOCK](https://github.com/akiyamalab/MEGADOCK), which is licensed under the [Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)](https://github.com/akiyamalab/MEGADOCK?tab=License-1-ov-file). If you use MEGADOCK, you must comply with its non-commercial restriction.
 - This project, P4ward, depends on [Open-Source PyMOL](https://github.com/schrodinger/pymol-open-source), which is copyrighted by Schrödinger, LLC, and is made available under its open-source license. For details, see the [Open-Source PyMOL Copyright Notice](https://github.com/schrodinger/pymol-open-source?tab=License-1-ov-file).
 - See `dockerfiles/conda_requirements.txt` for complete package attributions.
-- This repository does not redistribute any of P4ward's dependencies.
 - The Docker image provided contains third-party software ([MEGADOCK](https://github.com/akiyamalab/MEGADOCK)) licensed under [CC BY-NC 4.0](https://github.com/akiyamalab/MEGADOCK?tab=License-1-ov-file). Users must comply with the licensing terms of MEGADOCK, which prohibits commercial use.
