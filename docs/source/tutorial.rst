@@ -55,11 +55,15 @@ Now we can obtain the Protac. P4ward will take a smiles file with one or more sm
 
    Cc1c(sc-2c1C(=N[C@H](c3n2c(nn3)C)CC(=O)NCCOCCOCCOCC(=O)N[C@H](C(=O)N4C[C@@H](C[C@H]4C(=O)NCc5ccc(cc5)C6=C(NCS6)C)O)C(C)(C)C)c7ccc(cc7)Cl)C mz1
 
-An important step at this point is to examine the ligand files and the protac 2D structure determined in the smiles code and make sure they match, since P4ward will need to match them later. Bonds in aromatic rings, for example, can be represented in different ways, which could lead to incompatibilities. Visualize your smiles code in a program such as the web version of Marvin sketch, and the ligand files in a program that shows the bond orders, such as Pymol.
-In this case, we see there is no difference between them:
+An important step at this point is to examine the ligand files and the protac 2D structure determined in the smiles code and make sure they match, since P4ward will need to match them later. Bonds in aromatic rings, for example, can be represented in different ways, which could lead to incompatibilities. Visualize your smiles code in a program such as the web version of Marvin sketch, and the ligand files in a program that shows the bond orders, such as Pymol:
 
-ADD IMGS
 
+.. image:: ../../tutorial/molecule_comparison.png
+   :alt: Molecule comparison
+   :width: 100%
+   :align: center
+
+All is the same for the receptor ligand, but there are some bond order differences on the receptor ligand. It is important to make sure the smiles contains the correct bond orders. However, it is okay if the ligands in the mol2 files don't, as long as this does not prevent proper matching. This is because only the coordiners of the atoms in the mol2 files will be used for modelling of the protacs later on.
 
 Now we can add to our configuration file the names of the files we just prepared. Open a new file which we will call ``config.ini`` with the following contents:
 
@@ -146,7 +150,7 @@ Then we can run the check again and look at the output:
    19:26:28 > INFO - Wrote image for mz1 matches at ligand_matches-mz1.png
    Number of linker atoms found: 10, at indices: [18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
 
-And all looks good. The image P4ward generated shows that all ligand atoms in both the mol2 files provided were identified on the protac 2d structure, see that all the atoms that are also present in the ligands are highlighted. Also, note that the atom indices P4ward reports to belong to the linker in the output are correct when checking against the image.
+And all looks good. The image P4ward generated shows that all ligand atoms in both the mol2 files provided were identified on the protac 2d structure, see that all the atoms that are also present in the ligands are highlighted. Also, note that the atom indices P4ward reports to belong to the linker in the output are correct when checking against the image. If, at this point, the ligand matching does not look right, it is good to edit the bond orders in the mol2 files to make sure they match perfectly and try the matching test again.
 
 .. figure:: ../../tutorial/ligand_matches-mz1.png
    :alt: ligand matches image produced by P4ward ligand check.
