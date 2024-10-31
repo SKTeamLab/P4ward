@@ -108,8 +108,7 @@ def capture_scores(run_docking_output_file, ligase_obj):
 
 def rotate_atoms(atom_coords, ref_rotation, pose_rotation):
     """
-    move atoms as performed by megadock decoygen, using information
-    captured from the megadock output file
+    Move atoms using information captured from the megadock output file.
     """
 
     ref_psi, ref_theta, ref_phi = ref_rotation['initial_rot']
@@ -121,7 +120,7 @@ def rotate_atoms(atom_coords, ref_rotation, pose_rotation):
     t1, t2, t3 = pose_rotation['transl']
     a1, a2, a3 = pose_rotation['angles']
 
-    def rotate(psi, theta, phi, oldX, oldY, oldZ):
+    def rotate(psi, theta, phi, prevX, prevY, prevZ):
         import numpy as np
 
         r11 = np.cos(psi)*np.cos(phi)  -  np.sin(psi)*np.cos(theta)*np.sin(phi)
@@ -136,20 +135,20 @@ def rotate_atoms(atom_coords, ref_rotation, pose_rotation):
         r23 = -np.cos(psi)*np.sin(theta)
         r33 = np.cos(theta)
 
-        newX = r11 * oldX + r12 * oldY + r13 * oldZ
-        newY = r21 * oldX + r22 * oldY + r23 * oldZ
-        newZ = r31 * oldX + r32 * oldY + r33 * oldZ
+        newX = r11 * prevX + r12 * prevY + r13 * prevZ
+        newY = r21 * prevX + r22 * prevY + r23 * prevZ
+        newZ = r31 * prevX + r32 * prevY + r33 * prevZ
 
         return(newX, newY, newZ)
     
     # first subtract ligand initial translation
     coord1, coord2, coord3 = atom_coords
-    oldx = coord1 - l1
-    oldy = coord2 - l2
-    oldz = coord3 - l3
+    prevx = coord1 - l1
+    prevy = coord2 - l2
+    prevz = coord3 - l3
 
     # rotate based on reference rotation
-    tx1, ty1, tz1 = rotate(ref_psi, ref_theta, ref_phi, oldx, oldy, oldz)
+    tx1, ty1, tz1 = rotate(ref_psi, ref_theta, ref_phi, prevx, prevy, prevz)
     # rotate based on pose angles
     tx2, ty2, tz2 = rotate(a1, a2, a3, tx1, ty1, tz1)
 
