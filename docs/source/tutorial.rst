@@ -17,21 +17,21 @@ First we need to obtain the files that P4ward needs to run.
 
 Now, we need to clean up the protein files. Using the software of your choice, remove all except the protein's main chain of interest. For example, with ChimeraX we can:
 
-- Delete all nonstandard atoms and redundant chains then save the new structure as ``receptor.pdb``:
+- Delete all nonstandard atoms and redundant chains (while keeping chain A) then save the new structure as ``receptor.pdb``:
 
 .. code-block:: text
 
-   open receptor_raw.pdb
+   (open receptor_raw.pdb)
    del ~protein; del ~/A
-   save receptor.pdb
+   (save receptor.pdb)
 
-- Do the same for the ligase structure:
+- Do the same for the ligase structure (keeping chain C):
 
 .. code-block:: text
 
-   open ligase_raw.pdb
+   (open ligase_raw.pdb)
    del ~protein; del ~/C
-   save ligase.pdb
+   (save ligase.pdb)
 
 .. #BDBBD6, #494672
 
@@ -49,7 +49,7 @@ And we should see the same for ``ligase.pdb`` and ``ligase_ligand.mol2``:
    :width: 400px
    :align: center
 
-Now we can obtain the Protac. P4ward will take a smiles file with one or more smiles code per line. Each line is the code for an entire protac. For now, we can obtain the smiles code for protac MZ1 by copying it from its `PDB page <https://www.rcsb.org/ligand/759>`_ and we can paste it in a file called ``protacs.smiles``. Note that the smiles code can be followed by a single space and the molecule name. This way, the contents of ``protacs.smiles`` will be:
+Now we can obtain the Protac. P4ward will take a smiles file with one or more smiles code per line. Each line is the code for an entire protac. For now, we can obtain the smiles code for protac MZ1 by copying it from its `PDB page <https://www.rcsb.org/ligand/759>`_ and we can paste it in a file called ``protacs.smiles``. Note that the smiles code can be followed by a single space and the molecule name. If you add a molecule name, P4ward will use this name for the outputs. Otherwise, it will automatically generate molecule names by numbering them. This way, the contents of ``protacs.smiles`` will be:
 
 .. code-block:: text
 
@@ -84,7 +84,7 @@ It is also good to look at the mol2 files in a text editor to check for inconsis
 
 All is the same for the ligase ligand, but there are some bond order differences on the receptor ligand. It is important to make sure the smiles contains the correct bond orders. However, it is okay if the ligands in the mol2 files don't, as long as this does not prevent proper matching. This is because only the coordiners of the atoms in the mol2 files will be used for modelling of the protacs later on.
 
-Now we can add to our configuration file the names of the files we just prepared. Open a new file which we will call ``config.ini`` with the following contents:
+Now we can create a configuration file with the names of the files we just prepared. Open a new file which we will call ``config.ini`` with the following contents:
 
 .. code-block:: ini
    :caption: File: config.ini
@@ -346,6 +346,9 @@ Then we can run TC modelling using the command:
 
             apptainer run -B /home /path/to/p4ward.sif --config_file config_run.ini
 
+.. tip::
+
+   If at any point you need to restart your run, either because you encountered errors or need to change a setting, make sure to change the setting ``overwrite`` to ``True``, or delete the files with the ``.pickle`` extension.
 
 Viewing the results
 -------------------
@@ -995,7 +998,7 @@ Each row represents a TC model and the columns report the following properties:
 ``cluster_size``
    How many members the cluster that pose belongs to has. The cluster size will only be reported for the poses which are either cluster best or cluster centroid.
 ``protac_pose``
-   If at least a protac conformation was successfully sampled for that protein pose
+   If at least one protac conformation was successfully sampled for that protein pose
 ``active_linkers``
    Which protac conformations passed all the protac filters (such as steric clash detection)
 ``top_protac_score``
@@ -1408,11 +1411,11 @@ Bottom right plot
 Benchmarking the TC modelling run
 ---------------------------------
 
-So far, we have ran P4ward as if we had no information on how the ternary complex for these components would look like, and as if there was no experimentally determined ternary complex structure available. Now, we will rerun the modelling just as we have done before, but adding a benchmarking component. We will provide the known position of the ligase bound to the receptor protein, and will let P4ward compare its results with the known binding position.
+So far, we have ran P4ward as if we had no information on what the ternary complex for these components would look like, and as if there was no experimentally determined ternary complex structure available. Now, we will rerun the modelling just as we have done before, but adding a benchmarking component. We will provide the known position of the ligase bound to the receptor protein, and will let P4ward compare its results with the known binding position.
 
 In order to get the know ligase position, we need to:
 
-- access the ternary complex PDBID 5T35;
+- access the ternary complex PDBID `5T35 <https://www.rcsb.org/structure/5T35>`_;
 - delete all redundant chains and keep only one chain of the receptor protein (BRD4bd2) as well as the chain of VHL bound to it (we can safely remove the Elongins C and B);
 - align the structure to our previously generated ``receptor.pdb``;
 - delete everything except VHL from 5T35;
@@ -1427,9 +1430,9 @@ Here is a ChimeraX script that does this:
    open receptor.pdb
    mmaker #1 to #2
    del #2; del #1/A
-   save ref_ligase.pdb
+   (save ref_ligase.pdb)
 
-Next we will modify the P4ward command and tell it to benchmark itself, using as reference the file we just created. We do not need to change anything in ``config_run.ini``. Note that in the settings we have ``overwrite = False``. This means that, if you have previously run P4ward in the current working directory, it will access the previous run information (stored in the ``.pickle`` files) and not redo what has been done before. This means that when we rerun P4ward again with the benchmarking command, it will access the previous run and benchmark it, without having to rerun the same modelling calculations. 
+Next we will modify the P4ward command and tell it to benchmark itself, using as reference the file we just created. We do not need to change anything in ``config_run.ini``. Note that in the settings we have ``overwrite = False``. This means that, if you have previously run P4ward in the current working directory, it will access the previous run information (stored in the ``.pickle`` files) and not redo what has been done before. And so when we rerun P4ward again with the benchmarking command, it will access the previous run and benchmark it, without having to rerun the same modelling calculations. 
 
 .. note::
 

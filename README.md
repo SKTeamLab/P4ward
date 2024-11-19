@@ -4,7 +4,7 @@ P4ward is a fully automated, customizable and open-source program for Protacs te
 
 P4ward is written in Python3 and integrates free and open-source structural biology tools, such as Megadock, RxDock, and libraries such as RDkit and BioPython to build a workflow with no accessibility barriers. As such, we acknowledge the countless contributors to open-source code which enables research by all and for all (Please view [this section](LINK) for attribution and licenses).
 
-Please visit our [documentation page](LINK) for more information on:
+Please visit our [documentation page](LINK) (documentation page will be online soon!) for more information on:
 - How to obtain P4ward
 - How to run P4ward.
 - Detailed description of how P4ward works
