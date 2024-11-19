@@ -1,6 +1,6 @@
 
 
-if __name__ == '__main__':
+def main():
 
     from sys import exit
     from pathlib import Path
@@ -300,3 +300,6 @@ if __name__ == '__main__':
         conf=conf,
         choice=conf.getboolean('outputs','plots')
     )
+
+if __name__ == '__main__':
+    main()
