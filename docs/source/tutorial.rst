@@ -57,13 +57,32 @@ Now we can obtain the Protac. P4ward will take a smiles file with one or more sm
 
 An important step at this point is to examine the ligand files and the protac 2D structure determined in the smiles code and make sure they match, since P4ward will need to match them later. Bonds in aromatic rings, for example, can be represented in different ways, which could lead to incompatibilities. Visualize your smiles code in a program such as the web version of Marvin sketch, and the ligand files in a program that shows the bond orders, such as Pymol:
 
-
 .. image:: ../../tutorial/molecule_comparison.png
    :alt: Molecule comparison
    :width: 100%
    :align: center
 
-All is the same for the receptor ligand, but there are some bond order differences on the receptor ligand. It is important to make sure the smiles contains the correct bond orders. However, it is okay if the ligands in the mol2 files don't, as long as this does not prevent proper matching. This is because only the coordiners of the atoms in the mol2 files will be used for modelling of the protacs later on.
+It is also good to look at the mol2 files in a text editor to check for inconsistencies. In the case of this tutorial, the very first atom in ``receptor_ligand.mol2`` has inconsistent naming which will probably trigger an RDKit error. All atom names should have only the first character capitalized. So we need to change:
+
+.. code-block:: ini
+   :caption: File: receptor_ligand.mol2
+   :emphasize-removed: 9
+   :emphasize-added: 10
+
+   [...]
+   @<TRIPOS>MOLECULE
+   0S6
+   28 31 1
+   ****
+   ****
+
+   @<TRIPOS>ATOM
+   1 CL1 -45.604 12.621 21.900 CL 1 0S6 0.000
+   1 CL1 -45.604 12.621 21.900 Cl 1 0S6 0.000
+   2 C15 -44.378 13.693 21.178 C.ar 1 0S6 0.000
+   3 C16 -43.534 14.400 22.020 C.ar 1 0S6 0.000
+
+All is the same for the ligase ligand, but there are some bond order differences on the receptor ligand. It is important to make sure the smiles contains the correct bond orders. However, it is okay if the ligands in the mol2 files don't, as long as this does not prevent proper matching. This is because only the coordiners of the atoms in the mol2 files will be used for modelling of the protacs later on.
 
 Now we can add to our configuration file the names of the files we just prepared. Open a new file which we will call ``config.ini`` with the following contents:
 

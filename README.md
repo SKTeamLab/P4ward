@@ -4,7 +4,7 @@ P4ward is a fully automated, customizable and open-source program for Protacs te
 
 P4ward is written in Python3 and integrates free and open-source structural biology tools, such as Megadock, RxDock, and libraries such as RDkit and BioPython to build a workflow with no accessibility barriers. As such, we acknowledge the countless contributors to open-source code which enables research by all and for all (Please view [this section](LINK) for attribution and licenses).
 
-Please visit out [documentation page](LINK) for more information on:
+Please visit our [documentation page](LINK) for more information on:
 - How to obtain P4ward
 - How to run P4ward.
 - Detailed description of how P4ward works
@@ -13,6 +13,7 @@ Please refer to [P4ward's article](LINK) for:
 - Description of P4ward's workflow
 - Detailed description of the P4ward's benchmarking and validation
 
+
 > [!NOTE]  
 > If you use P4ward on your research, please acknowledge this work and cite:
 > xxxxxx
@@ -20,7 +21,7 @@ Please refer to [P4ward's article](LINK) for:
 > [!TIP]
 > If you require assistance or have any questions about using P4ward, I am happy to help! Please simply open an issue [here](LINK).
 
-Copyright (C) 2024 Paula Jofily de Lima Rangel. This project is licensed under the GNU General Public License version 3 (GPLv3). See the LICENSE file for more details.
+Also, check out my other projects at [PaulaJLR](https://github.com/PaulaJLR) and the lab's other projects at [SKLab](https://github.com/SKTeamLab).
 
 ## Third party attributions and licenses
 
