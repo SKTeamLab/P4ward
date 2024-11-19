@@ -1,8 +1,9 @@
+import logging
 from  threading import Thread
 from queue import Queue
-from ..tools.logger import logger
 from ..tools import decorators
 
+logger = logging.getLogger('p4ward')
 
 def sample_protac_pose(inQ, outQ, p, receptor_obj, ligase_obj, global_parameters, logger):
 

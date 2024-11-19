@@ -1,9 +1,10 @@
 import pickle
 import os
-from .logger import logger
+import logging
 from . import classes
 from ..definitions import TRACKER_FILE, CPT_FILE
 
+logger = logging.getLogger('p4ward')
 
 def load_tracker(overwrite):
     """

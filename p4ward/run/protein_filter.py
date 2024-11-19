@@ -1,10 +1,11 @@
+import logging
 from pathlib import Path
 from multiprocessing import Process, JoinableQueue
 from ..tools import decorators
-from ..tools.logger import logger
 from .structure_tools import load_biopython_structures, pymol_align
 from ..definitions import ROOT_DIR
 
+logger = logging.getLogger('p4ward')
 
 @decorators.user_choice
 @decorators.track_run

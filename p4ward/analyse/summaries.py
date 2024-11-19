@@ -1,8 +1,10 @@
+import logging
 import pandas as pd
 from pathlib import Path
 from ..tools import decorators
-from ..tools.logger import logger
 from ..definitions import CWD
+
+logger = logging.getLogger('p4ward')
 
 def summary_csv(protac_objs, ligase_obj, benchmark, cluster_trend):
 

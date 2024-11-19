@@ -1,7 +1,8 @@
+import logging
 from openmm.app import PDBFile
 from ..tools import decorators
-from ..tools.logger import logger
 
+logger = logging.getLogger('p4ward')
 
 @decorators.user_choice
 @decorators.track_run

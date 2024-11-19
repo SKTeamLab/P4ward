@@ -1,5 +1,7 @@
-from ..tools.logger import logger
+import logging
 from ..tools import decorators
+
+logger = logging.getLogger('p4ward')
 
 @decorators.track_run
 def protein_poses(

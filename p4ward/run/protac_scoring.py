@@ -3,7 +3,6 @@ from os import putenv
 from pathlib import Path
 from openbabel import pybel
 from ..definitions import ROOT_DIR, CWD
-# from ..tools.logger import logger
 from . import structure_tools
 
 

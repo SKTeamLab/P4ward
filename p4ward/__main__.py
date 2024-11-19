@@ -1,19 +1,23 @@
+from .tools.logger import set_logging
+from sys import exit
+from pathlib import Path
+import warnings
+from .config import config
+from .tools import run_tracker
+from .definitions import ROOT_DIR, CPT_FILE
 
 
 def main():
 
-    from sys import exit
-    from pathlib import Path
-    import warnings
-    from .config import config
-    from .tools import run_tracker
-    from .definitions import ROOT_DIR, CPT_FILE
-
+    # config logging
+    set_logging()
+    
     # disable warnings
     warnings.filterwarnings("ignore")
     ## rdkit c++ logging:
     from rdkit import RDLogger
     RDLogger.DisableLog('rdApp.*')
+
 
     # prepare internals:
     args = config.arg_parser(None)

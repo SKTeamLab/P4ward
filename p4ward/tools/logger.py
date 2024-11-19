@@ -26,7 +26,7 @@ Log created at {now.strftime("%Y-%m-%d, %H:%M:%S")}
         "%H:%M:%S"
     )
 
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger('p4ward')
     logger.setLevel(logging.DEBUG)
 
     stream_handler = logging.StreamHandler()
@@ -41,8 +41,5 @@ Log created at {now.strftime("%Y-%m-%d, %H:%M:%S")}
 
     return(logger)
   
-
-logger = set_logging()
-
   
 

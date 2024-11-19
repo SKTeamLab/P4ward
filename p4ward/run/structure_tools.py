@@ -1,9 +1,10 @@
-from ..tools.logger import logger
+import logging
 from ..tools import decorators
 from ..definitions import ROOT_DIR
 from pathlib import Path
 import subprocess
 
+logger = logging.getLogger('p4ward')
 
 def load_biopython_structures(structure_file, mol2=False):
     """

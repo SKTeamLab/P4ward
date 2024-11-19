@@ -3,7 +3,6 @@ from rdkit.Geometry.rdGeometry import Point3D
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from func_timeout import func_timeout
-# from ..tools.logger import logger
 from ..tools import classes
 from ..run.megadock import rotate_atoms
 

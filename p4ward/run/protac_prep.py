@@ -1,8 +1,9 @@
+import logging
 import numpy as np
 from rdkit import Chem
 from rdkit.Chem import rdFMCS
-from ..tools.logger import logger
 
+logger = logging.getLogger('p4ward')
 
 def get_matches(protac, reclig, liglig, reference_ligs):
 

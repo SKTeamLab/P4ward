@@ -1,11 +1,12 @@
+import logging
 from pathlib import Path
 import numpy as np
 import plotly.express as px
 import plotly.io as pio
-from ..tools.logger import logger
 from ..tools import decorators
 from ..tools.classes import *
 
+logger = logging.getLogger('p4ward')
 
 plot_colors = ['#34345e', '#548687', '#FCAA67', '#eee220']
 

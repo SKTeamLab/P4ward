@@ -1,10 +1,11 @@
 import configparser
 import argparse
+import logging
 from shutil import copy
 from pathlib import Path
 from ..definitions import CWD, ROOT_DIR
-from ..tools.logger import logger
 
+logger = logging.getLogger('p4ward')
 
 def arg_parser(arguments):
     """

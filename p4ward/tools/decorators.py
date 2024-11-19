@@ -1,7 +1,9 @@
+import logging
 import functools
 import pickle
-from ..tools.logger import logger
 from ..definitions import TRACKER_FILE
+
+logger = logging.getLogger('p4ward')
 
 def user_choice(func):
     """

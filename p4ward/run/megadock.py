@@ -1,9 +1,10 @@
 import subprocess
 import os
+import logging
 from ..tools import decorators, classes
-from ..tools.logger import logger
 from ..definitions import CWD
 
+logger = logging.getLogger('p4ward')
 
 @decorators.user_choice # NOTE choice is True if run megadock is true
 @decorators.track_run
