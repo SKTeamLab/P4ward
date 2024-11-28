@@ -1,3 +1,5 @@
+![logo](logo_v1.png)
+
 # P4ward - Predictive Python Protacs Pipeline: workflow automation for research and development.
 
 P4ward is a fully automated, customizable and open-source program for Protacs ternary complex modelling. P4ward takes two binary complexes, as well as a list of Protac 2D structures, and models ternary complexes for each of the protacs. P4ward also generates summary tables with all relevand modelling information, as well as interactive plots.
