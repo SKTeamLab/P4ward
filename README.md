@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="logo_v1.png" width="20%">
+  <img src="logo_v1.png" width="30%">
 </div>
 
 # P4ward - Predictive Python Protacs Pipeline: workflow automation for research and development.
@@ -13,7 +13,7 @@ Please visit our [documentation page](LINK) (documentation page will be online s
 - How to run P4ward.
 - Detailed description of how P4ward works
 
-Please refer to [P4ward's article](LINK) for:
+Please refer to [P4ward's preprint](LINK) (preprint will be online soon!) for:
 - Description of P4ward's workflow
 - Detailed description of the P4ward's benchmarking and validation
 
