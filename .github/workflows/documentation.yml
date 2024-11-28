@@ -32,7 +32,7 @@ jobs:
       # Step 4: Build the documentation
       - name: Build Documentation
         run: |
-          docs\make.bat html
+          sphinx-build docs build
 
       # Step 5: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
