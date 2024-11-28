@@ -29,6 +29,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install sphinx sphinxawesome-theme sphinx_design
 
+      - name: set pythonpath
+        run:
+          export PYTHONPATH=$PYTHONPATH:..
+
       # Step 4: Build the documentation
       - name: Build Documentation
         run: |
