@@ -18,7 +18,6 @@ def main():
     from rdkit import RDLogger
     RDLogger.DisableLog('rdApp.*')
 
-
     # prepare internals:
     args = config.arg_parser(None)
 
@@ -304,6 +303,7 @@ def main():
         conf=conf,
         choice=conf.getboolean('outputs','plots')
     )
+
 
 if __name__ == '__main__':
     main()

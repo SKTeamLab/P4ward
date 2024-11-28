@@ -10,7 +10,7 @@ Obtaining the input files
 First we need to obtain the files that P4ward needs to run.
 
 - Obtain the binary complex of BRD4bd2 bound to MS417 inhibitor from the PDB, code `6DUV <https://www.rcsb.org/structure/6DUV>`_. We will name this file ``receptor_raw.pdb``
-- Obtain the binary of VHL bound to ligand code 3JF, code `4W9H <https://www.rcsb.org/structure/4W9H>`_. This file will be ``ligase_raw.db``
+- Obtain the binary of VHL bound to ligand code 3JF, code `4W9H <https://www.rcsb.org/structure/4W9H>`_. This file will be ``ligase_raw.pdb``
 - For each of these binary complexes, we also need to obtain a ``mol2`` file of their respective ligands. Therefore, we can scroll down on their PDB pages and download the instance coordinates for the ligands, choosing mol2 format.
    - For BRD4bd2, download the instance coordinates for the ligand mol2 `here <https://models.rcsb.org/v1/6duv/ligand?auth_seq_id=501&label_asym_id=C&encoding=mol2&filename=6duv_C_0S6.mol2>`_. We will save this file as ``receptor_ligand.mol2``
    - For VHL, find them `here <https://models.rcsb.org/v1/4w9h/ligand?auth_seq_id=301&label_asym_id=M&encoding=mol2&filename=4w9h_M_3JF.mol2>`_. We will save this as ``ligase_ligand.mol2``
@@ -82,7 +82,7 @@ It is also good to look at the mol2 files in a text editor to check for inconsis
    2 C15 -44.378 13.693 21.178 C.ar 1 0S6 0.000
    3 C16 -43.534 14.400 22.020 C.ar 1 0S6 0.000
 
-All is the same for the ligase ligand, but there are some bond order differences on the receptor ligand. It is important to make sure the smiles contains the correct bond orders. However, it is okay if the ligands in the mol2 files don't, as long as this does not prevent proper matching. This is because only the coordiners of the atoms in the mol2 files will be used for modelling of the protacs later on.
+All is the same for the ligase ligand, but there are some bond order differences on the receptor ligand. It is important to make sure the smiles contains the correct bond orders. However, it is okay if the ligands in the mol2 files don't, as long as this does not prevent proper matching. This is because only the coordinates of the atoms in the mol2 files will be used for modelling of the protacs later on.
 
 Now we can create a configuration file with the names of the files we just prepared. Open a new file which we will call ``config.ini`` with the following contents:
 
@@ -100,7 +100,7 @@ Now we can create a configuration file with the names of the files we just prepa
 Checking the protac-ligand matches
 ----------------------------------
 
-P4ward also offers a simple way to check if the ligands and the protac match. Through its command ``check_lig_matches``, we can see if RDKit will throw any errors about processing the molecules' strucutures, or if it will be able to properly recognize the ligands in the protac structure.
+P4ward also offers a simple way to check if the ligands and the protac match. Through its command ``check_lig_matches``, we can see if RDKit will throw any errors about processing the molecules' structures, or if it will be able to properly recognize the ligands in the protac structure.
 Let's run the ligand check:
 
 .. note::
@@ -222,7 +222,7 @@ Next, we will make the following modifications to the default file:
    - We also want P4ward to consider all poses, so change ``top_poses`` to the same value of ``18000``;
 - Save this configuration as ``config_run.ini``.
 
-Thus, our configuration will have the following changes (Note that clicking the copy button copies the clean updated version of the file):
+Thus, our configuration will have the following changes:
 
 .. code-block:: ini
    :caption: File: config_run.ini
