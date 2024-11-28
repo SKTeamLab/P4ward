@@ -6,14 +6,14 @@
 
 P4ward is a fully automated, customizable and open-source program for Protacs ternary complex modelling. P4ward takes two binary complexes, as well as a list of Protac 2D structures, and models ternary complexes for each of the protacs. P4ward also generates summary tables with all relevand modelling information, as well as interactive plots.
 
-P4ward is written in Python3 and integrates free and open-source structural biology tools, such as Megadock, RxDock, and libraries such as RDkit and BioPython to build a workflow with no accessibility barriers. As such, we acknowledge the countless contributors to open-source code which enables research by all and for all (Please view [this section](LINK) for attribution and licenses).
+P4ward is written in Python3 and integrates free and open-source structural biology tools, such as Megadock, RxDock, and libraries such as RDkit and BioPython to build a workflow with no accessibility barriers. As such, we acknowledge the countless contributors to open-source code which enables research by all and for all (Please view [this section](https://github.com/SKTeamLab/P4ward?tab=readme-ov-file#third-party-attributions-and-licenses) for attribution and licenses).
 
-Please visit our [documentation page](LINK) (documentation page will be online soon!) for more information on:
+Please visit our [documentation page](https://skteamlab.github.io/P4ward/) for more information on:
 - How to obtain P4ward
 - How to run P4ward.
 - Detailed description of how P4ward works
 
-Please refer to [P4ward's preprint](LINK) (preprint will be online soon!) for:
+Please refer to P4ward's preprint (preprint will be online soon!) for:
 - Description of P4ward's workflow
 - Detailed description of the P4ward's benchmarking and validation
 
@@ -23,7 +23,7 @@ Please refer to [P4ward's preprint](LINK) (preprint will be online soon!) for:
 > xxxxxx
 
 > [!TIP]
-> If you require assistance or have any questions about using P4ward, I am happy to help! Please simply open an issue [here](LINK).
+> If you require assistance or have any questions about using P4ward, I am happy to help! Please simply open an issue [here](https://github.com/SKTeamLab/P4ward/issues).
 
 Also, check out my other projects at [PaulaJLR](https://github.com/PaulaJLR) and the lab's other projects at [SKLab](https://github.com/SKTeamLab).
 
