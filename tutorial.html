@@ -1,0 +1,1985 @@
+<!DOCTYPE html>
+
+<html :class="{'dark': darkMode === 'dark' || (darkMode === 'system' &amp;&amp; window.matchMedia('(prefers-color-scheme: dark)').matches)}" class="scroll-smooth" data-content_root="./" lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') || localStorage.setItem('darkMode', 'system'), activeSection: '' }" x-init="$watch('darkMode', val =&gt; localStorage.setItem('darkMode', val))">
+<head>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="white" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="black" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Tutorial | P4ward</title>
+<meta content="Tutorial | P4ward" property="og:title"/>
+<meta content="Tutorial | P4ward" name="twitter:title"/>
+<link href="_static/pygments.css?v=80d3c388" rel="stylesheet" type="text/css"/>
+<link href="_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
+<link href="_static/sphinx-design.min.css?v=95c83b7e" rel="stylesheet" type="text/css"/>
+<link href="_static/awesome-sphinx-design.css?v=15e0fffa" rel="stylesheet" type="text/css"/>
+<link href="search.html" rel="search" title="Search"/>
+<link href="genindex.html" rel="index" title="Index"/>
+<link href="configure.html" rel="next" title="Configure P4ward"/>
+<link href="obtain.html" rel="prev" title="Obtaining P4ward"/>
+<script>
+    <!-- Prevent Flash of wrong theme -->
+      const userPreference = localStorage.getItem('darkMode');
+      let mode;
+      if (userPreference === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        mode = 'dark';
+        document.documentElement.classList.add('dark');
+      } else {
+        mode = 'light';
+      }
+      if (!userPreference) {localStorage.setItem('darkMode', mode)}
+    </script>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-sm border-border supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="index.html"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">P4ward</span>
+</a></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 space-x-2 sm:space-x-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center space-x-1">
+<button @click="darkMode = darkMode === 'light' ? 'dark' : 'light'" aria-label="Color theme switcher" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full shrink-0 overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="!justify-start text-sm md:!hidden bg-background" href="index.html"><span class="font-bold text-clip whitespace-nowrap">P4ward</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="obtain.html">Obtaining P4ward</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="configure.html">Configure P4ward</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_reference.html">Run input configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_args.html">Command Line Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules_docs.html">Module Documentation</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="index.html">
+<span class="hidden md:inline">P4ward</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">Tutorial</span>
+</nav>
+<div id="content" role="main">
+<section id="tutorial">
+<h1>Tutorial<a class="headerlink" href="#tutorial" title="Link to this heading"><span>#</span></a></h1>
+<p>In this tutorial, we will obtain two binary complexes from the PDB, and model a Protac ternary complex (TC) with them. All input files and summary files can be found in the tutorial folder in the <a class="reference external" href="https://example.com">GitHub repo</a>.
+We will replicate the first ever TC determined experimentally, which comprises the protein of interest (POI) BRD4bd2 bound to the Von Hippel Lindau (VHL) E3 ligase substrate receptor and bridged by the protac MZ1. First, we will run P4ward as if this structure has never been solved at all and make a model of it. Next, we will run P4ward in benchmarking mode, so that we can compare the results with the known crystal structure.</p>
+<section id="obtaining-the-input-files">
+<h2>Obtaining the input files<a class="headerlink" href="#obtaining-the-input-files" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#obtaining-the-input-files'"><span>#</span></a></h2>
+<p>First we need to obtain the files that P4ward needs to run.</p>
+<ul class="simple">
+<li><p>Obtain the binary complex of BRD4bd2 bound to MS417 inhibitor from the PDB, code <a class="reference external" href="https://www.rcsb.org/structure/6DUV">6DUV</a>. We will name this file <code class="docutils literal notranslate"><span class="pre">receptor_raw.pdb</span></code></p></li>
+<li><p>Obtain the binary of VHL bound to ligand code 3JF, code <a class="reference external" href="https://www.rcsb.org/structure/4W9H">4W9H</a>. This file will be <code class="docutils literal notranslate"><span class="pre">ligase_raw.pdb</span></code></p></li>
+<li><dl class="simple">
+<dt>For each of these binary complexes, we also need to obtain a <code class="docutils literal notranslate"><span class="pre">mol2</span></code> file of their respective ligands. Therefore, we can scroll down on their PDB pages and download the instance coordinates for the ligands, choosing mol2 format.</dt><dd><ul>
+<li><p>For BRD4bd2, download the instance coordinates for the ligand mol2 <a class="reference external" href="https://models.rcsb.org/v1/6duv/ligand?auth_seq_id=501&amp;label_asym_id=C&amp;encoding=mol2&amp;filename=6duv_C_0S6.mol2">here</a>. We will save this file as <code class="docutils literal notranslate"><span class="pre">receptor_ligand.mol2</span></code></p></li>
+<li><p>For VHL, find them <a class="reference external" href="https://models.rcsb.org/v1/4w9h/ligand?auth_seq_id=301&amp;label_asym_id=M&amp;encoding=mol2&amp;filename=4w9h_M_3JF.mol2">here</a>. We will save this as <code class="docutils literal notranslate"><span class="pre">ligase_ligand.mol2</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Now, we need to clean up the protein files. Using the software of your choice, remove all except the protein’s main chain of interest. For example, with ChimeraX we can:</p>
+<ul class="simple">
+<li><p>Delete all nonstandard atoms and redundant chains (while keeping chain A) then save the new structure as <code class="docutils literal notranslate"><span class="pre">receptor.pdb</span></code>:</p></li>
+</ul>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">(open receptor_raw.pdb)
+</span><span id="line-2">del ~protein; del ~/A
+</span><span id="line-3">(save receptor.pdb)
+</span></code></pre></div>
+</div>
+<ul class="simple">
+<li><p>Do the same for the ligase structure (keeping chain C):</p></li>
+</ul>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">(open ligase_raw.pdb)
+</span><span id="line-2">del ~protein; del ~/C
+</span><span id="line-3">(save ligase.pdb)
+</span></code></pre></div>
+</div>
+<p>Now, if we open <code class="docutils literal notranslate"><span class="pre">receptor.pdb</span></code> with <code class="docutils literal notranslate"><span class="pre">receptor_ligand.mol2</span></code>, we should see the binary complex:</p>
+<a class="reference internal image-reference" href="_images/vhl_binary.png"><img alt="VHL binary complex shown by ``ligase.pdb`` and ``ligase_ligand.mol2``" class="align-center" src="_images/vhl_binary.png" style="width: 400px;"/>
+</a>
+<p>And we should see the same for <code class="docutils literal notranslate"><span class="pre">ligase.pdb</span></code> and <code class="docutils literal notranslate"><span class="pre">ligase_ligand.mol2</span></code>:</p>
+<a class="reference internal image-reference" href="_images/brd4_binary.png"><img alt="BRD4bd2 binary complex shown by ``receptor.pdb`` and ``receptor_ligand.mol2``" class="align-center" src="_images/brd4_binary.png" style="width: 400px;"/>
+</a>
+<p>Now we can obtain the Protac. P4ward will take a smiles file with one or more smiles code per line. Each line is the code for an entire protac. For now, we can obtain the smiles code for protac MZ1 by copying it from its <a class="reference external" href="https://www.rcsb.org/ligand/759">PDB page</a> and we can paste it in a file called <code class="docutils literal notranslate"><span class="pre">protacs.smiles</span></code>. Note that the smiles code can be followed by a single space and the molecule name. If you add a molecule name, P4ward will use this name for the outputs. Otherwise, it will automatically generate molecule names by numbering them. This way, the contents of <code class="docutils literal notranslate"><span class="pre">protacs.smiles</span></code> will be:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">Cc1c(sc-2c1C(=N[C@H](c3n2c(nn3)C)CC(=O)NCCOCCOCCOCC(=O)N[C@H](C(=O)N4C[C@@H](C[C@H]4C(=O)NCc5ccc(cc5)C6=C(NCS6)C)O)C(C)(C)C)c7ccc(cc7)Cl)C mz1
+</span></code></pre></div>
+</div>
+<p>An important step at this point is to examine the ligand files and the protac 2D structure determined in the smiles code and make sure they match, since P4ward will need to match them later. Bonds in aromatic rings, for example, can be represented in different ways, which could lead to incompatibilities. Visualize your smiles code in a program such as the web version of Marvin sketch, and the ligand files in a program that shows the bond orders, such as Pymol:</p>
+<a class="reference internal image-reference" href="_images/molecule_comparison.png"><img alt="Molecule comparison" class="align-center" src="_images/molecule_comparison.png" style="width: 100%;"/>
+</a>
+<p>It is also good to look at the mol2 files in a text editor to check for inconsistencies. In the case of this tutorial, the very first atom in <code class="docutils literal notranslate"><span class="pre">receptor_ligand.mol2</span></code> has inconsistent naming which will probably trigger an RDKit error. All atom names should have only the first character capitalized. So we need to change:</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">File: receptor_ligand.mol2</span><a class="headerlink" href="#id2" title="Link to this code"><span>#</span></a></div>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="k">[...]</span>
+</span><span id="line-2"><span class="na">@&lt;TRIPOS&gt;MOLECULE</span>
+</span><span id="line-3"><span class="na">0S6</span>
+</span><span id="line-4"><span class="na">28 31 1</span>
+</span><span id="line-5"><span class="na">****</span>
+</span><span id="line-6"><span class="na">****</span>
+</span><span id="line-7">
+</span><span id="line-8"><span class="na">@&lt;TRIPOS&gt;ATOM</span>
+</span><span id="line-9"><del><span class="na">1 CL1 -45.604 12.621 21.900 CL 1 0S6 0.000</span>
+</del></span><span id="line-10"><ins><span class="na">1 CL1 -45.604 12.621 21.900 Cl 1 0S6 0.000</span>
+</ins></span><span id="line-11"><span class="na">2 C15 -44.378 13.693 21.178 C.ar 1 0S6 0.000</span>
+</span><span id="line-12"><span class="na">3 C16 -43.534 14.400 22.020 C.ar 1 0S6 0.000</span>
+</span></code></pre></div>
+</div>
+</div>
+<p>All is the same for the ligase ligand, but there are some bond order differences on the receptor ligand. It is important to make sure the smiles contains the correct bond orders. However, it is okay if the ligands in the mol2 files don’t, as long as this does not prevent proper matching. This is because only the coordinates of the atoms in the mol2 files will be used for modelling of the protacs later on.</p>
+<p>Now we can create a configuration file with the names of the files we just prepared. Open a new file which we will call <code class="docutils literal notranslate"><span class="pre">config.ini</span></code> with the following contents:</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">File: config.ini</span><a class="headerlink" href="#id3" title="Link to this code"><span>#</span></a></div>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="k">[general]</span>
+</span><span id="line-2"><span class="na">receptor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">receptor.pdb</span>
+</span><span id="line-3"><span class="na">ligase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ligase.pdb</span>
+</span><span id="line-4"><span class="na">receptor_ligand</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">receptor_ligand.mol2</span>
+</span><span id="line-5"><span class="na">ligase_ligand</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ligase_ligand.mol2</span>
+</span><span id="line-6"><span class="na">protacs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">protacs.smiles</span>
+</span></code></pre></div>
+</div>
+</div>
+</section>
+<section id="checking-the-protac-ligand-matches">
+<h2>Checking the protac-ligand matches<a class="headerlink" href="#checking-the-protac-ligand-matches" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#checking-the-protac-ligand-matches'"><span>#</span></a></h2>
+<p>P4ward also offers a simple way to check if the ligands and the protac match. Through its command <code class="docutils literal notranslate"><span class="pre">check_lig_matches</span></code>, we can see if RDKit will throw any errors about processing the molecules’ structures, or if it will be able to properly recognize the ligands in the protac structure.
+Let’s run the ligand check:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When running P4ward through conda, don’t forget to activate the conda environment.
+If running through apptainer, don’t forget to change the path to the <code class="docutils literal notranslate"><span class="pre">.sif</span></code> file when copying the example commands. When using docker, note that <code class="docutils literal notranslate"><span class="pre">-v</span> <span class="pre">.:/home/data</span></code> should not be changed.</p>
+</div>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio"/>
+<label class="sd-tab-label" for="sd-tab-item-0">
+Docker</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">sudo<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span>-v<span class="w"> </span>.:/home/data<span class="w"> </span>p4ward<span class="w"> </span>--config_file<span class="w"> </span>config.ini<span class="w"> </span>--check_lig_matches
+</span></code></pre></div>
+</div>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio"/>
+<label class="sd-tab-label" for="sd-tab-item-1">
+Conda</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">python<span class="w"> </span>-m<span class="w"> </span>p4ward<span class="w"> </span>--config_file<span class="w"> </span>config.ini<span class="w"> </span>--check_lig_matches
+</span></code></pre></div>
+</div>
+</div>
+<input id="sd-tab-item-2" name="sd-tab-set-0" type="radio"/>
+<label class="sd-tab-label" for="sd-tab-item-2">
+Apptainer</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">apptainer<span class="w"> </span>run<span class="w"> </span>-B<span class="w"> </span>/home<span class="w"> </span>/path/to/p4ward.sif<span class="w"> </span>--config_file<span class="w"> </span>config.ini<span class="w"> </span>--check_lig_matches
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<p>P4ward will then run and write a log at <code class="docutils literal notranslate"><span class="pre">p4ward.log</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="go">19:13:30 &gt; INFO - Retrieving previous run steps.</span>
+</span><span id="line-2"><span class="go">19:13:30 &gt; INFO - No previous data retrieved.</span>
+</span><span id="line-3"><mark><span class="go">19:13:30 &gt; ERROR - Ligand matching failed.Please check your structures and consider turning off RDKit ligand sanitization.</span>
+</mark></span><span id="line-4"><span class="go">RDKit error:</span>
+</span><span id="line-5"><span class="go">Python argument types in</span>
+</span><span id="line-6"><span class="go">   rdkit.Chem.rdmolops.CombineMols(Mol, NoneType)</span>
+</span><span id="line-7"><span class="go">did not match C++ signature:</span>
+</span><span id="line-8"><span class="go">   CombineMols(RDKit::ROMol mol1, RDKit::ROMol mol2, RDGeom::Point3D offset=&lt;rdkit.Geometry.rdGeometry.Point3D object at 0x7feff2c8adc0&gt;)</span>
+</span></code></pre></div>
+</div>
+<p>We see P4ward warned us that there is an error with the ligands (highlighted line). By default, ligand sanitization is set to <code class="docutils literal notranslate"><span class="pre">True</span></code> on in P4ward’s settings, so we will add it to our <code class="docutils literal notranslate"><span class="pre">config.ini</span></code> file with a value of <code class="docutils literal notranslate"><span class="pre">False</span></code> to turn it off:</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">File: config.ini</span><a class="headerlink" href="#id4" title="Link to this code"><span>#</span></a></div>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="k">[general]</span>
+</span><span id="line-2"><span class="na">receptor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">receptor.pdb</span>
+</span><span id="line-3"><span class="na">ligase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ligase.pdb</span>
+</span><span id="line-4"><span class="na">receptor_ligand</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">receptor_ligand.mol2</span>
+</span><span id="line-5"><span class="na">ligase_ligand</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ligase_ligand.mol2</span>
+</span><span id="line-6"><span class="na">protacs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">protacs.smiles</span>
+</span><span id="line-7"><ins><span class="na">rdkit_ligands_cleanup</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">False</span>
+</ins></span></code></pre></div>
+</div>
+</div>
+<p>Then we can run the check again and look at the output:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="gp">$ </span>python<span class="w"> </span>-m<span class="w"> </span>p4ward<span class="w"> </span>--config_file<span class="w"> </span>config.ini<span class="w"> </span>--check_lig_matches
+</span><span id="line-2">
+</span><span id="line-3"><span class="go">19:26:27 &gt; INFO - Retrieving previous run steps.</span>
+</span><span id="line-4"><span class="go">19:26:27 &gt; INFO - No previous data retrieved.</span>
+</span><span id="line-5"><span class="go">19:26:27 &gt; INFO - Testing ligand match between the protac smiles codes and the ligand structures at receptor_ligand_test.mol2 and ligase_ligand.mol2</span>
+</span><span id="line-6"><mark><span class="go">19:26:28 &gt; INFO - Wrote image for mz1 matches at ligand_matches-mz1.png</span>
+</mark></span><span id="line-7"><mark><span class="go">Number of linker atoms found: 10, at indices: [18, 19, 20, 21, 22, 23, 24, 25, 26, 27]</span>
+</mark></span></code></pre></div>
+</div>
+<p>And all looks good. The image P4ward generated shows that all ligand atoms in both the mol2 files provided were identified on the protac 2d structure, see that all the atoms that are also present in the ligands are highlighted. Also, note that the atom indices P4ward reports to belong to the linker in the output are correct when checking against the image. If, at this point, the ligand matching does not look right, it is good to edit the bond orders in the mol2 files to make sure they match perfectly and try the matching test again.</p>
+<figure class="align-center" id="id5">
+<a class="reference internal image-reference" href="_images/ligand_matches-mz1.png"><img alt="ligand matches image produced by P4ward ligand check." src="_images/ligand_matches-mz1.png" style="width: 500px;"/>
+</a>
+<figcaption>
+<p><span class="caption-text">The image result of P4ward’s ligand check. The atoms highlighted in red have been matched between the ligands <code class="docutils literal notranslate"><span class="pre">mol2</span></code> files and the 2D protac smiles file provided.</span><a class="headerlink" href="#id5" title="Link to this image"><span>#</span></a></p>
+</figcaption>
+</figure>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There is no need to add hydrogens to the protac. They will be added automatically during sampling.</p>
+</div>
+</section>
+<section id="running-p4ward-tc-modelling">
+<h2>Running P4ward TC modelling<a class="headerlink" href="#running-p4ward-tc-modelling" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#running-p4ward-tc-modelling'"><span>#</span></a></h2>
+<p>Now we can finish building the input file with our preferred settings. If you submit P4ward with <code class="docutils literal notranslate"><span class="pre">config.ini</span></code> as is, all other settings will be automatically populated with the default values, which can be found at <a class="reference internal" href="config_reference.html"><span class="doc">Run input configuration</span></a>. For more information about how these default values were chosen, please refer to [our publication](LINK).</p>
+<p>For the purposes of this tutorial, we will modify slightly the options so that our run does not take too long to complete. We will generate a template configuration file, <code class="docutils literal notranslate"><span class="pre">default.ini</span></code>, by running:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-3" name="sd-tab-set-1" type="radio"/>
+<label class="sd-tab-label" for="sd-tab-item-3">
+Docker</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">sudo<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span>-v<span class="w"> </span>.:/home/data<span class="w"> </span>p4ward<span class="w"> </span>--write_default
+</span></code></pre></div>
+</div>
+</div>
+<input id="sd-tab-item-4" name="sd-tab-set-1" type="radio"/>
+<label class="sd-tab-label" for="sd-tab-item-4">
+Conda</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">python<span class="w"> </span>-m<span class="w"> </span>p4ward<span class="w"> </span>--write_default
+</span></code></pre></div>
+</div>
+</div>
+<input id="sd-tab-item-5" name="sd-tab-set-1" type="radio"/>
+<label class="sd-tab-label" for="sd-tab-item-5">
+Apptainer</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">apptainer<span class="w"> </span>run<span class="w"> </span>-B<span class="w"> </span>/home<span class="w"> </span>/path/to/p4ward.sif<span class="w"> </span>--write_default
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<p>Next, we will make the following modifications to the default file:</p>
+<ul class="simple">
+<li><p>If you’re running using Docker or a conda environment, there is no need to worry about changing anything in the <code class="docutils literal notranslate"><span class="pre">[program_paths]</span></code> section;</p></li>
+<li><p>Adjust the file names to reflect our input files;</p></li>
+<li><p>Make sure we keep <code class="docutils literal notranslate"><span class="pre">rdkit_ligands_cleanup</span></code> as <code class="docutils literal notranslate"><span class="pre">False</span></code>;</p></li>
+<li><p>Depending on your system, change <code class="docutils literal notranslate"><span class="pre">number_of_processors</span></code> to a value that suits it best;</p></li>
+<li><dl class="simple">
+<dt>Change the megadock settings to generate fewer protein poses, this will reduce the runtime for this tutorial;</dt><dd><ul>
+<li><p>Change <code class="docutils literal notranslate"><span class="pre">num_rotational_angles</span></code> to <code class="docutils literal notranslate"><span class="pre">3600</span></code>;</p></li>
+<li><p>Change <code class="docutils literal notranslate"><span class="pre">num_predictions_per_rotation</span></code> to <code class="docutils literal notranslate"><span class="pre">5</span></code>;</p></li>
+<li><p>We want all the poses to be reported in the megadock output file, so we can change <code class="docutils literal notranslate"><span class="pre">num_predictions</span></code> to <code class="docutils literal notranslate"><span class="pre">18000</span></code>;</p></li>
+<li><p>We also want P4ward to consider all poses, so change <code class="docutils literal notranslate"><span class="pre">top_poses</span></code> to the same value of <code class="docutils literal notranslate"><span class="pre">18000</span></code>;</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Save this configuration as <code class="docutils literal notranslate"><span class="pre">config_run.ini</span></code>.</p></li>
+</ul>
+<p>Thus, our configuration will have the following changes:</p>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">File: config_run.ini</span><a class="headerlink" href="#id6" title="Link to this code"><span>#</span></a></div>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="linenos"> 1</span><span class="k">[program_paths]</span>
+</span><span id="line-2"><span class="linenos"> 2</span><span class="na">megadock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">megadock</span>
+</span><span id="line-3"><span class="linenos"> 3</span><span class="na">obabel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">obabel</span>
+</span><span id="line-4"><span class="linenos"> 4</span><span class="na">rxdock_root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">""</span>
+</span><span id="line-5"><span class="linenos"> 5</span>
+</span><span id="line-6"><span class="linenos"> 6</span><span class="k">[general]</span>
+</span><span id="line-7"><span class="linenos"> 7</span><span class="na">overwrite</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">False</span>
+</span><span id="line-8"><span class="linenos"> 8</span><span class="na">receptor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">receptor.pdb</span>
+</span><span id="line-9"><span class="linenos"> 9</span><span class="na">ligase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ligase.pdb</span>
+</span><span id="line-10"><del><span class="linenos">10</span><span class="na">protacs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">protac.smiles</span>
+</del></span><span id="line-11"><ins><span class="linenos">11</span><span class="na">protacs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">protacs.smiles</span>
+</ins></span><span id="line-12"><span class="linenos">12</span><span class="na">receptor_ligand</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">receptor_ligand.mol2</span>
+</span><span id="line-13"><span class="linenos">13</span><span class="na">ligase_ligand</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">ligase_ligand.mol2</span>
+</span><span id="line-14"><del><span class="linenos">14</span><span class="na">rdkit_ligands_cleanup</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</del></span><span id="line-15"><ins><span class="linenos">15</span><span class="na">rdkit_ligands_cleanup</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">False</span>
+</ins></span><span id="line-16"><span class="linenos">16</span><span class="na">num_processors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">8</span>
+</span><span id="line-17"><span class="linenos">17</span>
+</span><span id="line-18"><span class="linenos">18</span><span class="k">[protein_prep]</span>
+</span><span id="line-19"><span class="linenos">19</span><span class="na">pdbfixer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</span><span id="line-20"><span class="linenos">20</span><span class="na">pdbfixer_ignore_extremities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</span><span id="line-21"><span class="linenos">21</span><span class="na">pdbfixer_ph</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">7.0</span>
+</span><span id="line-22"><span class="linenos">22</span><span class="na">minimize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</span><span id="line-23"><span class="linenos">23</span><span class="na">minimize_maxiter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">0</span>
+</span><span id="line-24"><span class="linenos">24</span><span class="na">minimize_h_only</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</span><span id="line-25"><span class="linenos">25</span>
+</span><span id="line-26"><span class="linenos">26</span><span class="k">[megadock]</span>
+</span><span id="line-27"><span class="linenos">27</span><span class="na">run_docking</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</span><span id="line-28"><del><span class="linenos">28</span><span class="na">num_predictions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">162000</span>
+</del></span><span id="line-29"><ins><span class="linenos">29</span><span class="na">num_predictions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">18000</span>
+</ins></span><span id="line-30"><del><span class="linenos">30</span><span class="na">num_predictions_per_rotation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">3</span>
+</del></span><span id="line-31"><ins><span class="linenos">31</span><span class="na">num_predictions_per_rotation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">5</span>
+</ins></span><span id="line-32"><del><span class="linenos">32</span><span class="na">num_rotational_angles</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">54000</span>
+</del></span><span id="line-33"><ins><span class="linenos">33</span><span class="na">num_rotational_angles</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">3600</span>
+</ins></span><span id="line-34"><span class="linenos">34</span><span class="na">run_docking_output_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">megadock.out</span>
+</span><span id="line-35"><span class="linenos">35</span><span class="na">run_docking_log_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">megadock_run.log</span>
+</span><span id="line-36"><span class="linenos">36</span>
+</span><span id="line-37"><span class="linenos">37</span><span class="k">[protein_filter]</span>
+</span><span id="line-38"><span class="linenos">38</span><span class="na">ligand_distances</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</span><span id="line-39"><span class="linenos">39</span><span class="na">filter_dist_cutoff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">auto</span>
+</span><span id="line-40"><span class="linenos">40</span><span class="na">filter_dist_sampling_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">3D</span>
+</span><span id="line-41"><span class="linenos">41</span><span class="na">crl_model_clash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</span><span id="line-42"><span class="linenos">42</span><span class="na">clash_threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1.0</span>
+</span><span id="line-43"><span class="linenos">43</span><span class="na">clash_count_tol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">10</span>
+</span><span id="line-44"><span class="linenos">44</span><span class="na">accessible_lysines</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</span><span id="line-45"><span class="linenos">45</span><span class="na">lysine_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span>
+</span><span id="line-46"><span class="linenos">46</span><span class="na">lys_sasa_cutoff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">2.5</span>
+</span><span id="line-47"><span class="linenos">47</span><span class="na">overlap_dist_cutoff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">5.0</span>
+</span><span id="line-48"><span class="linenos">48</span><span class="na">vhl_ubq_dist_cutoff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">60.0</span>
+</span><span id="line-49"><span class="linenos">49</span><span class="na">crbn_ubq_dist_cutoff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">16.0</span>
+</span><span id="line-50"><span class="linenos">50</span><span class="na">e3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">vhl</span>
+</span><span id="line-51"><span class="linenos">51</span>
+</span><span id="line-52"><span class="linenos">52</span><span class="k">[protein_ranking]</span>
+</span><span id="line-53"><span class="linenos">53</span><span class="na">cluster_poses_redundancy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">False</span>
+</span><span id="line-54"><span class="linenos">54</span><span class="na">cluster_poses_trend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</span><span id="line-55"><span class="linenos">55</span><span class="na">clustering_cutoff_redund</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">3.0</span>
+</span><span id="line-56"><span class="linenos">56</span><span class="na">clustering_cutoff_trend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">10.0</span>
+</span><span id="line-57"><span class="linenos">57</span><span class="na">cluster_redund_repr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">centroid</span>
+</span><span id="line-58"><del><span class="linenos">58</span><span class="na">top_poses</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">10</span>
+</del></span><span id="line-59"><ins><span class="linenos">59</span><span class="na">top_poses</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">18000</span>
+</ins></span><span id="line-60"><span class="linenos">60</span><span class="na">generate_poses</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">filtered</span>
+</span><span id="line-61"><span class="linenos">61</span><span class="na">generate_poses_altlocA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</span><span id="line-62"><span class="linenos">62</span><span class="na">generated_poses_folder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">protein_docking</span>
+</span><span id="line-63"><span class="linenos">63</span><span class="na">rescore_poses</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</span><span id="line-64"><span class="linenos">64</span>
+</span><span id="line-65"><span class="linenos">65</span><span class="k">[protac_sampling]</span>
+</span><span id="line-66"><span class="linenos">66</span><span class="na">unbound_protac_num_confs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">10</span>
+</span><span id="line-67"><span class="linenos">67</span>
+</span><span id="line-68"><span class="linenos">68</span><span class="k">[linker_sampling]</span>
+</span><span id="line-69"><span class="linenos">69</span><span class="na">rdkit_sampling</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</span><span id="line-70"><span class="linenos">70</span><span class="na">protac_poses_folder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">protac_sampling</span>
+</span><span id="line-71"><span class="linenos">71</span><span class="na">extend_flexible_small_linker</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</span><span id="line-72"><span class="linenos">72</span><span class="na">extend_neighbour_number</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">2</span>
+</span><span id="line-73"><span class="linenos">73</span><span class="na">min_linker_length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">2</span>
+</span><span id="line-74"><span class="linenos">74</span><span class="na">rdkit_number_of_confs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">10</span>
+</span><span id="line-75"><span class="linenos">75</span><span class="na">write_protac_conf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</span><span id="line-76"><span class="linenos">76</span><span class="na">rdkit_pose_rmsd_tolerance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1.0</span>
+</span><span id="line-77"><span class="linenos">77</span><span class="na">rdkit_time_tolerance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">300</span>
+</span><span id="line-78"><span class="linenos">78</span><span class="na">rdkit_random_seed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">103</span>
+</span><span id="line-79"><span class="linenos">79</span><span class="na">extend_top_poses_sampled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</span><span id="line-80"><span class="linenos">80</span><span class="na">extend_top_poses_score</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</span><span id="line-81"><span class="linenos">81</span><span class="na">extend_top_poses_energy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">False</span>
+</span><span id="line-82"><span class="linenos">82</span>
+</span><span id="line-83"><span class="linenos">83</span><span class="k">[linker_ranking]</span>
+</span><span id="line-84"><span class="linenos">84</span><span class="na">linker_scoring_folder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">protac_scoring</span>
+</span><span id="line-85"><span class="linenos">85</span><span class="na">rxdock_score</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</span><span id="line-86"><span class="linenos">86</span><span class="na">rxdock_target_score</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">SCORE.INTER</span>
+</span><span id="line-87"><span class="linenos">87</span><span class="na">rxdock_minimize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">False</span>
+</span><span id="line-88"><span class="linenos">88</span>
+</span><span id="line-89"><span class="linenos">89</span><span class="k">[outputs]</span>
+</span><span id="line-90"><span class="linenos">90</span><span class="na">plots</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</span><span id="line-91"><span class="linenos">91</span><span class="na">chimerax_view</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</span><span id="line-92"><span class="linenos">92</span><span class="na">write_crl_complex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</span><span id="line-93"><span class="linenos">93</span><span class="na">crl_cluster_rep_only</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+</span></code></pre></div>
+</div>
+</div>
+<p>Then we can run TC modelling using the command:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-6" name="sd-tab-set-2" type="radio"/>
+<label class="sd-tab-label" for="sd-tab-item-6">
+Docker</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">sudo<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span>-v<span class="w"> </span>.:/home/data<span class="w"> </span>p4ward<span class="w"> </span>--config_file<span class="w"> </span>config_run.ini
+</span></code></pre></div>
+</div>
+</div>
+<input id="sd-tab-item-7" name="sd-tab-set-2" type="radio"/>
+<label class="sd-tab-label" for="sd-tab-item-7">
+Conda</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">python<span class="w"> </span>-m<span class="w"> </span>p4ward<span class="w"> </span>--config_file<span class="w"> </span>config_run.ini
+</span></code></pre></div>
+</div>
+</div>
+<input id="sd-tab-item-8" name="sd-tab-set-2" type="radio"/>
+<label class="sd-tab-label" for="sd-tab-item-8">
+Apptainer</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">apptainer<span class="w"> </span>run<span class="w"> </span>-B<span class="w"> </span>/home<span class="w"> </span>/path/to/p4ward.sif<span class="w"> </span>--config_file<span class="w"> </span>config_run.ini
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If at any point you need to restart your run, either because you encountered errors or need to change a setting, make sure to change the setting <code class="docutils literal notranslate"><span class="pre">overwrite</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>, or delete the files with the <code class="docutils literal notranslate"><span class="pre">.pickle</span></code> extension.</p>
+</div>
+</section>
+<section id="viewing-the-results">
+<h2>Viewing the results<a class="headerlink" href="#viewing-the-results" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#viewing-the-results'"><span>#</span></a></h2>
+<p>A P4ward run will generate result files in the following folders:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">protein_docking</span></code></dt><dd><p>Contains pdb files of the ligase docking poses generated by megadock. By default, only the poses which passed the protein filters (distance filter and CRL filter) will be written.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">protac_sampling</span></code></dt><dd><p>Contains sdf files comprising protac conformations sampled by rdkit for each protein pose.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">protac_scoring</span></code></dt><dd><p>Contains sdf files comprising protac conformations previously generated by RDKit and now scored by RxDock. If RxDock minimization was performed (which is not the case in this tutorial), then the conformation of the protacs in this folder will be different than in the <code class="docutils literal notranslate"><span class="pre">protac_sampling</span></code> folder.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">crl_models</span></code></dt><dd><p>If configured to do so, P4ward will write the complete CRL models of the final TC predictions.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">results_summaries</span></code></dt><dd><p>Automatically generated outputs with the results. We will go into this folder to see the modelling results.</p>
+</dd>
+</dl>
+<p>The first thing to do is look at <code class="docutils literal notranslate"><span class="pre">summary-mz1.csv</span></code>. You can open it in your preferred way (like a spreadsheet) but I will view it using python and pandas. If we just open the table, this is what we see (note that it scrolls vertically and horizontally):</p>
+<div style="overflow: auto; max-width: 100%; max-height: 600px;">
+<style scoped="">
+   .dataframe tbody tr th:only-of-type {
+      vertical-align: middle;
+   }
+
+   .dataframe tbody tr th {
+      vertical-align: top;
+   }
+
+   .dataframe thead th {
+      text-align: right;
+   }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>pose_number</th>
+<th>megadock_score</th>
+<th>crl</th>
+<th>cluster_number</th>
+<th>cluster_centr</th>
+<th>cluster_best</th>
+<th>cluster_size</th>
+<th>protac_pose</th>
+<th>active_linkers</th>
+<th>top_protac_score</th>
+<th>final_score</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>15092</td>
+<td>1699.34</td>
+<td>[2]</td>
+<td>16</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>3</td>
+<td>-35.73040</td>
+<td>-0.510400</td>
+</tr>
+<tr>
+<th>1</th>
+<td>11831</td>
+<td>1802.28</td>
+<td>[1]</td>
+<td>14</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>8,9,2,1</td>
+<td>-37.73660</td>
+<td>-0.509957</td>
+</tr>
+<tr>
+<th>2</th>
+<td>14422</td>
+<td>1722.82</td>
+<td>[2]</td>
+<td>2</td>
+<td>False</td>
+<td>True</td>
+<td>6.0</td>
+<td>True</td>
+<td>2</td>
+<td>-34.06310</td>
+<td>-0.509786</td>
+</tr>
+<tr>
+<th>3</th>
+<td>15321</td>
+<td>1690.30</td>
+<td>[2]</td>
+<td>15</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>8,6,1</td>
+<td>-34.61550</td>
+<td>-0.509641</td>
+</tr>
+<tr>
+<th>4</th>
+<td>9971</td>
+<td>1854.86</td>
+<td>[2]</td>
+<td>17</td>
+<td>False</td>
+<td>True</td>
+<td>2.0</td>
+<td>True</td>
+<td>2,3,9,8</td>
+<td>-37.39660</td>
+<td>-0.509021</td>
+</tr>
+<tr>
+<th>5</th>
+<td>13549</td>
+<td>1749.68</td>
+<td>[1]</td>
+<td>5</td>
+<td>True</td>
+<td>True</td>
+<td>2.0</td>
+<td>True</td>
+<td>5,3,0,4,8,1,9,6</td>
+<td>-37.09920</td>
+<td>-0.508916</td>
+</tr>
+<tr>
+<th>6</th>
+<td>5047</td>
+<td>2021.71</td>
+<td>[1]</td>
+<td>8</td>
+<td>False</td>
+<td>True</td>
+<td>4.0</td>
+<td>True</td>
+<td>2,3,4</td>
+<td>-36.81800</td>
+<td>-0.508751</td>
+</tr>
+<tr>
+<th>7</th>
+<td>8181</td>
+<td>1907.59</td>
+<td>[2]</td>
+<td>0</td>
+<td>True</td>
+<td>True</td>
+<td>7.0</td>
+<td>True</td>
+<td>8,9,1,0</td>
+<td>-36.01740</td>
+<td>-0.508517</td>
+</tr>
+<tr>
+<th>8</th>
+<td>5028</td>
+<td>2022.13</td>
+<td>[1]</td>
+<td>8</td>
+<td>False</td>
+<td>False</td>
+<td>NaN</td>
+<td>True</td>
+<td>3,6</td>
+<td>-34.57790</td>
+<td>-0.508475</td>
+</tr>
+<tr>
+<th>9</th>
+<td>5355</td>
+<td>2009.79</td>
+<td>[3]</td>
+<td>18</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>7,5,8,2,0,3,9,4,6</td>
+<td>-39.32680</td>
+<td>-0.506855</td>
+</tr>
+<tr>
+<th>10</th>
+<td>14543</td>
+<td>1718.41</td>
+<td>[1]</td>
+<td>2</td>
+<td>True</td>
+<td>False</td>
+<td>6.0</td>
+<td>True</td>
+<td>3,1,5,4,9</td>
+<td>-32.96480</td>
+<td>-0.506844</td>
+</tr>
+<tr>
+<th>11</th>
+<td>10109</td>
+<td>1851.04</td>
+<td>[2]</td>
+<td>0</td>
+<td>False</td>
+<td>False</td>
+<td>NaN</td>
+<td>True</td>
+<td>2,5,6</td>
+<td>-30.81380</td>
+<td>-0.506769</td>
+</tr>
+<tr>
+<th>12</th>
+<td>10949</td>
+<td>1826.69</td>
+<td>[2]</td>
+<td>13</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>8,4,9</td>
+<td>-34.51120</td>
+<td>-0.506620</td>
+</tr>
+<tr>
+<th>13</th>
+<td>5916</td>
+<td>1987.98</td>
+<td>[2]</td>
+<td>3</td>
+<td>False</td>
+<td>True</td>
+<td>4.0</td>
+<td>True</td>
+<td>9,5,2,6</td>
+<td>-40.35560</td>
+<td>-0.506268</td>
+</tr>
+<tr>
+<th>14</th>
+<td>13080</td>
+<td>1763.08</td>
+<td>[1]</td>
+<td>10</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>7</td>
+<td>-21.26170</td>
+<td>-0.505993</td>
+</tr>
+<tr>
+<th>15</th>
+<td>15570</td>
+<td>1679.60</td>
+<td>[2]</td>
+<td>1</td>
+<td>True</td>
+<td>True</td>
+<td>2.0</td>
+<td>True</td>
+<td>0,8,6</td>
+<td>-34.05350</td>
+<td>-0.505378</td>
+</tr>
+<tr>
+<th>16</th>
+<td>1919</td>
+<td>2223.11</td>
+<td>[4]</td>
+<td>0</td>
+<td>False</td>
+<td>False</td>
+<td>NaN</td>
+<td>True</td>
+<td>3,7,9,5,0</td>
+<td>-39.61620</td>
+<td>-0.505227</td>
+</tr>
+<tr>
+<th>17</th>
+<td>955</td>
+<td>2351.91</td>
+<td>[1]</td>
+<td>8</td>
+<td>False</td>
+<td>False</td>
+<td>NaN</td>
+<td>True</td>
+<td>3,6</td>
+<td>-39.26950</td>
+<td>-0.504948</td>
+</tr>
+<tr>
+<th>18</th>
+<td>1933</td>
+<td>2221.36</td>
+<td>[2]</td>
+<td>20</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>9,7</td>
+<td>-39.22140</td>
+<td>-0.504773</td>
+</tr>
+<tr>
+<th>19</th>
+<td>15080</td>
+<td>1699.91</td>
+<td>[1]</td>
+<td>2</td>
+<td>False</td>
+<td>False</td>
+<td>NaN</td>
+<td>True</td>
+<td>6,3,2</td>
+<td>-36.36990</td>
+<td>-0.504639</td>
+</tr>
+<tr>
+<th>20</th>
+<td>2483</td>
+<td>2170.09</td>
+<td>[1]</td>
+<td>8</td>
+<td>True</td>
+<td>False</td>
+<td>4.0</td>
+<td>True</td>
+<td>3,6</td>
+<td>-20.34860</td>
+<td>-0.503868</td>
+</tr>
+<tr>
+<th>21</th>
+<td>12327</td>
+<td>1787.53</td>
+<td>[2]</td>
+<td>3</td>
+<td>False</td>
+<td>False</td>
+<td>NaN</td>
+<td>True</td>
+<td>8</td>
+<td>-12.98290</td>
+<td>-0.503618</td>
+</tr>
+<tr>
+<th>22</th>
+<td>12625</td>
+<td>1777.97</td>
+<td>[1]</td>
+<td>19</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>4,8,9</td>
+<td>-21.81520</td>
+<td>-0.503593</td>
+</tr>
+<tr>
+<th>23</th>
+<td>12632</td>
+<td>1777.53</td>
+<td>[1]</td>
+<td>2</td>
+<td>False</td>
+<td>False</td>
+<td>NaN</td>
+<td>True</td>
+<td>5,2,7,3</td>
+<td>-19.46110</td>
+<td>-0.503536</td>
+</tr>
+<tr>
+<th>24</th>
+<td>10686</td>
+<td>1833.94</td>
+<td>[2]</td>
+<td>3</td>
+<td>True</td>
+<td>False</td>
+<td>4.0</td>
+<td>True</td>
+<td>7,3</td>
+<td>-22.21530</td>
+<td>-0.503425</td>
+</tr>
+<tr>
+<th>25</th>
+<td>7081</td>
+<td>1944.16</td>
+<td>[2]</td>
+<td>3</td>
+<td>False</td>
+<td>False</td>
+<td>NaN</td>
+<td>True</td>
+<td>2,7</td>
+<td>-21.03310</td>
+<td>-0.503044</td>
+</tr>
+<tr>
+<th>26</th>
+<td>14696</td>
+<td>1712.56</td>
+<td>[1]</td>
+<td>5</td>
+<td>False</td>
+<td>False</td>
+<td>NaN</td>
+<td>True</td>
+<td>2</td>
+<td>-10.12990</td>
+<td>-0.502949</td>
+</tr>
+<tr>
+<th>27</th>
+<td>5730</td>
+<td>1994.99</td>
+<td>[5]</td>
+<td>0</td>
+<td>False</td>
+<td>False</td>
+<td>NaN</td>
+<td>True</td>
+<td>4,7</td>
+<td>-19.81230</td>
+<td>-0.502814</td>
+</tr>
+<tr>
+<th>28</th>
+<td>1117</td>
+<td>2322.41</td>
+<td>[2]</td>
+<td>0</td>
+<td>False</td>
+<td>False</td>
+<td>NaN</td>
+<td>True</td>
+<td>3,0,4,9,1,7</td>
+<td>-35.90990</td>
+<td>-0.502763</td>
+</tr>
+<tr>
+<th>29</th>
+<td>4581</td>
+<td>2042.30</td>
+<td>[2]</td>
+<td>9</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>1</td>
+<td>-10.97070</td>
+<td>-0.502679</td>
+</tr>
+<tr>
+<th>30</th>
+<td>15072</td>
+<td>1700.16</td>
+<td>[1]</td>
+<td>4</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>9,4</td>
+<td>-9.02296</td>
+<td>-0.502528</td>
+</tr>
+<tr>
+<th>31</th>
+<td>12624</td>
+<td>1778.06</td>
+<td>[3]</td>
+<td>0</td>
+<td>False</td>
+<td>False</td>
+<td>NaN</td>
+<td>True</td>
+<td>9</td>
+<td>-7.60426</td>
+<td>-0.502134</td>
+</tr>
+<tr>
+<th>32</th>
+<td>6536</td>
+<td>1963.25</td>
+<td>[2]</td>
+<td>2</td>
+<td>False</td>
+<td>False</td>
+<td>NaN</td>
+<td>True</td>
+<td>7</td>
+<td>-7.63405</td>
+<td>-0.501940</td>
+</tr>
+<tr>
+<th>33</th>
+<td>13338</td>
+<td>1756.03</td>
+<td>[2]</td>
+<td>0</td>
+<td>False</td>
+<td>False</td>
+<td>NaN</td>
+<td>True</td>
+<td>0</td>
+<td>-5.62066</td>
+<td>-0.501598</td>
+</tr>
+<tr>
+<th>34</th>
+<td>8884</td>
+<td>1886.30</td>
+<td>[1]</td>
+<td>7</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>9</td>
+<td>-5.73324</td>
+<td>-0.501517</td>
+</tr>
+<tr>
+<th>35</th>
+<td>16665</td>
+<td>1631.66</td>
+<td>[2]</td>
+<td>11</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>7</td>
+<td>-4.58055</td>
+<td>-0.501402</td>
+</tr>
+<tr>
+<th>36</th>
+<td>2569</td>
+<td>2163.34</td>
+<td>[4]</td>
+<td>1</td>
+<td>False</td>
+<td>False</td>
+<td>NaN</td>
+<td>True</td>
+<td>2,8</td>
+<td>-7.45048</td>
+<td>-0.501365</td>
+</tr>
+<tr>
+<th>37</th>
+<td>14916</td>
+<td>1705.75</td>
+<td>[1]</td>
+<td>12</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>8</td>
+<td>-3.34762</td>
+<td>-0.500980</td>
+</tr>
+<tr>
+<th>38</th>
+<td>9143</td>
+<td>1878.31</td>
+<td>[2]</td>
+<td>17</td>
+<td>True</td>
+<td>False</td>
+<td>2.0</td>
+<td>True</td>
+<td>0</td>
+<td>-2.63723</td>
+<td>-0.500702</td>
+</tr>
+<tr>
+<th>39</th>
+<td>15510</td>
+<td>1682.22</td>
+<td>[1]</td>
+<td>2</td>
+<td>False</td>
+<td>False</td>
+<td>NaN</td>
+<td>True</td>
+<td>2</td>
+<td>-1.94529</td>
+<td>-0.500578</td>
+</tr>
+<tr>
+<th>40</th>
+<td>902</td>
+<td>2363.43</td>
+<td>[1]</td>
+<td>6</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>2</td>
+<td>-1.51342</td>
+<td>-0.500320</td>
+</tr>
+</tbody>
+</table>
+</div><p>Each row represents a TC model and the columns report the following properties:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">pose_number</span></code></dt><dd><p>The number of the protein pose in the TC model.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">megadock_score</span></code></dt><dd><p>The megadock score for the protein-protein interaction</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">crl</span></code></dt><dd><p>The number of accessible lysines</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">cluster_number</span></code></dt><dd><p>The cluster that protein pose belongs to</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">cluster_centr</span></code></dt><dd><p>If that protein pose is the closest to the cluster centroid</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">cluster_best</span></code></dt><dd><p>If that protein pose is the best scoring one in the centroid (based on final score, if it was used)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">cluster_size</span></code></dt><dd><p>How many members the cluster that pose belongs to has. The cluster size will only be reported for the poses which are either cluster best or cluster centroid.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">protac_pose</span></code></dt><dd><p>If at least one protac conformation was successfully sampled for that protein pose</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">active_linkers</span></code></dt><dd><p>Which protac conformations passed all the protac filters (such as steric clash detection)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">top_protac_score</span></code></dt><dd><p>The best scoring protac conformation (based on RxDock score)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">final_score</span></code></dt><dd><p>The final score for the TC model. This score combines both protein-protein docking score generated by Megadock, and the protein-protac score generated by RxDock. This score is used to sort the table, and the lower the better.</p>
+</dd>
+</dl>
+<p>We want to see the results filtered by the cluster analysis, which is performed using all the protein poses listed in this table. Therefore, to get our final P4ward best predicted TC models, we must filter this table by the column <code class="docutils literal notranslate"><span class="pre">cluster_centr</span></code>. With python, we can just:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</span><span id="line-2"><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'summary-mz1.csv'</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span><span id="line-3"><span class="n">data_centr</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">'cluster_centr'</span><span class="p">]]</span>
+</span><span id="line-4"><span class="nb">print</span><span class="p">(</span><span class="n">data_centr</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<div "="" style="overflow: auto; max-width: 100%; max-height: 600px;">
+<style scoped="">
+   .dataframe tbody tr th:only-of-type {
+      vertical-align: middle;
+   }
+
+   .dataframe tbody tr th {
+      vertical-align: top;
+   }
+
+   .dataframe thead th {
+      text-align: right;
+   }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>pose_number</th>
+<th>megadock_score</th>
+<th>crl</th>
+<th>cluster_number</th>
+<th>cluster_centr</th>
+<th>cluster_best</th>
+<th>cluster_size</th>
+<th>protac_pose</th>
+<th>active_linkers</th>
+<th>top_protac_score</th>
+<th>final_score</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>15092</td>
+<td>1699.34</td>
+<td>[2]</td>
+<td>16</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>3</td>
+<td>-35.73040</td>
+<td>-0.510400</td>
+</tr>
+<tr>
+<th>1</th>
+<td>11831</td>
+<td>1802.28</td>
+<td>[1]</td>
+<td>14</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>8,9,2,1</td>
+<td>-37.73660</td>
+<td>-0.509957</td>
+</tr>
+<tr>
+<th>3</th>
+<td>15321</td>
+<td>1690.30</td>
+<td>[2]</td>
+<td>15</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>8,6,1</td>
+<td>-34.61550</td>
+<td>-0.509641</td>
+</tr>
+<tr>
+<th>5</th>
+<td>13549</td>
+<td>1749.68</td>
+<td>[1]</td>
+<td>5</td>
+<td>True</td>
+<td>True</td>
+<td>2.0</td>
+<td>True</td>
+<td>5,3,0,4,8,1,9,6</td>
+<td>-37.09920</td>
+<td>-0.508916</td>
+</tr>
+<tr>
+<th>7</th>
+<td>8181</td>
+<td>1907.59</td>
+<td>[2]</td>
+<td>0</td>
+<td>True</td>
+<td>True</td>
+<td>7.0</td>
+<td>True</td>
+<td>8,9,1,0</td>
+<td>-36.01740</td>
+<td>-0.508517</td>
+</tr>
+<tr>
+<th>9</th>
+<td>5355</td>
+<td>2009.79</td>
+<td>[3]</td>
+<td>18</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>7,5,8,2,0,3,9,4,6</td>
+<td>-39.32680</td>
+<td>-0.506855</td>
+</tr>
+<tr>
+<th>10</th>
+<td>14543</td>
+<td>1718.41</td>
+<td>[1]</td>
+<td>2</td>
+<td>True</td>
+<td>False</td>
+<td>6.0</td>
+<td>True</td>
+<td>3,1,5,4,9</td>
+<td>-32.96480</td>
+<td>-0.506844</td>
+</tr>
+<tr>
+<th>12</th>
+<td>10949</td>
+<td>1826.69</td>
+<td>[2]</td>
+<td>13</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>8,4,9</td>
+<td>-34.51120</td>
+<td>-0.506620</td>
+</tr>
+<tr>
+<th>14</th>
+<td>13080</td>
+<td>1763.08</td>
+<td>[1]</td>
+<td>10</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>7</td>
+<td>-21.26170</td>
+<td>-0.505993</td>
+</tr>
+<tr>
+<th>15</th>
+<td>15570</td>
+<td>1679.60</td>
+<td>[2]</td>
+<td>1</td>
+<td>True</td>
+<td>True</td>
+<td>2.0</td>
+<td>True</td>
+<td>0,8,6</td>
+<td>-34.05350</td>
+<td>-0.505378</td>
+</tr>
+<tr>
+<th>18</th>
+<td>1933</td>
+<td>2221.36</td>
+<td>[2]</td>
+<td>20</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>9,7</td>
+<td>-39.22140</td>
+<td>-0.504773</td>
+</tr>
+<tr>
+<th>20</th>
+<td>2483</td>
+<td>2170.09</td>
+<td>[1]</td>
+<td>8</td>
+<td>True</td>
+<td>False</td>
+<td>4.0</td>
+<td>True</td>
+<td>3,6</td>
+<td>-20.34860</td>
+<td>-0.503868</td>
+</tr>
+<tr>
+<th>22</th>
+<td>12625</td>
+<td>1777.97</td>
+<td>[1]</td>
+<td>19</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>4,8,9</td>
+<td>-21.81520</td>
+<td>-0.503593</td>
+</tr>
+<tr>
+<th>24</th>
+<td>10686</td>
+<td>1833.94</td>
+<td>[2]</td>
+<td>3</td>
+<td>True</td>
+<td>False</td>
+<td>4.0</td>
+<td>True</td>
+<td>7,3</td>
+<td>-22.21530</td>
+<td>-0.503425</td>
+</tr>
+<tr>
+<th>29</th>
+<td>4581</td>
+<td>2042.30</td>
+<td>[2]</td>
+<td>9</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>1</td>
+<td>-10.97070</td>
+<td>-0.502679</td>
+</tr>
+<tr>
+<th>30</th>
+<td>15072</td>
+<td>1700.16</td>
+<td>[1]</td>
+<td>4</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>9,4</td>
+<td>-9.02296</td>
+<td>-0.502528</td>
+</tr>
+<tr>
+<th>34</th>
+<td>8884</td>
+<td>1886.30</td>
+<td>[1]</td>
+<td>7</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>9</td>
+<td>-5.73324</td>
+<td>-0.501517</td>
+</tr>
+<tr>
+<th>35</th>
+<td>16665</td>
+<td>1631.66</td>
+<td>[2]</td>
+<td>11</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>7</td>
+<td>-4.58055</td>
+<td>-0.501402</td>
+</tr>
+<tr>
+<th>37</th>
+<td>14916</td>
+<td>1705.75</td>
+<td>[1]</td>
+<td>12</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>8</td>
+<td>-3.34762</td>
+<td>-0.500980</td>
+</tr>
+<tr>
+<th>38</th>
+<td>9143</td>
+<td>1878.31</td>
+<td>[2]</td>
+<td>17</td>
+<td>True</td>
+<td>False</td>
+<td>2.0</td>
+<td>True</td>
+<td>0</td>
+<td>-2.63723</td>
+<td>-0.500702</td>
+</tr>
+<tr>
+<th>40</th>
+<td>902</td>
+<td>2363.43</td>
+<td>[1]</td>
+<td>6</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>2</td>
+<td>-1.51342</td>
+<td>-0.500320</td>
+</tr>
+</tbody>
+</table>
+</div><p>Thus there are 21 final TC models. Viewing a single TC model is simple. We need to open the receptor file as well as the files corresponding to the model’s protein pose number.
+the docked ligase file will be at <code class="docutils literal notranslate"><span class="pre">protein_docking</span></code>, and the scored protac conformations file at <code class="docutils literal notranslate"><span class="pre">protac_scoring</span></code>. For example, to look at the TC model number 0 (the first and best-scored model), open these files:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">./receptor.pdb
+</span><span id="line-2">./protein_docking/pose15092.pdb
+</span><span id="line-3">./protac_scoring/protac_mz1/protein_pose_15092/protac_scored_confs.sd
+</span></code></pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Most visualization programs can open these file types, but some (such as ChimeraX) will not recognise the suffix <code class="docutils literal notranslate"><span class="pre">.sd</span></code>, even though it is a regular sdf file. You can rename the suffix to <code class="docutils literal notranslate"><span class="pre">.sdf</span></code>. However, I recommend Pymol to open these individual files. It will recognise the <code class="docutils literal notranslate"><span class="pre">.sd</span></code> suffix and separate the ligand conformations into different “frames” which you can satisfyingly cycle through using the arrow keys.</p>
+</div>
+<p>As can be seen in the image below and by loading <code class="docutils literal notranslate"><span class="pre">protac_scored_confs.sd</span></code> file, three linker conformations were generated, but we can see in the table that only one of them is active, conformation 3. If we look at the interaction scores reported by RxDock in the same file, we see that <code class="docutils literal notranslate"><span class="pre">conf_3</span></code> is the only one with a negative value. Indeed, based on the image below, it seems like two of them could be sterically clashing with the protein loops above.</p>
+<a class="reference internal image-reference" href="_images/example_pose15092.gif"><img alt="First predicted model" class="align-center" src="_images/example_pose15092.gif" style="width: 100%;"/>
+</a>
+<p>In addition, P4ward generates a ChimeraX script which opens all of the final models at once. If clustering was performed, such as in this tutorial, then the only the cluster centroids will be represented. The script will combine the protein poses with their respective protac poses, as well as color the proteins based on the TC model’s final score.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If your modelling run generated many hundreds of protein poses, opening them all at once with the ChimeraX script may crash your computer.</p>
+</div>
+<p>You can open the ChimeraX visualization using:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">open ./results_summaries/summary-mz1.cxc
+</span></code></pre></div>
+</div>
+<p>Finally, we can look at the interactive plots P4ward generates using Plotly. You can open <code class="docutils literal notranslate"><span class="pre">results_summaries/plots-mz1.html</span></code> using any browser, and you will see the following:</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>You can hover over datapoints, zoom in and out of graphs, and you can also toggle the display of the plot elements by clicking their legends.</p>
+</div>
+<div style="height: 650px; overflow: hidden;">
+<iframe frameborder="0" height="1000px" src="plots-mz1.html" style="transform: scale(0.7); transform-origin: 0 0;" width="140%">
+</iframe>
+</div><dl class="simple">
+<dt>Top left plot</dt><dd><p>We can see how many protein-protein poses were selected at each filtering step: it starts with the 18k poses we asked for, then 2466 passed the distance filter. 2432 of them do not clash with the CRL model, and 1181 exhibit at least one accessible lysine. Out of these, 41 can sample protac poses and therefore successfully generate ternary complex models. After clustering these models, and selecting the centroid poses, we reach our selected final 21 complexes.</p>
+</dd>
+<dt>Top right plot</dt><dd><p>Shows the distribution of the protein-protein scores throughout the main stages of the pipeline: the scores for all the protein poses generated, the scores remaining after the protein filters (distance and CRL), the scores of the poses which successfully sampled protacs, and the distribution of the scores for the cluster centroids.</p>
+</dd>
+<dt>Bottom left plot</dt><dd><p>Plots principal components 1 and 2 from a PCA analysis of the protein poses’ 3D coordinates. This provides a simplified 2D overview of the distribution of the ligases around the receptor protein. The receptor is represented as a green mark, and the protein poses are colored based on whether they passed the protein filters (gray), successfully sampled protacs (purple), or are cluster centroids (yellow).</p>
+</dd>
+<dt>Bottom right plot</dt><dd><p>Provides a scatterplot for all the sampled TC models (protein poses which successfully sampled protacs). The x-axis represents their Megadock score, and the y-axis the protein-protac interaction score by RxDock. Their colors correspond to the P4ward final score, which is a combination of both.</p>
+</dd>
+</dl>
+</section>
+<section id="benchmarking-the-tc-modelling-run">
+<h2>Benchmarking the TC modelling run<a class="headerlink" href="#benchmarking-the-tc-modelling-run" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#benchmarking-the-tc-modelling-run'"><span>#</span></a></h2>
+<p>So far, we have ran P4ward as if we had no information on what the ternary complex for these components would look like, and as if there was no experimentally determined ternary complex structure available. Now, we will rerun the modelling just as we have done before, but adding a benchmarking component. We will provide the known position of the ligase bound to the receptor protein, and will let P4ward compare its results with the known binding position.</p>
+<p>In order to get the know ligase position, we need to:</p>
+<ul class="simple">
+<li><p>access the ternary complex PDBID <a class="reference external" href="https://www.rcsb.org/structure/5T35">5T35</a>;</p></li>
+<li><p>delete all redundant chains and keep only one chain of the receptor protein (BRD4bd2) as well as the chain of VHL bound to it (we can safely remove the Elongins C and B);</p></li>
+<li><p>align the structure to our previously generated <code class="docutils literal notranslate"><span class="pre">receptor.pdb</span></code>;</p></li>
+<li><p>delete everything except VHL from 5T35;</p></li>
+<li><p>save the transformed VHL as <code class="docutils literal notranslate"><span class="pre">ref_ligase.pdb</span></code></p></li>
+</ul>
+<p>Here is a ChimeraX script that does this:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">open 5t35
+</span><span id="line-2">del ~protein; del ~/A,D
+</span><span id="line-3">open receptor.pdb
+</span><span id="line-4">mmaker #1 to #2
+</span><span id="line-5">del #2; del #1/A
+</span><span id="line-6">(save ref_ligase.pdb)
+</span></code></pre></div>
+</div>
+<p>Next we will modify the P4ward command and tell it to benchmark itself, using as reference the file we just created. We do not need to change anything in <code class="docutils literal notranslate"><span class="pre">config_run.ini</span></code>. Note that in the settings we have <code class="docutils literal notranslate"><span class="pre">overwrite</span> <span class="pre">=</span> <span class="pre">False</span></code>. This means that, if you have previously run P4ward in the current working directory, it will access the previous run information (stored in the <code class="docutils literal notranslate"><span class="pre">.pickle</span></code> files) and not redo what has been done before. And so when we rerun P4ward again with the benchmarking command, it will access the previous run and benchmark it, without having to rerun the same modelling calculations.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If we were to change the configuration settings for any reason, we would also need to rerun the calculations, and therefore toggle <code class="docutils literal notranslate"><span class="pre">overwrite</span> <span class="pre">=</span> <span class="pre">True</span></code>.</p>
+</div>
+<p>To benchmark, run:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-9" name="sd-tab-set-3" type="radio"/>
+<label class="sd-tab-label" for="sd-tab-item-9">
+Docker</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">sudo<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span>-v<span class="w"> </span>.:/home/data<span class="w"> </span>p4ward<span class="w"> </span>--config_file<span class="w"> </span>config_run.ini<span class="w"> </span>--benchmark<span class="w"> </span>--ref_ligase<span class="w"> </span>ref_ligase.pdb
+</span></code></pre></div>
+</div>
+</div>
+<input id="sd-tab-item-10" name="sd-tab-set-3" type="radio"/>
+<label class="sd-tab-label" for="sd-tab-item-10">
+Conda</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">python<span class="w"> </span>-m<span class="w"> </span>p4ward<span class="w"> </span>--config_file<span class="w"> </span>config_run.ini<span class="w"> </span>--benchmark<span class="w"> </span>--ref_ligase<span class="w"> </span>ref_ligase.pdb
+</span></code></pre></div>
+</div>
+</div>
+<input id="sd-tab-item-11" name="sd-tab-set-3" type="radio"/>
+<label class="sd-tab-label" for="sd-tab-item-11">
+Apptainer</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">apptainer<span class="w"> </span>run<span class="w"> </span>-B<span class="w"> </span>/home<span class="w"> </span>/path/to/p4ward.sif<span class="w"> </span>--config_file<span class="w"> </span>config_run.ini<span class="w"> </span>--benchmark<span class="w"> </span>--ref_ligase<span class="w"> </span>ref_ligase.pdb
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<p>This will trigger running the <a class="reference internal" href="_autosummary/p4ward.benchmark.capri.html"><span class="doc">p4ward.benchmark.capri</span></a> module, which performs the Capri assessment when comparing the <code class="docutils literal notranslate"><span class="pre">ref_ligase</span></code> with each TC protein pose.</p>
+</section>
+<section id="viewing-the-benchmarking-results">
+<h2>Viewing the benchmarking results<a class="headerlink" href="#viewing-the-benchmarking-results" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#viewing-the-benchmarking-results'"><span>#</span></a></h2>
+<p>As we did before, let’s look at the final table, filtered to show only the cluster centroids:</p>
+<div style="overflow: auto; max-width: 100%; max-height: 600px;">
+<style scoped="">
+   .dataframe tbody tr th:only-of-type {
+      vertical-align: middle;
+   }
+
+   .dataframe tbody tr th {
+      vertical-align: top;
+   }
+
+   .dataframe thead th {
+      text-align: right;
+   }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>pose_number</th>
+<th>megadock_score</th>
+<th>crl</th>
+<th>l_rms</th>
+<th>i_rms</th>
+<th>fnat</th>
+<th>capri_rank</th>
+<th>cluster_number</th>
+<th>cluster_centr</th>
+<th>cluster_best</th>
+<th>cluster_size</th>
+<th>protac_pose</th>
+<th>active_linkers</th>
+<th>top_protac_score</th>
+<th>final_score</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>15092</td>
+<td>1699.34</td>
+<td>[2]</td>
+<td>44.425</td>
+<td>14.060</td>
+<td>0.000</td>
+<td>incorrect</td>
+<td>16</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>3</td>
+<td>-35.73040</td>
+<td>-0.510400</td>
+</tr>
+<tr>
+<th>1</th>
+<td>11831</td>
+<td>1802.28</td>
+<td>[1]</td>
+<td>19.387</td>
+<td>4.900</td>
+<td>0.318</td>
+<td>acceptable</td>
+<td>14</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>8,9,2,1</td>
+<td>-37.73660</td>
+<td>-0.509957</td>
+</tr>
+<tr>
+<th>3</th>
+<td>15321</td>
+<td>1690.30</td>
+<td>[2]</td>
+<td>45.988</td>
+<td>12.708</td>
+<td>0.000</td>
+<td>incorrect</td>
+<td>15</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>8,6,1</td>
+<td>-34.61550</td>
+<td>-0.509641</td>
+</tr>
+<tr>
+<th>5</th>
+<td>13549</td>
+<td>1749.68</td>
+<td>[1]</td>
+<td>20.590</td>
+<td>10.626</td>
+<td>0.000</td>
+<td>incorrect</td>
+<td>5</td>
+<td>True</td>
+<td>True</td>
+<td>2.0</td>
+<td>True</td>
+<td>5,3,0,4,8,1,9,6</td>
+<td>-37.09920</td>
+<td>-0.508916</td>
+</tr>
+<tr>
+<th>7</th>
+<td>8181</td>
+<td>1907.59</td>
+<td>[2]</td>
+<td>5.087</td>
+<td>1.347</td>
+<td>0.727</td>
+<td>medium</td>
+<td>0</td>
+<td>True</td>
+<td>True</td>
+<td>7.0</td>
+<td>True</td>
+<td>8,9,1,0</td>
+<td>-36.01740</td>
+<td>-0.508517</td>
+</tr>
+<tr>
+<th>9</th>
+<td>5355</td>
+<td>2009.79</td>
+<td>[3]</td>
+<td>37.226</td>
+<td>9.478</td>
+<td>0.045</td>
+<td>incorrect</td>
+<td>18</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>7,5,8,2,0,3,9,4,6</td>
+<td>-39.32680</td>
+<td>-0.506855</td>
+</tr>
+<tr>
+<th>10</th>
+<td>14543</td>
+<td>1718.41</td>
+<td>[1]</td>
+<td>37.405</td>
+<td>8.163</td>
+<td>0.045</td>
+<td>incorrect</td>
+<td>2</td>
+<td>True</td>
+<td>False</td>
+<td>6.0</td>
+<td>True</td>
+<td>3,1,5,4,9</td>
+<td>-32.96480</td>
+<td>-0.506844</td>
+</tr>
+<tr>
+<th>12</th>
+<td>10949</td>
+<td>1826.69</td>
+<td>[2]</td>
+<td>40.803</td>
+<td>9.324</td>
+<td>0.000</td>
+<td>incorrect</td>
+<td>13</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>8,4,9</td>
+<td>-34.51120</td>
+<td>-0.506620</td>
+</tr>
+<tr>
+<th>14</th>
+<td>13080</td>
+<td>1763.08</td>
+<td>[1]</td>
+<td>48.159</td>
+<td>13.643</td>
+<td>0.000</td>
+<td>incorrect</td>
+<td>10</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>7</td>
+<td>-21.26170</td>
+<td>-0.505993</td>
+</tr>
+<tr>
+<th>15</th>
+<td>15570</td>
+<td>1679.60</td>
+<td>[2]</td>
+<td>15.844</td>
+<td>2.844</td>
+<td>0.364</td>
+<td>acceptable</td>
+<td>1</td>
+<td>True</td>
+<td>True</td>
+<td>2.0</td>
+<td>True</td>
+<td>0,8,6</td>
+<td>-34.05350</td>
+<td>-0.505378</td>
+</tr>
+<tr>
+<th>18</th>
+<td>1933</td>
+<td>2221.36</td>
+<td>[2]</td>
+<td>23.297</td>
+<td>6.348</td>
+<td>0.045</td>
+<td>incorrect</td>
+<td>20</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>9,7</td>
+<td>-39.22140</td>
+<td>-0.504773</td>
+</tr>
+<tr>
+<th>20</th>
+<td>2483</td>
+<td>2170.09</td>
+<td>[1]</td>
+<td>44.530</td>
+<td>12.872</td>
+<td>0.000</td>
+<td>incorrect</td>
+<td>8</td>
+<td>True</td>
+<td>False</td>
+<td>4.0</td>
+<td>True</td>
+<td>3,6</td>
+<td>-20.34860</td>
+<td>-0.503868</td>
+</tr>
+<tr>
+<th>22</th>
+<td>12625</td>
+<td>1777.97</td>
+<td>[1]</td>
+<td>22.088</td>
+<td>11.043</td>
+<td>0.000</td>
+<td>incorrect</td>
+<td>19</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>4,8,9</td>
+<td>-21.81520</td>
+<td>-0.503593</td>
+</tr>
+<tr>
+<th>24</th>
+<td>10686</td>
+<td>1833.94</td>
+<td>[2]</td>
+<td>16.188</td>
+<td>5.183</td>
+<td>0.318</td>
+<td>acceptable</td>
+<td>3</td>
+<td>True</td>
+<td>False</td>
+<td>4.0</td>
+<td>True</td>
+<td>7,3</td>
+<td>-22.21530</td>
+<td>-0.503425</td>
+</tr>
+<tr>
+<th>29</th>
+<td>4581</td>
+<td>2042.30</td>
+<td>[2]</td>
+<td>14.540</td>
+<td>4.694</td>
+<td>0.182</td>
+<td>incorrect</td>
+<td>9</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>1</td>
+<td>-10.97070</td>
+<td>-0.502679</td>
+</tr>
+<tr>
+<th>30</th>
+<td>15072</td>
+<td>1700.16</td>
+<td>[1]</td>
+<td>13.144</td>
+<td>4.996</td>
+<td>0.318</td>
+<td>acceptable</td>
+<td>4</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>9,4</td>
+<td>-9.02296</td>
+<td>-0.502528</td>
+</tr>
+<tr>
+<th>34</th>
+<td>8884</td>
+<td>1886.30</td>
+<td>[1]</td>
+<td>24.267</td>
+<td>6.546</td>
+<td>0.045</td>
+<td>incorrect</td>
+<td>7</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>9</td>
+<td>-5.73324</td>
+<td>-0.501517</td>
+</tr>
+<tr>
+<th>35</th>
+<td>16665</td>
+<td>1631.66</td>
+<td>[2]</td>
+<td>42.112</td>
+<td>13.782</td>
+<td>0.000</td>
+<td>incorrect</td>
+<td>11</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>7</td>
+<td>-4.58055</td>
+<td>-0.501402</td>
+</tr>
+<tr>
+<th>37</th>
+<td>14916</td>
+<td>1705.75</td>
+<td>[1]</td>
+<td>16.501</td>
+<td>5.227</td>
+<td>0.318</td>
+<td>acceptable</td>
+<td>12</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>8</td>
+<td>-3.34762</td>
+<td>-0.500980</td>
+</tr>
+<tr>
+<th>38</th>
+<td>9143</td>
+<td>1878.31</td>
+<td>[2]</td>
+<td>25.254</td>
+<td>4.770</td>
+<td>0.091</td>
+<td>incorrect</td>
+<td>17</td>
+<td>True</td>
+<td>False</td>
+<td>2.0</td>
+<td>True</td>
+<td>0</td>
+<td>-2.63723</td>
+<td>-0.500702</td>
+</tr>
+<tr>
+<th>40</th>
+<td>902</td>
+<td>2363.43</td>
+<td>[1]</td>
+<td>42.778</td>
+<td>13.278</td>
+<td>0.000</td>
+<td>incorrect</td>
+<td>6</td>
+<td>True</td>
+<td>True</td>
+<td>1.0</td>
+<td>True</td>
+<td>2</td>
+<td>-1.51342</td>
+<td>-0.500320</td>
+</tr>
+</tbody>
+</table>
+</div><p>There are four new rows in the results table now.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">l_rms</span></code></dt><dd><p>The RMSD (Å) between the reference pose and the model pose. The RMSD is calculated using the smaller of the proteins.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">i_rms</span></code></dt><dd><p>The RMSD (Å) of the interface atoms between the reference and the model pose.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">fnat</span></code></dt><dd><p>The fraction of native contacts. This is calculated by dividing the number of correct residue-residue pairs in the model divided by the number of residue-residue pairs in the target complex.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">capri_rank</span></code></dt><dd><p>Using the parameters above, P4ward calculates the Capri rank, which reflects the level of accuracy of the prediction, and can be of “high”, “medium”, “acceptable”, or “incorrect” category.</p>
+</dd>
+</dl>
+<p>There are 5 acceptable poses among the 21 final models, and one medium pose. If we were performing a modelling study for this system and looked at the top 10 predicted models, we would have encountered two acceptable poses and one medium pose. The Capri thresholds are strict, and we can see the medium pose has quite low RMSD values: 5.1Å between the protein poses and only 1.3Å at the interface. It is exciting that P4ward was able to detect this pose and rank it quite favourably at 5th position. Here is a visual of this pose (number 8181) and a comparison to the reference pose:</p>
+<figure class="align-center" id="id7">
+<a class="reference internal image-reference" href="_images/pose8181_ref.png"><img alt="pose 8181 comparison" src="_images/pose8181_ref.png" style="width: 80%;"/>
+</a>
+<figcaption>
+<p><span class="caption-text">Comparison between pose 8181 (dark purple), considered medium quality by the Capri benchmark, and the known TC pose seen in PDB code 5T35 (light purple). In light blue is the Protac pose from 5T35 and in dark blue are the linker predictions by P4ward.</span><a class="headerlink" href="#id7" title="Link to this image"><span>#</span></a></p>
+</figcaption>
+</figure>
+<p>When benchmarking, the ChimeraX script that P4ward outputs will show the incorrect poses as transparent, and the other in full color. When looking at all poses, note that some appear to be a bit far from the reference pose. This may happen because the residue-residue contacts might not change much in comparison to the orientation of the proteins. Thus, it is good to always check the l_rms values. I recommend disconsidering those much above 10Å (such as poses 11831 and 14916), which is the l_rms threshold for acceptable poses.</p>
+</section>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#obtaining-the-input-files'" class="reference internal" href="#obtaining-the-input-files">Obtaining the input files</a></li>
+<li><a :data-current="activeSection === '#checking-the-protac-ligand-matches'" class="reference internal" href="#checking-the-protac-ligand-matches">Checking the protac-ligand matches</a></li>
+<li><a :data-current="activeSection === '#running-p4ward-tc-modelling'" class="reference internal" href="#running-p4ward-tc-modelling">Running P4ward TC modelling</a></li>
+<li><a :data-current="activeSection === '#viewing-the-results'" class="reference internal" href="#viewing-the-results">Viewing the results</a></li>
+<li><a :data-current="activeSection === '#benchmarking-the-tc-modelling-run'" class="reference internal" href="#benchmarking-the-tc-modelling-run">Benchmarking the TC modelling run</a></li>
+<li><a :data-current="activeSection === '#viewing-the-benchmarking-results'" class="reference internal" href="#viewing-the-benchmarking-results">Viewing the benchmarking results</a></li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left">© 2024, Paula Jofily Built with <a class="font-medium underline underline-offset-4" href="https://www.sphinx-doc.org" rel="noreferrer">Sphinx 8.1.3</a></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="_static/documentation_options.js?v=5929fcd5"></script>
+<script src="_static/doctools.js?v=9bcbadda"></script>
+<script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+<script defer="defer" src="_static/theme.js?v=073f68d9"></script>
+<script src="_static/design-tabs.js?v=f930bc37"></script>
+</body>
+</html>

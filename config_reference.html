@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html :class="{'dark': darkMode === 'dark' || (darkMode === 'system' &amp;&amp; window.matchMedia('(prefers-color-scheme: dark)').matches)}" class="scroll-smooth" data-content_root="./" lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') || localStorage.setItem('darkMode', 'system'), activeSection: '' }" x-init="$watch('darkMode', val =&gt; localStorage.setItem('darkMode', val))">
+<head>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="white" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="black" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Run input configuration | P4ward</title>
+<meta content="Run input configuration | P4ward" property="og:title"/>
+<meta content="Run input configuration | P4ward" name="twitter:title"/>
+<link href="_static/pygments.css?v=80d3c388" rel="stylesheet" type="text/css"/>
+<link href="_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
+<link href="_static/sphinx-design.min.css?v=95c83b7e" rel="stylesheet" type="text/css"/>
+<link href="_static/awesome-sphinx-design.css?v=15e0fffa" rel="stylesheet" type="text/css"/>
+<link href="search.html" rel="search" title="Search"/>
+<link href="genindex.html" rel="index" title="Index"/>
+<link href="command_args.html" rel="next" title="Command Line Reference"/>
+<link href="configure.html" rel="prev" title="Configure P4ward"/>
+<script>
+    <!-- Prevent Flash of wrong theme -->
+      const userPreference = localStorage.getItem('darkMode');
+      let mode;
+      if (userPreference === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        mode = 'dark';
+        document.documentElement.classList.add('dark');
+      } else {
+        mode = 'light';
+      }
+      if (!userPreference) {localStorage.setItem('darkMode', mode)}
+    </script>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-sm border-border supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="index.html"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">P4ward</span>
+</a></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 space-x-2 sm:space-x-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center space-x-1">
+<button @click="darkMode = darkMode === 'light' ? 'dark' : 'light'" aria-label="Color theme switcher" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full shrink-0 overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="!justify-start text-sm md:!hidden bg-background" href="index.html"><span class="font-bold text-clip whitespace-nowrap">P4ward</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="obtain.html">Obtaining P4ward</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="configure.html">Configure P4ward</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Run input configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_args.html">Command Line Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules_docs.html">Module Documentation</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="index.html">
+<span class="hidden md:inline">P4ward</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">Run input configuration</span>
+</nav>
+<div id="content" role="main">
+<section id="run-input-configuration">
+<h1>Run input configuration<a class="headerlink" href="#run-input-configuration" title="Link to this heading"><span>#</span></a></h1>
+<p>All the settings for a P4ward run can be found at the <code class="docutils literal notranslate"><span class="pre">config.ini</span></code> file. All settings have default values which are populated automatically if the configuration option cannot be found in <code class="docutils literal notranslate"><span class="pre">config.ini</span></code>. This page describes all settings. In order to view an <code class="docutils literal notranslate"><span class="pre">.ini</span></code> file with all the default values, run p4ward with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">p4ward<span class="w"> </span>--write_default
+</span></code></pre></div>
+</div>
+<p>This will result in a file called <code class="docutils literal notranslate"><span class="pre">default.ini</span></code> to be written to the working directory.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Default values are shown within square brackets.</p>
+</div>
+<hr class="docutils"/>
+<section id="program-paths">
+<h2>Program Paths<a class="headerlink" href="#program-paths" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#program-paths'"><span>#</span></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">megadock</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">obabel</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">rxdock_root</span></code></p>
+</section>
+<section id="general">
+<h2>general<a class="headerlink" href="#general" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#general'"><span>#</span></a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">overwrite</span></code>: <code class="docutils literal notranslate"><span class="pre">true</span></code> | [<code class="docutils literal notranslate"><span class="pre">false</span></code>].</dt><dd><p>If there are records from previous runs of the pipeline, but they should be ignored and a overwritten with a new run starting from scratch. Default: <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">receptor</span></code>: [<code class="docutils literal notranslate"><span class="pre">receptor.pdb</span></code>]</dt><dd><p>Path to the receptor protein file, in pdb format.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ligase</span></code>: [<code class="docutils literal notranslate"><span class="pre">ligase.pdb</span></code>]</dt><dd><p>Path to the ligase protein file, in pdb format.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">protacs</span></code>: [<code class="docutils literal notranslate"><span class="pre">protacs.smiles</span></code>]</dt><dd><p>Path to the protacs filelist, in smiles format.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">receptor_ligand</span></code>: [<code class="docutils literal notranslate"><span class="pre">receptor_ligand.mol2</span></code>]</dt><dd><p>Path to the receptor ligand file, in mol2 format.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ligase_ligand</span></code>: [<code class="docutils literal notranslate"><span class="pre">ligase_ligand.mol2</span></code>]</dt><dd><p>Path to the ligase ligand file, in mol2 format.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">rdkit_ligands_cleanup</span></code>: [<code class="docutils literal notranslate"><span class="pre">True</span></code>] | <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>RDKit’s sanitization of small molecules may fail for some structures. This keyword may be used to turn it off.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">num_processors</span></code>: [<code class="docutils literal notranslate"><span class="pre">8</span></code>]</dt><dd><p>How many processes to use for the parallel processing steps in the pipeline.</p>
+</dd>
+</dl>
+</section>
+<section id="protein-prep">
+<h2>protein_prep<a class="headerlink" href="#protein-prep" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#protein-prep'"><span>#</span></a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">pdbfixer</span></code>: [<code class="docutils literal notranslate"><span class="pre">True</span></code>] | <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>Whether to use pdbfixer to fix the structures before running the pipeline and ensure compatibility with all modules. Highly recommended.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">pdbfixer_ignore_extremities</span></code>: [<code class="docutils literal notranslate"><span class="pre">True</span></code>] | <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>When adding missing residues, pdbfixer can be made to ignore protein extremities. This way, it will not attempt to add long sequences if the protein is truncated.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">pdbfixer_ph</span></code>: [<code class="docutils literal notranslate"><span class="pre">7.0</span></code>]</dt><dd><p>pH to add hydrogens for.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">minimize</span></code>: [<code class="docutils literal notranslate"><span class="pre">True</span></code>] | <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>Use openmm to minimize the protein structure before running.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">minimize_maxiter</span></code>: [<code class="docutils literal notranslate"><span class="pre">0</span></code>]</dt><dd><p>Maximum minimization steps to perform. <code class="docutils literal notranslate"><span class="pre">0</span></code> indicates until convergence.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">minimize_h_only</span></code>: [<code class="docutils literal notranslate"><span class="pre">True</span></code>] | <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>Minimize only the bonds to hydrogen and keep the rest of the protein restrained. Use this option if minimization is to be used only to optimize the coordinates of the hydrogens previously added.</p>
+</dd>
+</dl>
+</section>
+<section id="megadock">
+<h2>megadock<a class="headerlink" href="#megadock" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#megadock'"><span>#</span></a></h2>
+<p>Run Megadock for protein-protein docking of receptor and ligase. The following options regulate its usage:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">run_docking</span></code>: [<code class="docutils literal notranslate"><span class="pre">True</span></code>] | <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>Toggles protein-protein docking with Megadock.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">num_predictions</span></code>: [<code class="docutils literal notranslate"><span class="pre">162000</span></code>]</dt><dd><p>Out of all the protein poses generated by megadock, how many will go into the ranked output file written by megadock and parsed by P4ward. P4ward’s default: <code class="docutils literal notranslate"><span class="pre">162000</span></code>, Megadock’s default: <code class="docutils literal notranslate"><span class="pre">2000</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">num_rotational_angles</span></code>: [<code class="docutils literal notranslate"><span class="pre">54000</span></code>]</dt><dd><p>How many angles to rotate the ligase protein by. P4ward’s default: <code class="docutils literal notranslate"><span class="pre">54000</span></code>, Megadock’s default: <code class="docutils literal notranslate"><span class="pre">3600</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">num_predictions_per_rotation</span></code>: [<code class="docutils literal notranslate"><span class="pre">3</span></code>]</dt><dd><p>How many poses to generate per rotation. P4ward’s default: <code class="docutils literal notranslate"><span class="pre">3</span></code>, Megadock’s default: <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">run_docking_output_file</span></code>: [<code class="docutils literal notranslate"><span class="pre">megadock.out</span></code>]</dt><dd><p>The main megadock output file path, where the docking results are placed.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">run_docking_log_file</span></code>: [<code class="docutils literal notranslate"><span class="pre">megadock_run.log</span></code>]</dt><dd><p>The log file which will contain what megadock would normally print to the terminal.</p>
+</dd>
+</dl>
+</section>
+<section id="protein-filter">
+<h2>protein_filter<a class="headerlink" href="#protein-filter" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#protein-filter'"><span>#</span></a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">ligand_distances</span></code>: [<code class="docutils literal notranslate"><span class="pre">True</span></code>] | <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>Toggle to filter the protein poses based on the proximity of the ligands after docking. For more information on how this is done, please refer to [XXXXX].</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">filter_dist_cutoff</span></code>: [<code class="docutils literal notranslate"><span class="pre">auto</span></code>]</dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">ligand_distances</span></code> is True, then this setting defines the distance cutoff. The option can either be a number or <code class="docutils literal notranslate"><span class="pre">auto</span></code> to generate a proximity cutoff based on the protac size.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">filter_dist_sampling_type</span></code>: [<code class="docutils literal notranslate"><span class="pre">3D</span></code>]</dt><dd><p>In order to calculate the distance between the ligands in the protac structure, P4ward employs RDKit to sample the unbound protac conformations. This setting defines if the conformation sampled should be three or two dimensional. 3D structures generate more restrictive distance values, while 2D structures will often yield the maximum possible distance between the ligands. Options: <code class="docutils literal notranslate"><span class="pre">3D</span></code> or <code class="docutils literal notranslate"><span class="pre">2D</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">crl_model_clash</span></code>: [<code class="docutils literal notranslate"><span class="pre">True</span></code>] | <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>Whether the protein poses should be filtered based on clashes against the CRL model.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">clash_threshold</span></code>: [<code class="docutils literal notranslate"><span class="pre">1.0</span></code>]</dt><dd><p>Distance between two atoms (not including hydrogens) that is considered a clash.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">clash_count_tol</span></code>: [<code class="docutils literal notranslate"><span class="pre">10</span></code>]</dt><dd><p>How many clashing atoms until the protein pose is considered to be clashing.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">accessible_lysines</span></code>: [<code class="docutils literal notranslate"><span class="pre">True</span></code>] | <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>Whether to use the accessible lysine filter.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">lysine_count</span></code>: [<code class="docutils literal notranslate"><span class="pre">1</span></code>]</dt><dd><p>How many accessible lysines should a protein pose have in order to be considered productive.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">lys_sasa_cutoff</span></code>: [<code class="docutils literal notranslate"><span class="pre">2.5</span></code>]</dt><dd><p>The SASA value above which a lysine is considered to be at the protein surface and therefore is checked for accessibility.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">overlap_dist_cutoff</span></code>: [<code class="docutils literal notranslate"><span class="pre">5.0</span></code>]</dt><dd><p>Also described as “LOCut”. The distance value between a potentially occuding atom and the segment between lysine and ubiquitin, below which the atom is considered to be occluding and the lysine is then considered inaccessible.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">vhl_ubq_dist_cutoff</span></code>: [<code class="docutils literal notranslate"><span class="pre">60.0</span></code>]</dt><dd><p>Maximum distance between lysine and ubiquitin C-terminus for the VHL model.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">crbn_ubq_dist_cutoff</span></code>: [<code class="docutils literal notranslate"><span class="pre">16.0</span></code>]</dt><dd><p>Maximum distance between lysine and ubiquitin C-terminus for the CRBN model.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">e3</span></code>: [<code class="docutils literal notranslate"><span class="pre">vhl</span></code>] | <code class="docutils literal notranslate"><span class="pre">crbn</span></code></dt><dd><p>Which E3 model to use. Values can be <code class="docutils literal notranslate"><span class="pre">vhl</span></code> or <code class="docutils literal notranslate"><span class="pre">crbn</span></code>.</p>
+</dd>
+</dl>
+</section>
+<section id="protein-ranking">
+<h2>protein_ranking<a class="headerlink" href="#protein-ranking" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#protein-ranking'"><span>#</span></a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">cluster_poses_redundancy</span></code>: <code class="docutils literal notranslate"><span class="pre">True</span></code> | [<code class="docutils literal notranslate"><span class="pre">False</span></code>]</dt><dd><p>Toggle clustering for redundancy. Please see [XXXXX] for a description of this clustering step.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">cluster_poses_trend</span></code>: [<code class="docutils literal notranslate"><span class="pre">True</span></code>] | <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>Toggle clustering for trend capture of ternary complex modelling results. Please see [XXXXX] for a description of this clustering step.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">clustering_cutoff_redund</span></code>: [<code class="docutils literal notranslate"><span class="pre">3.0</span></code>]</dt><dd><p>Distance cutoff for redundancy clustering.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">clustering_cutoff_trend</span></code>: [<code class="docutils literal notranslate"><span class="pre">10.0</span></code>]</dt><dd><p>Distance cutoff for trend clustering.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">cluster_redund_repr</span></code>: [<code class="docutils literal notranslate"><span class="pre">centroid</span></code>] | <code class="docutils literal notranslate"><span class="pre">best</span></code></dt><dd><p>Which cluster component should be the cluster representative. Values can be <code class="docutils literal notranslate"><span class="pre">best</span></code>, denoting best megadock score in the cluster, or <code class="docutils literal notranslate"><span class="pre">centroid</span></code>, denoting the cluster centroid. For the <code class="docutils literal notranslate"><span class="pre">centroid</span></code> option, if the cluster has only two components, the best scoring pose is selected as representative.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">top_poses</span></code>: [<code class="docutils literal notranslate"><span class="pre">162000</span></code>]</dt><dd><p>How many poses should be considered top poses for sampling. This value should be the same as (or higher than) <code class="docutils literal notranslate"><span class="pre">num_predictions</span></code> if the user intends to perform ternary complex rescoring (thus generating p4ward’s final score) and trend clustering. If the user intends to model ternary complexes for N top scoring protein poses, then this value should be adjusted accordingly.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">generate_poses</span></code>: [<code class="docutils literal notranslate"><span class="pre">filtered</span></code>]</dt><dd><p>Which set off protein poses should be written to disk in pdb format. If the user intends to perform RXdock rescoring, ternary complex rescoring (thus generating p4ward’s final score) and/or trend clustering, then this should be set to either <code class="docutils literal notranslate"><span class="pre">filtered</span></code> or <code class="docutils literal notranslate"><span class="pre">all</span></code>. Values can be <code class="docutils literal notranslate"><span class="pre">none</span></code>, <code class="docutils literal notranslate"><span class="pre">all</span></code>, <code class="docutils literal notranslate"><span class="pre">filtered</span></code>, <code class="docutils literal notranslate"><span class="pre">top</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">generate_poses_altlocA</span></code>: [<code class="docutils literal notranslate"><span class="pre">True</span></code>] | <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>Keep only alternate location A when generating pdb files.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">generated_poses_folder</span></code>: <code class="docutils literal notranslate"><span class="pre">protein_docking</span></code></dt><dd><p>Folder name to save the protein pose pdb files to.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">rescore_poses</span></code>: [<code class="docutils literal notranslate"><span class="pre">True</span></code>] | <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>Use P4ward’s final score.</p>
+</dd>
+</dl>
+</section>
+<section id="protac-sampling">
+<h2>protac_sampling<a class="headerlink" href="#protac-sampling" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#protac-sampling'"><span>#</span></a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">unbound_protac_num_confs</span></code>: [<code class="docutils literal notranslate"><span class="pre">10</span></code>]</dt><dd><p>How many conformations for the unbound protac should be generated with RDKit.</p>
+</dd>
+</dl>
+</section>
+<section id="linker-sampling">
+<h2>Linker sampling<a class="headerlink" href="#linker-sampling" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#linker-sampling'"><span>#</span></a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">rdkit_sampling</span></code>: [<code class="docutils literal notranslate"><span class="pre">True</span></code>] | <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>Use rdkit to perform protac sampling.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">protac_poses_folder</span></code>: [<code class="docutils literal notranslate"><span class="pre">protac_sampling</span></code>]</dt><dd><p>Name of the folder where the generated protac sdf will reside.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">extend_flexible_small_linker</span></code>: [<code class="docutils literal notranslate"><span class="pre">True</span></code>] | <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>If the linker consists of very few atoms, protac sampling will fail because small deviations on the extremities’ positions will make bonds unfeasible. With this option, if the pipeline detects that the linker is short (see <code class="docutils literal notranslate"><span class="pre">min_linker_length</span></code>), it will then consider more neighbouring atoms as flexible (see <code class="docutils literal notranslate"><span class="pre">extend</span> <span class="pre">neighbour</span> <span class="pre">number</span></code>).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">extend_neighbour_number</span></code>: [<code class="docutils literal notranslate"><span class="pre">2</span></code>]</dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">extend_flexible_small_linker</span></code> is turned on, then this flag controls how many neighbouring atoms should become flexible.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">min_linker_length</span></code>: [<code class="docutils literal notranslate"><span class="pre">2</span></code>]</dt><dd><p>If the protac’s linker contains up to this many atoms, it is considered too short and can be extended if <code class="docutils literal notranslate"><span class="pre">extend_flexible_small_linker</span></code> is turned on.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">rdkit_number_of_confs</span></code>: [<code class="docutils literal notranslate"><span class="pre">10</span></code>]</dt><dd><p>How many protac linker conformations to generate.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">rdkit_pose_rmsd_tolerance</span></code>: [<code class="docutils literal notranslate"><span class="pre">1.0</span></code>] (angstroms)</dt><dd><p>Some protac poses cannot be sampled while perfectly retaining the rigid ligands’ positions. This flag controls how much deviation is allowed when this happens.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">rdkit_time_tolerance</span></code>: [<code class="docutils literal notranslate"><span class="pre">300</span></code>] (seconds)</dt><dd><p>Sometimes rdkit will get stuck for a very long time in a pose only to fail sampling. This flag sets a time limit to the time rdkit can spend in the sampling calculation for each pose. If the limit is reach, the pose is considered failed.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">extend_top_poses_sampled</span></code>: [<code class="docutils literal notranslate"><span class="pre">True</span></code>] | <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>Extends how many protein poses are considered top (based on <code class="docutils literal notranslate"><span class="pre">protein_ranking/top_poses</span></code>) so that the <code class="docutils literal notranslate"><span class="pre">top_poses</span></code> number of poses have successfully generated protac conformations. For example, if the user determined <code class="docutils literal notranslate"><span class="pre">top_poses</span></code> to be 10, then the top 10 protein poses will be forwarded to protac sampling. However, a few of these may not be optimal for protac conformation and so would fail at sampling. So the pipeline will try sampling for the 11th pose, 12th and so on, until exactly 10 poses have successfully generated protac conformations.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">extend_top_poses_score</span></code>: [<code class="docutils literal notranslate"><span class="pre">True</span></code>] | <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>When extending top poses sampled, also considered the protein-ligand interaction score by disregarding positive scores. This ensures that clashing models are discarded.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">extend_top_poses_energy</span></code>: <code class="docutils literal notranslate"><span class="pre">True</span></code> | [<code class="docutils literal notranslate"><span class="pre">False</span></code>]</dt><dd><p>When extending top poses sampled, also considered the internal energy calculated by RDKit. Poses where the protac internal energy is higher than the energies of all the unbound poses previously sampled are discarded.</p>
+</dd>
+</dl>
+</section>
+<section id="linker-ranking">
+<h2>Linker ranking<a class="headerlink" href="#linker-ranking" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#linker-ranking'"><span>#</span></a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">protac_scoring_folder</span></code>: <code class="docutils literal notranslate"><span class="pre">protac_scoring</span></code></dt><dd><p>Name of the folder where the scored protac sdf files will reside.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">rxdock_score</span></code>: [<code class="docutils literal notranslate"><span class="pre">True</span></code>] | <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>Use RXdock for scoring the protac conformations.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">rxdock_minimize</span></code>: <code class="docutils literal notranslate"><span class="pre">True</span></code> | [<code class="docutils literal notranslate"><span class="pre">False</span></code>]</dt><dd><p>Perform a a quick minimization with RXdock before scoring.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">rxdock_target_score</span></code>: [<code class="docutils literal notranslate"><span class="pre">SCORE.INTER</span></code>] | <code class="docutils literal notranslate"><span class="pre">SCORE</span></code></dt><dd><p>Which score value to capture from RXdock. Values can be <code class="docutils literal notranslate"><span class="pre">SCORE</span></code> or <code class="docutils literal notranslate"><span class="pre">SCORE.INTER</span></code>. Please refer to RXdock documentation for detailed description of these values.</p>
+</dd>
+</dl>
+</section>
+<section id="outputs">
+<h2>Outputs<a class="headerlink" href="#outputs" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#outputs'"><span>#</span></a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">plots</span></code>: [<code class="docutils literal notranslate"><span class="pre">True</span></code>] | <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>Whether to generate analysis plots.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">chimerax_view</span></code>: [<code class="docutils literal notranslate"><span class="pre">True</span></code>] | <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>Whether to generate ChimeraX script for visualization of the results.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">write_crl_complex</span></code>: [<code class="docutils literal notranslate"><span class="pre">True</span></code>] | <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>Whether to write the full CRL complex models for the final predictions.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">crl_cluster_rep_only</span></code>: [<code class="docutils literal notranslate"><span class="pre">True</span></code>] | <code class="docutils literal notranslate"><span class="pre">False</span></code></dt><dd><p>If writing CRL models, write only for the cluster representative structures.</p>
+</dd>
+</dl>
+</section>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#program-paths'" class="reference internal" href="#program-paths">Program Paths</a></li>
+<li><a :data-current="activeSection === '#general'" class="reference internal" href="#general">general</a></li>
+<li><a :data-current="activeSection === '#protein-prep'" class="reference internal" href="#protein-prep">protein_prep</a></li>
+<li><a :data-current="activeSection === '#megadock'" class="reference internal" href="#megadock">megadock</a></li>
+<li><a :data-current="activeSection === '#protein-filter'" class="reference internal" href="#protein-filter">protein_filter</a></li>
+<li><a :data-current="activeSection === '#protein-ranking'" class="reference internal" href="#protein-ranking">protein_ranking</a></li>
+<li><a :data-current="activeSection === '#protac-sampling'" class="reference internal" href="#protac-sampling">protac_sampling</a></li>
+<li><a :data-current="activeSection === '#linker-sampling'" class="reference internal" href="#linker-sampling">Linker sampling</a></li>
+<li><a :data-current="activeSection === '#linker-ranking'" class="reference internal" href="#linker-ranking">Linker ranking</a></li>
+<li><a :data-current="activeSection === '#outputs'" class="reference internal" href="#outputs">Outputs</a></li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left">© 2024, Paula Jofily Built with <a class="font-medium underline underline-offset-4" href="https://www.sphinx-doc.org" rel="noreferrer">Sphinx 8.1.3</a></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="_static/documentation_options.js?v=5929fcd5"></script>
+<script src="_static/doctools.js?v=9bcbadda"></script>
+<script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+<script defer="defer" src="_static/theme.js?v=073f68d9"></script>
+<script src="_static/design-tabs.js?v=f930bc37"></script>
+</body>
+</html>
