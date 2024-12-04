@@ -10,17 +10,18 @@ P4ward is written in Python3 and integrates free and open-source structural biol
 
 Please visit our [documentation page](https://skteamlab.github.io/P4ward/) for more information on:
 - How to obtain P4ward
-- How to run P4ward.
-- Detailed description of how P4ward works
+- How to run P4ward
+- Detailed description of how P4ward works.
 
-Please refer to P4ward's preprint (preprint will be online soon!) for:
+Please refer to [P4ward's preprint](https://www.biorxiv.org/content/10.1101/2024.11.28.625921v1) for:
 - Description of P4ward's workflow
-- Detailed description of the P4ward's benchmarking and validation
+- Detailed description of the P4ward's benchmarking and validation.
 
 
 > [!NOTE]  
 > If you use P4ward on your research, please acknowledge this work and cite:
-> xxxxxx
+>  P4ward: an automated modelling platformfor Protac ternary complexes. Paula Jofily, Subha Kalyaanamoorthy. bioRxiv 2024.11.28.625921; doi: https://doi.org/10.1101/2024.11.28.625921 
+
 
 > [!TIP]
 > If you require assistance or have any questions about using P4ward, I am happy to help! Please simply open an issue [here](https://github.com/SKTeamLab/P4ward/issues).
