@@ -14,7 +14,7 @@ RUN apt-get install -y --no-install-recommends \
 
 
 # FFTW
-ENV FFTW_TARGET fftw-3.3.8
+ENV FFTW_TARGET=fftw-3.3.8
 
 RUN wget -P /tmp http://www.fftw.org/${FFTW_TARGET}.tar.gz && \
     tar xzf /tmp/${FFTW_TARGET}.tar.gz -C /tmp && \
@@ -26,7 +26,7 @@ RUN wget -P /tmp http://www.fftw.org/${FFTW_TARGET}.tar.gz && \
 
 
 # MEGADOCK
-ENV MEGADOCK_WORK_DIR /opt/MEGADOCK
+ENV MEGADOCK_WORK_DIR=/opt/MEGADOCK
 
 RUN git clone https://github.com/akiyamalab/MEGADOCK.git /opt/MEGADOCK
 RUN cp /opt/MEGADOCK/Dockerfiles/cpu/Makefile ${MEGADOCK_WORK_DIR}
@@ -56,7 +56,7 @@ RUN conda create -n p4ward python=3.11 --file /home/conda_requirements.txt
 ###################
 
 COPY ./p4ward /home/python/p4ward
-ENV PYTHONPATH /home/python:$PYTHONPATH
+ENV PYTHONPATH=/home/python:$PYTHONPATH
 
 SHELL ["conda", "run", "-n", "p4ward", "/bin/bash", "-c"]
 
