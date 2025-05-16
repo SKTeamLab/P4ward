@@ -83,7 +83,7 @@ def check_linker_size(protac, indices_ligs, min_linker_length, neighbour_number,
             indices_ligs = list(matches['receptor_lig_indices'])
             indices_ligs.extend(list(matches['pose_lig_indices']))
 
-            indices_link = make_indices_link()
+            indices_link = make_indices_link(protac, indices_ligs)
         
         logger.info(f"There are now {len(indices_link)} atoms treated as flexible.")
     
