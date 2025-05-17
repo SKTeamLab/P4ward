@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="logo_v1.png" width="30%">
+  <img src="ga_v1.png" width="30%">
 </div>
 
 # P4ward - Predictive Python Protacs Pipeline: workflow automation for research and development.
