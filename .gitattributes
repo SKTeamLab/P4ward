@@ -1,1 +1,5 @@
-docs/* linguist-vendored
+*.md linguist-documentation
+docs/source/** linguist-documentation
+docs/build/** linguist-generated
+tutorial/** linguist-vendored
+benchmark/** linguist-vendored
