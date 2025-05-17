@@ -6,7 +6,7 @@ The easiest way to obtain and run P4ward is through Docker, where it is possible
 Docker
 ------
 
-Running using a single command by obtaining it from Docker Hub (this option will be available soon):
+Running using a single command by obtaining it from Docker Hub:
 
 .. code:: bash
 
