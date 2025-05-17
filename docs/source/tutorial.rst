@@ -37,14 +37,14 @@ Now, we need to clean up the protein files. Using the software of your choice, r
 
 Now, if we open ``receptor.pdb`` with ``receptor_ligand.mol2``, we should see the binary complex:
 
-.. image:: ../../tutorial/vhl_binary.png
+.. image:: ../../tutorial/brd4_binary.png
    :alt: VHL binary complex shown by ``ligase.pdb`` and ``ligase_ligand.mol2``
    :width: 400px
    :align: center
 
 And we should see the same for ``ligase.pdb`` and ``ligase_ligand.mol2``:
 
-.. image:: ../../tutorial/brd4_binary.png
+.. image:: ../../tutorial/vhl_binary.png
    :alt: BRD4bd2 binary complex shown by ``receptor.pdb`` and ``receptor_ligand.mol2``
    :width: 400px
    :align: center
@@ -1432,6 +1432,7 @@ Here is a ChimeraX script that does this:
    del #2; del #1/A
    (save ref_ligase.pdb)
 
+Make sure to check whether the structures in ``receptor.pdb`` and ``ref_ligase.pdb`` are nicely bound. If not, the new position after alignment may not have been saved and you might need to tweak a parameter when saving. For example, if using the "Save File" window in ChimeraX, uncheck "Use untransformed coordinates".
 Next we will modify the P4ward command and tell it to benchmark itself, using as reference the file we just created. We do not need to change anything in ``config_run.ini``. Note that in the settings we have ``overwrite = False``. This means that, if you have previously run P4ward in the current working directory, it will access the previous run information (stored in the ``.pickle`` files) and not redo what has been done before. And so when we rerun P4ward again with the benchmarking command, it will access the previous run and benchmark it, without having to rerun the same modelling calculations. 
 
 .. note::
