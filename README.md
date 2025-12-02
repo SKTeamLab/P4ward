@@ -20,7 +20,7 @@ Please refer to [P4ward's publication](https://pubs.acs.org/doi/full/10.1021/acs
 
 > [!NOTE]  
 > If you use P4ward on your research, please acknowledge this work and cite:
->  P4ward: an automated modelling platformfor Protac ternary complexes. Paula Jofily, Subha Kalyaanamoorthy. bioRxiv 2024.11.28.625921; doi: https://doi.org/10.1101/2024.11.28.625921 
+> P4ward: An Automated Modeling Platform for Protac Ternary Complexes. Paula Jofily and Subha Kalyaanamoorthy. Journal of Chemical Information and Modeling 2025 65 (16), 8806-8818; doi: https://doi.org/10.1021/acs.jcim.5c00614
 
 
 > [!TIP]
