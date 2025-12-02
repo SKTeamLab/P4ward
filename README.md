@@ -13,7 +13,7 @@ Please visit our [documentation page](https://skteamlab.github.io/P4ward/) for m
 - How to run P4ward
 - Detailed description of how P4ward works.
 
-Please refer to [P4ward's preprint](https://www.biorxiv.org/content/10.1101/2024.11.28.625921v1) for:
+Please refer to [P4ward's publication](https://pubs.acs.org/doi/full/10.1021/acs.jcim.5c00614) for:
 - Description of P4ward's workflow
 - Detailed description of the P4ward's benchmarking and validation.
 
