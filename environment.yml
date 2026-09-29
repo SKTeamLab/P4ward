@@ -1,0 +1,20 @@
+name: p4ward
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.11.10
+  - biopython=1.84
+  - rdkit=2024.03.6
+  - openbabel=3.1.1
+  - openmm=8.1.2
+  - pdbfixer=1.9
+  - scikit-learn=1.5.2
+  - rmsd=1.5.1
+  - plotly=5.24.1
+  - pandas=2.2.3
+  - numpy=1.26.4
+  - seaborn=0.13.2
+  - func_timeout=4.3.5
+  - pymol-open-source=3.0.0
+  - rxdock=2013.1*
