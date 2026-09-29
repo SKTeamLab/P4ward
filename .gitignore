@@ -3,3 +3,4 @@
 p4ward.log
 docs/build
 __pycache__
+.pytest_cache/
